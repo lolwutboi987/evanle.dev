@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="theme.js"></script>
     <style>
         .loading {
             padding: 4rem;
@@ -26,6 +27,7 @@
                 <li><a href="about.html">About</a></li>
                 <li><a href="showcase.html" class="active">Showcase</a></li>
                 <li><a href="blog.html">Blog</a></li>
+                <li><button id="theme-toggle" aria-label="Toggle theme">Theme</button></li>
             </ul>
         </div>
     </nav>
@@ -70,7 +72,7 @@
                 container.innerHTML = '';
 
                 repos.forEach(repo => {
-                    if (repo.fork) return; // Optional: filter out forks
+                    if (repo.fork) return;
 
                     const card = document.createElement('div');
                     card.className = 'gallery-item';
@@ -79,7 +81,7 @@
 
                     card.innerHTML = `
                         <div class="gallery-image">
-                            <img src="${imageUrl}" alt="${repo.name}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size: 2rem; color: #ddd\'>📂</div>'">
+                            <img src="${imageUrl}" alt="${repo.name}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size: 2rem; color: var(--border-color)\'>📂</div>'">
                         </div>
                         <div class="gallery-info">
                             <h3>${repo.name}</h3>
