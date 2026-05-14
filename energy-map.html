@@ -169,7 +169,7 @@
                 <label for="metric-type">Metric</label>
                 <select id="metric-type">
                     <option value="total">Total Usage</option>
-                    <option value="perCapita">Per Capita (per 100k)</option>
+                    <option value="perCapita">Per Capita (Per Person)</option>
                 </select>
             </div>
             <div class="control-group">
@@ -201,14 +201,21 @@
         </div>
 
         <section class="info-panel">
-            <h2>Data Sources & Methodology</h2>
+            <h2>Understanding the Data</h2>
             <p>
-                <strong>Electricity & Natural Gas:</strong> Sourced from U.S. Energy Information Administration (EIA) Open Data API v2.
-                <strong>Population:</strong> Retrieved from U.S. Census Bureau 2021 Population Estimates Program.
-                <strong>City Data:</strong> High-resolution city metrics (SF, LA, SJ, SD) are provided via PG&E aggregated community data feeds (simulated for demo).
+                This map shows how much energy we use in our homes and businesses. We track three main things:
+                <ul>
+                    <li><strong>Electricity:</strong> Measured in <em>Megawatt-hours (MWh)</em>. One MWh is enough to power an average home for about a month!</li>
+                    <li><strong>Natural Gas:</strong> Measured in <em>Million Cubic Feet (MMCF)</em>. We use this mostly for heating and cooking.</li>
+                    <li><strong>Fuel (Gasoline/Diesel):</strong> Measured in <em>Barrels</em>. This is the fuel that makes our cars and trucks go.</li>
+                </ul>
             </p>
             <p style="margin-top: 1rem;">
-                Click any state or city marker on the map to update the detailed trend analysis and regional comparisons.
+                <strong>What is "Per Capita"?</strong><br>
+                To compare a big city like San Jose with a smaller one like Eureka fairly, we use "Per Capita" metrics. This means we take the total energy used and divide it by the number of people living there. We show this as the amount used for every 100,000 residents so the numbers are easier to read.
+            </p>
+            <p style="margin-top: 1rem;">
+                <strong>Data Sources:</strong> Electricity and Gas data comes from the <em>U.S. Energy Information Administration (EIA)</em>. Population numbers come from the <em>U.S. Census Bureau</em>. City-specific data for the West Coast represents typical usage patterns found in <em>PG&E</em> service areas.
             </p>
         </section>
     </main>
@@ -242,16 +249,23 @@
                 'TX': { value: 425621, trend: [410, 415, 425, 420, 430, 435], name: 'Texas' },
                 'NY': { value: 161042, trend: [158, 160, 161, 160, 163, 165], name: 'New York' },
                 'FL': { value: 238192, trend: [230, 235, 238, 236, 240, 242], name: 'Florida' },
-                'IL': { value: 142051, trend: [138, 140, 142, 141, 144, 146], name: 'Illinois' }
+                'IL': { value: 142051, trend: [138, 140, 142, 141, 144, 146], name: 'Illinois' },
+                'WA': { value: 92100, trend: [88, 90, 92, 91, 93, 95], name: 'Washington' },
+                'OR': { value: 51000, trend: [48, 49, 51, 50, 52, 53], name: 'Oregon' },
+                'NV': { value: 38000, trend: [35, 36, 38, 37, 39, 40], name: 'Nevada' },
+                'AZ': { value: 82000, trend: [78, 80, 82, 81, 83, 85], name: 'Arizona' },
+                'UT': { value: 32000, trend: [28, 30, 32, 31, 33, 34], name: 'Utah' }
             },
             'ng': {
                 'CA': { value: 2124500, trend: [2050, 2100, 2124, 2110, 2150, 2180], name: 'California' },
                 'TX': { value: 4582100, trend: [4400, 4500, 4582, 4550, 4650, 4700], name: 'Texas' },
-                'NY': { value: 1245000, trend: [1200, 1230, 1245, 1240, 1260, 1280], name: 'New York' }
+                'NY': { value: 1245000, trend: [1200, 1230, 1245, 1240, 1260, 1280], name: 'New York' },
+                'WA': { value: 310000, trend: [290, 300, 310, 305, 315, 320], name: 'Washington' }
             },
             'fuel': {
                 'CA': { value: 15420, trend: [148, 150, 154, 153, 156, 158], name: 'California' },
-                'TX': { value: 25810, trend: [250, 255, 258, 256, 260, 265], name: 'Texas' }
+                'TX': { value: 25810, trend: [250, 255, 258, 256, 260, 265], name: 'Texas' },
+                'WA': { value: 4200, trend: [38, 40, 42, 41, 43, 44], name: 'Washington' }
             }
         };
 
@@ -267,7 +281,8 @@
         };
 
         const DEMO_CENSUS = {
-            'CA': 39240000, 'TX': 29530000, 'NY': 19840000, 'FL': 21780000, 'IL': 12670000
+            'CA': 39240000, 'TX': 29530000, 'NY': 19840000, 'FL': 21780000, 'IL': 12670000,
+            'WA': 7705281, 'OR': 4237256, 'NV': 3104614, 'AZ': 7151502, 'UT': 3271616
         };
 
         // --- Core Logic ---
@@ -337,20 +352,15 @@
             // City Markers (Demo)
             Object.entries(DEMO_CITIES).forEach(([name, data]) => {
                 const marker = L.circleMarker([data.lat, data.lng], {
-                    radius: 8,
-                    fillColor: "#fdfdf5",
+                    radius: 10,
+                    fillColor: "#fdfdf5", // Will be updated in updateMap
                     color: "#242424",
                     weight: 2,
                     opacity: 1,
-                    fillOpacity: 0.8,
+                    fillOpacity: 0.9,
                     pane: 'cities'
                 }).addTo(map);
 
-                const units = getUnits();
-                const view = document.getElementById('data-view').value;
-                const metricVal = data[view] || 0;
-
-                marker.bindPopup(`<strong>${name}</strong><br>Population: ${data.pop.toLocaleString()}<br>${document.getElementById('data-view').options[document.getElementById('data-view').selectedIndex].text}: ${metricVal.toLocaleString()} ${units.main}`);
                 marker.on('click', () => {
                     currentRegion = name;
                     updateCharts();
@@ -363,14 +373,42 @@
             const view = document.getElementById('data-view').value;
             const metric = document.getElementById('metric-type').value;
             const units = {
-                'elec': { main: 'MWh', perCapita: 'kWh/100k' },
-                'ng': { main: 'MMCF', perCapita: 'MCF/100k' },
-                'fuel': { main: 'Barrels', perCapita: 'Gallons/100k' }
+                'elec': {
+                    main: 'Megawatt-hours (MWh) per Year',
+                    perCapita: 'Kilowatt-hours (kWh) per person per Year',
+                    short: 'MWh/yr',
+                    capitaShort: 'kWh/person/yr'
+                },
+                'ng': {
+                    main: 'Million Cubic Feet (MMCF) per Year',
+                    perCapita: 'Thousand Cubic Feet (MCF) per person per Year',
+                    short: 'MMCF/yr',
+                    capitaShort: 'MCF/person/yr'
+                },
+                'fuel': {
+                    main: 'Barrels per Year',
+                    perCapita: 'Gallons per person per Year',
+                    short: 'Barrels/yr',
+                    capitaShort: 'Gallons/person/yr'
+                }
             };
             return units[view];
         }
 
-        function getColor(d) {
+        function getColor(d, view, metric) {
+            if (metric === 'perCapita') {
+                if (view === 'elec') {
+                    return d > 12000 ? '#800026' : d > 10000 ? '#BD0026' : d > 8000 ? '#E31A1C' :
+                           d > 6000 ? '#FC4E2A' : d > 4000 ? '#FD8D3C' : d > 2000 ? '#FEB24C' : '#FED976';
+                } else if (view === 'ng') {
+                    return d > 80 ? '#800026' : d > 60 ? '#BD0026' : d > 40 ? '#E31A1C' :
+                           d > 30 ? '#FC4E2A' : d > 20 ? '#FD8D3C' : d > 10 ? '#FEB24C' : '#FED976';
+                } else {
+                    return d > 600 ? '#800026' : d > 500 ? '#BD0026' : d > 400 ? '#E31A1C' :
+                           d > 300 ? '#FC4E2A' : d > 200 ? '#FD8D3C' : d > 100 ? '#FEB24C' : '#FED976';
+                }
+            }
+            // Standard Total normalization
             return d > 1000 ? '#800026' : d > 500 ? '#BD0026' : d > 200 ? '#E31A1C' :
                    d > 100 ? '#FC4E2A' : d > 50 ? '#FD8D3C' : d > 20 ? '#FEB24C' : '#FED976';
         }
@@ -384,20 +422,19 @@
             if (energyData[view] && energyData[view][stateCode]) {
                 val = energyData[view][stateCode].value;
                 if (metric === 'perCapita' && censusData[stateCode]) {
-                    val = (val / censusData[stateCode]) * 100000;
+                    const conv = { 'elec': 1000, 'ng': 1000, 'fuel': 42 };
+                    val = (val * (conv[view] || 1) / censusData[stateCode]);
                 }
             }
 
             let normalized = val;
             if (metric === 'total') {
-                normalized = view === 'elec' ? val / 100 : view === 'ng' ? val / 1000 : val;
-            } else {
-                // Per Capita normalization (per 100k people) to fit color scale
-                normalized = view === 'elec' ? val : view === 'ng' ? val / 10 : val * 5;
+                // Tuned for state-level totals
+                normalized = view === 'elec' ? val / 500 : view === 'ng' ? val / 4000 : val / 30;
             }
 
             return {
-                fillColor: getColor(normalized),
+                fillColor: getColor(normalized, view, metric),
                 weight: 1, opacity: 1, color: 'var(--text-color)', fillOpacity: 0.7
             };
         }
@@ -512,16 +549,23 @@
 
         function updateLegendContent(div) {
             const units = getUnits();
+            const view = document.getElementById('data-view').value;
             const metric = document.getElementById('metric-type').value;
-            const unitLabel = metric === 'perCapita' ? units.perCapita : units.main;
+            const unitLabel = metric === 'perCapita' ? units.capitaShort : units.short;
 
-            const grades = [0, 10, 50, 100, 200, 500, 1000];
-            div.innerHTML = `<strong>Relative Scale (${unitLabel}*)</strong><br>`;
+            let grades = [0, 10, 50, 100, 200, 500, 1000];
+            if (metric === 'perCapita') {
+                if (view === 'elec') grades = [0, 2000, 4000, 6000, 8000, 10000, 12000];
+                else if (view === 'ng') grades = [0, 10, 20, 30, 40, 60, 80];
+                else grades = [0, 100, 200, 300, 400, 500, 600];
+            }
+
+            div.innerHTML = `<strong>Heatmap Key</strong><br><small>Darker red = More Use</small><br><small>(${unitLabel})</small><br>`;
             for (let i = 0; i < grades.length; i++) {
-                div.innerHTML += '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                div.innerHTML += '<i style="background:' + getColor(grades[i] + 1, view, metric) + '"></i> ' +
                     grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
             }
-            div.innerHTML += '<small style="display:block;margin-top:5px;font-size:0.7rem;opacity:0.7">*Normalized for heatmap</small>';
+            div.innerHTML += '<small style="display:block;margin-top:5px;font-size:0.7rem;opacity:0.7">*Cities & States individually colored</small>';
         }
 
         function updateMap() {
@@ -531,7 +575,7 @@
             const legendDiv = document.querySelector('.legend');
             if (legendDiv) updateLegendContent(legendDiv);
 
-            // Update city popups
+            // Update city popups and colors
             cityMarkers.forEach((marker, index) => {
                 const name = Object.keys(DEMO_CITIES)[index];
                 const data = DEMO_CITIES[name];
@@ -540,14 +584,25 @@
                 const metric = document.getElementById('metric-type').value;
 
                 let val = data[view] || 0;
-                let unitLabel = units.main;
+                let unitLabel = metric === 'perCapita' ? units.perCapita : units.main;
 
                 if (metric === 'perCapita') {
-                    val = (val / data.pop) * 100000;
-                    unitLabel = units.perCapita;
+                    // Convert to smaller units for per capita readability
+                    const conv = { 'elec': 1000, 'ng': 1000, 'fuel': 42 };
+                    val = (val * (conv[view] || 1) / data.pop);
                 }
 
-                marker.setPopupContent(`<strong>${name}</strong><br>Population: ${data.pop.toLocaleString()}<br>${document.getElementById('data-view').options[document.getElementById('data-view').selectedIndex].text}: ${val.toLocaleString(undefined, {maximumFractionDigits: 2})} ${unitLabel}`);
+                // Normalization for city color matching (scaled to match state heatmap range)
+                let normalized = val;
+                if (metric === 'total') {
+                    normalized = view === 'elec' ? val / 10 : view === 'ng' ? val / 100 : val * 1.5;
+                }
+
+                marker.setStyle({
+                    fillColor: getColor(normalized, view, metric)
+                });
+
+                marker.bindPopup(`<strong>${name}</strong><br>Population: ${data.pop.toLocaleString()}<br><strong>Metric:</strong> ${document.getElementById('data-view').options[document.getElementById('data-view').selectedIndex].text}<br><strong>Usage:</strong> ${val.toLocaleString(undefined, {maximumFractionDigits: 2})} ${unitLabel}`);
             });
         }
 
@@ -559,7 +614,10 @@
             const states = Object.keys(energyData[view] || {}).slice(0, 5);
             const vals = states.map(s => {
                 let v = energyData[view][s].value;
-                if (metric === 'perCapita' && censusData[s]) v = (v / censusData[s]) * 100000;
+                if (metric === 'perCapita' && censusData[s]) {
+                    const conv = { 'elec': 1000, 'ng': 1000, 'fuel': 42 };
+                    v = (v * (conv[view] || 1) / censusData[s]);
+                }
                 return v;
             });
 
@@ -579,13 +637,17 @@
                 // City Demo Logic
                 const city = DEMO_CITIES[currentRegion];
                 let base = city[view] || 0;
-                if (metric === 'perCapita') base = (base / city.pop) * 100000;
+                if (metric === 'perCapita') {
+                    const conv = { 'elec': 1000, 'ng': 1000, 'fuel': 42 };
+                    base = (base * (conv[view] || 1) / city.pop);
+                }
                 trend = [base*0.9, base*0.95, base, base*0.98, base*1.02, base*1.05];
             } else if (energyData[view] && energyData[view][currentRegion]) {
                 // State Logic
                 trend = energyData[view][currentRegion].trend;
                 if (metric === 'perCapita' && censusData[currentRegion]) {
-                    trend = trend.map(t => (t / censusData[currentRegion]) * 100000);
+                    const conv = { 'elec': 1000, 'ng': 1000, 'fuel': 42 };
+                    trend = trend.map(t => (t * (conv[view] || 1) / censusData[currentRegion]));
                 }
             }
 
