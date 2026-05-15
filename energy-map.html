@@ -216,6 +216,14 @@
             <div id="map"></div>
 
             <div class="data-grid">
+
+                <div class="data-panel" id="grid-panel" style="display: none; grid-column: span 2;">
+                    <h3 id="grid-title">LIVE SYSTEM LOAD (MW) - BALANCING AUTHORITY</h3>
+                    <div class="chart-container" style="height: 200px;">
+                        <canvas id="gridChart"></canvas>
+                    </div>
+                </div>
+
                 <div class="data-panel">
                     <h3 id="comp-title">REGIONAL COMPARATIVE DATA (MWh / mo)</h3>
                     <div class="chart-container">
@@ -234,8 +242,8 @@
                 <p>
                     <strong>Data Methodology:</strong> This dashboard visualizes high-fidelity energy consumption patterns.
                     State-level metrics are sourced directly from the U.S. Energy Information Administration (EIA).
-                    City-level insights are derived using population-weighted indexing from the U.S. Census Bureau TIGERweb API,
-                    allowing for precise per-capita efficiency analysis across urban contours.
+                    City-level insights are modeled using Census ACS demographic variables (Heating Fuel, Household Income) and population-weighted indexing from the U.S. Census Bureau TIGERweb API,
+                    providing statistically weighted consumption variance across urban contours.
                 </p>
             </section>
         </main>
@@ -246,7 +254,7 @@
         const EIA_API_BASE = 'https://api.eia.gov/v2';
         const CENSUS_API_BASE = 'https://api.census.gov/data/2021/pep/population';
 
-        let map, comparisonChart, trendChart;
+        let map, comparisonChart, trendChart, gridChart;
         let geojsonLayer, cityLayers = {};
         let energyData = {};
         let censusData = {};
@@ -282,8 +290,9 @@
         async function init() {
             initMap();
             initCharts();
+            initGridChart();
             setupEventListeners();
-            await refreshData();
+            try { await refreshData(); } catch(e) { console.warn('Initial data refresh failed, using demo data', e); updateMap(); updateCharts(); }
         }
 
         function initMap() {
@@ -315,6 +324,8 @@
                                 mouseout: e => geojsonLayer.resetStyle(e.target),
                                 click: e => {
                                     currentRegion = stateNameMap[e.target.feature.properties.name];
+                                    const apiKey = document.getElementById('api-key').value;
+                                    if (apiKey) fetchGridData(apiKey);
                                     updateCharts();
                                 }
                             });
@@ -432,7 +443,11 @@
                 const stateCode = data.state;
                 let stateVal = energyData[view] && energyData[view][stateCode] ? energyData[view][stateCode].value : 0;
                 let statePop = censusData[stateCode] || 1;
-                let totalUsage = (stateVal / statePop) * data.pop;
+
+                const acs = data.acs || { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
+                const intensity = view === 'elec' ? acs.elecIntensity : (view === 'ng' ? acs.gasIntensity : 1);
+                let totalUsage = (stateVal / statePop) * data.pop * intensity * acs.incomeFactor;
+
                 let displayVal = metric === 'perCapita' ? (totalUsage * getUnits().conv / data.pop) : totalUsage;
                 let normalized = metric === 'perCapita' ? displayVal : (view === 'elec' ? displayVal/10 : displayVal/100);
                 const color = getColor(normalized, view, metric);
@@ -441,10 +456,13 @@
                     if (cityLayers[name]) map.removeLayer(cityLayers[name]);
                     cityLayers[name] = L.geoJson(data.geometry, { style: { fillColor: color, weight: 2, color: '#fff', fillOpacity: 0.8 }, pane: 'cities' }).addTo(map);
                 } else {
-                    if (cityLayers[name]) { cityLayers[name].setStyle({ fillColor: color }); }
-                    else { cityLayers[name] = L.circleMarker([data.lat, data.lng], { radius: 10, fillColor: color, color: "#fff", weight: 2, fillOpacity: 0.9, pane: 'cities' }).addTo(map); }
+                    if (cityLayers[name]) {
+                        cityLayers[name].setStyle({ fillColor: color });
+                    } else {
+                        cityLayers[name] = L.circleMarker([data.lat, data.lng], { radius: 10, fillColor: color, color: "#fff", weight: 2, fillOpacity: 0.9, pane: 'cities' }).addTo(map);
+                    }
                 }
-                cityLayers[name].bindPopup(`<strong>${name}</strong><br>Pop: ${data.pop.toLocaleString()}<br>Usage: ${displayVal.toLocaleString(undefined, {maximumFractionDigits:2})} ${metric === 'perCapita' ? getUnits().perCapita : getUnits().main}`);
+                cityLayers[name].bindPopup(`<strong>${name}</strong><br>Pop: ${data.pop.toLocaleString()}<br>Modeled Usage (ACS Weighted): ${displayVal.toLocaleString(undefined, {maximumFractionDigits:2})} ${metric === 'perCapita' ? getUnits().perCapita : getUnits().main}`);
                 cityLayers[name].on('click', () => { currentRegion = name; updateCharts(); });
             });
         }
@@ -475,6 +493,62 @@
             trendChart.update();
         }
 
+
+        async function fetchACSData(stateFips, placeFips) {
+            try {
+                const res = await fetch(`https://api.census.gov/data/2021/acs/acs5?get=NAME,B25040_001E,B25040_004E,B25040_002E,B19013_001E&for=place:${placeFips}&in=state:${stateFips}`);
+                const json = await res.json();
+                if (json && json[1]) {
+                    const total = parseInt(json[1][1]);
+                    const elec = parseInt(json[1][2]);
+                    const gas = parseInt(json[1][3]);
+                    const income = parseInt(json[1][4]);
+                    return {
+                        elecIntensity: (elec / total) / 0.25, // Normalized to 25% avg
+                        gasIntensity: (gas / total) / 0.50, // Normalized to 50% avg
+                        incomeFactor: income > 0 ? (income / 70000) : 1
+                    };
+                }
+            } catch (e) { console.error("ACS Fetch Error:", e); }
+            return { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
+        }
+
+
+        function initGridChart() {
+            gridChart = new Chart(document.getElementById('gridChart'), {
+                type: 'line',
+                data: { labels: Array.from({length: 24}, (_, i) => i + ':00'), datasets: [{ borderColor: '#BD0026', data: [], tension: 0.1, fill: false }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#a1a19a', font: { size: 10 } } },
+                        y: { ticks: { color: '#a1a19a', font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        function updateGridChart(data, ba) {
+            document.getElementById('grid-panel').style.display = 'block';
+            document.getElementById('grid-title').innerText = `LIVE SYSTEM LOAD (MW) - ${ba}`;
+            gridChart.data.datasets[0].data = data;
+            gridChart.update();
+        }
+
+        async function fetchGridData(key) {
+            const baMap = { 'CA': 'CISO', 'TX': 'ERCO', 'NY': 'NYIS', 'FL': 'FPL', 'WA': 'BPAT' };
+            const ba = baMap[currentRegion] || 'CISO';
+            try {
+                const res = await fetch(`https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=${key}&frequency=hourly&data[]=value&facets[respondent][]=${ba}&sort[0][column]=period&sort[0][direction]=desc&length=24`);
+                const json = await res.json();
+                if (json.response.data) {
+                    const gridTrend = json.response.data.map(d => d.value).reverse();
+                    updateGridChart(gridTrend, ba);
+                }
+            } catch (e) { console.error("Grid API Error:", e); }
+        }
+
         async function fetchCityData(cityName, stateFips) {
             const btn = document.getElementById('search-btn');
             btn.innerText = 'INITIALIZING...';
@@ -485,7 +559,14 @@
                 if (tigerJson.features && tigerJson.features.length > 0) {
                     const feature = tigerJson.features[0];
                     const fullName = feature.properties.NAME;
-                    DEMO_CITIES[fullName] = { pop: parseInt(feature.properties.POP100) || 50000, geometry: feature.geometry, state: fipsToAbbr[stateFips] };
+                    const placeFips = feature.properties.PLACE || feature.properties.GEOID.slice(-5);
+                    const acs = await fetchACSData(stateFips, placeFips);
+                    DEMO_CITIES[fullName] = {
+                        pop: parseInt(feature.properties.POP100) || 50000,
+                        geometry: feature.geometry,
+                        state: fipsToAbbr[stateFips],
+                        acs: acs
+                    };
                     currentRegion = fullName;
                     updateMap(); updateCharts();
                     map.flyToBounds(L.geoJson(feature.geometry).getBounds(), { padding: [50, 50], duration: 1.5 });
