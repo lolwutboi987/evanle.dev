@@ -134,22 +134,24 @@
     </style>
 </head>
 <body data-theme="dark">
-    <nav>
-        <div class="nav-content">
+    <nav class="navbar">
+        <div class="nav-container">
             <a href="index.html" class="logo">evanle.dev</a>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="showcase.html">Showcase</a>
-                <a href="blog.html">Blog</a>
-                <button id="theme-toggle">LIGHT</button>
-            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="showcase.html">Showcase</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><button id="theme-toggle" aria-label="Toggle theme">Theme</button></li>
+            </ul>
         </div>
     </nav>
 
     <main class="dashboard-container">
         <header style="margin-bottom: 4rem;">
-            <p style="text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; font-size: 0.875rem; margin-bottom: 1rem;">Live Dashboard</p>
+            <p style="text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; font-size: 0.875rem; margin-bottom: 1rem;">
+                Live Dashboard <span id="live-indicator" style="color: #BD0026; margin-left: 1rem; display: none;">● REALTIME</span>
+            </p>
             <h1 style="font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 1.5rem;">Energy Consumption Map</h1>
             <p style="max-width: 600px; opacity: 0.8; line-height: 1.6;">
                 An interactive visualization of power, natural gas, and fuel consumption. Compare states and cities using per capita metrics indexed with US Census data.
@@ -174,8 +176,22 @@
             </div>
             <div class="control-group">
                 <label for="city-search">Search City</label>
-                <input type="text" id="city-search" list="city-list" placeholder="e.g. Oakland, San Francisco">
-                <datalist id="city-list"></datalist>
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" id="city-search" placeholder="e.g. Oakland">
+                    <select id="state-select" style="width: 100px;">
+                        <option value="06">CA</option>
+                        <option value="48">TX</option>
+                        <option value="36">NY</option>
+                        <option value="12">FL</option>
+                        <option value="17">IL</option>
+                        <option value="53">WA</option>
+                        <option value="41">OR</option>
+                        <option value="32">NV</option>
+                        <option value="04">AZ</option>
+                        <option value="49">UT</option>
+                    </select>
+                    <button id="search-btn" style="background: var(--text-color); color: var(--bg-color); border: none; padding: 0 1rem; cursor: pointer; font-weight: bold;">GO</button>
+                </div>
             </div>
             <div class="control-group">
                 <label for="api-key">EIA API Key (Optional)</label>
@@ -212,7 +228,7 @@
             </p>
             <p style="margin-top: 1rem;">
                 <strong>What is "Per Capita"?</strong><br>
-                To compare a big city like San Jose with a smaller one like Eureka fairly, we use "Per Capita" metrics. This means we take the total energy used and divide it by the number of people living there. We show this as the amount used for every 100,000 residents so the numbers are easier to read.
+                To compare a big city like San Jose with a smaller one like Eureka fairly, we use "Per Capita" metrics. This means we take the total energy used and divide it by the number of people living there. We show this as the amount used per individual resident so you can see the average personal impact.
             </p>
             <p style="margin-top: 1rem;">
                 <strong>Data Sources:</strong> Electricity and Gas data comes from the <em>U.S. Energy Information Administration (EIA)</em>. Population numbers come from the <em>U.S. Census Bureau</em>. City-specific data for the West Coast represents typical usage patterns found in <em>PG&E</em> service areas.
@@ -221,10 +237,10 @@
     </main>
 
     <footer>
-        <div class="footer-content">
+        <div class="container">
             <p>&copy; 2025 Evan Le</p>
             <div class="social-links">
-                <a href="https://github.com/lolwutboi987">GitHub</a>
+                <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer">GitHub</a>
             </div>
         </div>
     </footer>
@@ -236,7 +252,7 @@
         const CENSUS_API_BASE = 'https://api.census.gov/data/2021/pep/population';
 
         let map, comparisonChart, trendChart;
-        let geojsonLayer, cityMarkers = [];
+        let geojsonLayer, cityLayers = {};
         let energyData = {};
         let censusData = {};
         let currentRegion = 'CA';
@@ -290,18 +306,7 @@
             initMap();
             initCharts();
             setupEventListeners();
-            populateCityList();
             await refreshData();
-        }
-
-        function populateCityList() {
-            const list = document.getElementById('city-list');
-            list.innerHTML = '';
-            Object.keys(DEMO_CITIES).forEach(city => {
-                const option = document.createElement('option');
-                option.value = city;
-                list.appendChild(option);
-            });
         }
 
         function initMap() {
@@ -349,24 +354,7 @@
                     }).addTo(map);
                 });
 
-            // City Markers (Demo)
-            Object.entries(DEMO_CITIES).forEach(([name, data]) => {
-                const marker = L.circleMarker([data.lat, data.lng], {
-                    radius: 10,
-                    fillColor: "#fdfdf5", // Will be updated in updateMap
-                    color: "#242424",
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.9,
-                    pane: 'cities'
-                }).addTo(map);
-
-                marker.on('click', () => {
-                    currentRegion = name;
-                    updateCharts();
-                });
-                cityMarkers.push(marker);
-            });
+            // Initial City markers (Demo) will be handled in updateMap
         }
 
         function getUnits() {
@@ -575,34 +563,59 @@
             const legendDiv = document.querySelector('.legend');
             if (legendDiv) updateLegendContent(legendDiv);
 
-            // Update city popups and colors
-            cityMarkers.forEach((marker, index) => {
-                const name = Object.keys(DEMO_CITIES)[index];
-                const data = DEMO_CITIES[name];
+            // Update cities (Polygons or Markers)
+            Object.entries(DEMO_CITIES).forEach(([name, data]) => {
                 const units = getUnits();
                 const view = document.getElementById('data-view').value;
                 const metric = document.getElementById('metric-type').value;
 
-                let val = data[view] || 0;
-                let unitLabel = metric === 'perCapita' ? units.perCapita : units.main;
+                // Estimation: (State Avg per Capita) * City Pop
+                const stateCode = data.state || 'CA';
+                let stateVal = energyData[view] && energyData[view][stateCode] ? energyData[view][stateCode].value : 0;
+                let statePop = censusData[stateCode] || 1;
 
+                // Base value is State Total / State Pop * City Pop
+                let totalUsage = (stateVal / statePop) * data.pop;
+
+                // If it's a "known" demo city, we might have specific overrides, but for general cities we use the estimate
+                if (data[view] && data.state === 'CA') totalUsage = data[view];
+
+                let displayVal = totalUsage;
                 if (metric === 'perCapita') {
-                    // Convert to smaller units for per capita readability
                     const conv = { 'elec': 1000, 'ng': 1000, 'fuel': 42 };
-                    val = (val * (conv[view] || 1) / data.pop);
+                    displayVal = (totalUsage * (conv[view] || 1) / data.pop);
                 }
 
-                // Normalization for city color matching (scaled to match state heatmap range)
-                let normalized = val;
+                let normalized = displayVal;
                 if (metric === 'total') {
-                    normalized = view === 'elec' ? val / 10 : view === 'ng' ? val / 100 : val * 1.5;
+                    normalized = view === 'elec' ? displayVal / 10 : view === 'ng' ? displayVal / 100 : displayVal * 1.5;
                 }
 
-                marker.setStyle({
-                    fillColor: getColor(normalized, view, metric)
-                });
+                const color = getColor(normalized, view, metric);
+                const liveBadge = data.isLive ? '<span style="color: #BD0026; font-size: 0.7rem; font-weight: bold;">● LIVE</span>' : '';
+                const popupContent = `<strong>${name}</strong> ${liveBadge}<br>Population: ${data.pop.toLocaleString()}<br><strong>Metric:</strong> ${document.getElementById('data-view').options[document.getElementById('data-view').selectedIndex].text}<br><strong>Usage:</strong> ${displayVal.toLocaleString(undefined, {maximumFractionDigits: 2})} ${metric === 'perCapita' ? units.perCapita : units.main}<br><small>*Estimated based on state average</small>`;
 
-                marker.bindPopup(`<strong>${name}</strong><br>Population: ${data.pop.toLocaleString()}<br><strong>Metric:</strong> ${document.getElementById('data-view').options[document.getElementById('data-view').selectedIndex].text}<br><strong>Usage:</strong> ${val.toLocaleString(undefined, {maximumFractionDigits: 2})} ${unitLabel}`);
+                if (data.geometry) {
+                    // Polygon Render
+                    if (cityLayers[name]) map.removeLayer(cityLayers[name]);
+                    cityLayers[name] = L.geoJson(data.geometry, {
+                        style: { fillColor: color, weight: 2, opacity: 1, color: 'var(--text-color)', fillOpacity: 0.8 },
+                        pane: 'cities'
+                    }).addTo(map);
+                    cityLayers[name].bindPopup(popupContent);
+                    cityLayers[name].on('click', () => { currentRegion = name; updateCharts(); });
+                } else {
+                    // Marker Render
+                    if (cityLayers[name]) {
+                        cityLayers[name].setStyle({ fillColor: color });
+                    } else {
+                        cityLayers[name] = L.circleMarker([data.lat, data.lng], {
+                            radius: 10, fillColor: color, color: "#242424", weight: 2, opacity: 1, fillOpacity: 0.9, pane: 'cities'
+                        }).addTo(map);
+                        cityLayers[name].on('click', () => { currentRegion = name; updateCharts(); });
+                    }
+                    cityLayers[name].bindPopup(popupContent);
+                }
             });
         }
 
@@ -634,9 +647,15 @@
             let trend = [0,0,0,0,0,0];
 
             if (DEMO_CITIES[currentRegion]) {
-                // City Demo Logic
+                // City Logic (Estimated or Demo)
                 const city = DEMO_CITIES[currentRegion];
-                let base = city[view] || 0;
+                const stateCode = city.state || 'CA';
+                let stateVal = energyData[view] && energyData[view][stateCode] ? energyData[view][stateCode].value : 0;
+                let statePop = censusData[stateCode] || 1;
+                let base = (stateVal / statePop) * city.pop;
+
+                if (city[view] && city.state === 'CA') base = city[view];
+
                 if (metric === 'perCapita') {
                     const conv = { 'elec': 1000, 'ng': 1000, 'fuel': 42 };
                     base = (base * (conv[view] || 1) / city.pop);
@@ -656,6 +675,58 @@
             trendChart.update();
         }
 
+        async function fetchCityData(cityName, stateFips) {
+            const btn = document.getElementById('search-btn');
+            const indicator = document.getElementById('live-indicator');
+            const originalText = btn.innerText;
+            btn.innerText = '...';
+            btn.disabled = true;
+            indicator.style.display = 'inline';
+
+            try {
+                // Query TIGERweb for Geometry AND Population (POP100 from 2020 Census layer)
+                const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=BASENAME='${cityName}' AND STATE='${stateFips}'&outFields=NAME,STATE,GEOID,POP100&f=geojson&outSR=4326`;
+
+                const tigerRes = await fetch(tigerUrl);
+                const tigerJson = await tigerRes.json();
+
+                if (!tigerJson.features || tigerJson.features.length === 0) {
+                    // Try without strict state check as fallback or just notify
+                    alert('City not found in this state. Please check spelling (e.g. "Seattle").');
+                    return;
+                }
+
+                const feature = tigerJson.features[0];
+                const props = feature.properties;
+                const fullName = props.NAME;
+                const stateAbbr = fipsToAbbr[stateFips];
+                const population = parseInt(props.POP100) || 50000; // Fallback if missing
+
+                // Add to our active cities
+                DEMO_CITIES[fullName] = {
+                    pop: population,
+                    geometry: feature.geometry,
+                    state: stateAbbr,
+                    isLive: true
+                };
+
+                currentRegion = fullName;
+                updateMap();
+                updateCharts();
+
+                // Zoom to city bounds
+                const cityLayer = L.geoJson(feature.geometry);
+                map.flyToBounds(cityLayer.getBounds(), { padding: [20, 20], duration: 1.5 });
+
+            } catch (e) {
+                console.error(e);
+                alert('Error connecting to Census servers. Please try again.');
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
         function setupEventListeners() {
             ['data-view', 'metric-type'].forEach(id => {
                 document.getElementById(id).addEventListener('change', () => {
@@ -664,24 +735,17 @@
                 });
             });
 
-            document.getElementById('city-search').addEventListener('change', (e) => {
-                const val = e.target.value;
-                if (DEMO_CITIES[val]) {
-                    const data = DEMO_CITIES[val];
-                    map.flyTo([data.lat, data.lng], 12);
-                    currentRegion = val;
-                    updateCharts();
-                }
+            document.getElementById('search-btn').addEventListener('click', () => {
+                const city = document.getElementById('city-search').value;
+                const state = document.getElementById('state-select').value;
+                if (city) fetchCityData(city, state);
             });
 
-            document.getElementById('city-search').addEventListener('input', (e) => {
-                const query = e.target.value.toLowerCase();
-                const city = Object.keys(DEMO_CITIES).find(c => c.toLowerCase() === query);
-                if (city) {
-                    const data = DEMO_CITIES[city];
-                    map.flyTo([data.lat, data.lng], 12);
-                    currentRegion = city;
-                    updateCharts();
+            document.getElementById('city-search').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const city = e.target.value;
+                    const state = document.getElementById('state-select').value;
+                    if (city) fetchCityData(city, state);
                 }
             });
 
