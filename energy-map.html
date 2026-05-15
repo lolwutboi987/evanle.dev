@@ -262,27 +262,32 @@
         let currentMode = 'demo';
 
         // --- Demo Data ---
-        const DEMO_STATES = {
+                        const DEMO_STATES = {
             'elec': {
-                'CA': { value: 250218, trend: [242, 245, 250, 248, 252, 255], name: 'California' },
-                'TX': { value: 425621, trend: [410, 415, 425, 420, 430, 435], name: 'Texas' },
-                'NY': { value: 161042, trend: [158, 160, 161, 160, 163, 165], name: 'New York' },
-                'WA': { value: 92100, trend: [88, 90, 92, 91, 93, 95], name: 'Washington' }
+                'CA': { value: 21000000, trend: [20500000, 20800000, 21000000, 20900000, 21200000, 21500000], name: 'California' },
+                'TX': { value: 35000000, trend: [34000000, 34500000, 35000000, 34800000, 35500000, 36000000], name: 'Texas' },
+                'NY': { value: 12500000, trend: [12000000, 12200000, 12500000, 12300000, 12800000, 13000000], name: 'New York' },
+                'WA': { value: 7500000, trend: [7200000, 7300000, 7500000, 7400000, 7600000, 7700000], name: 'Washington' },
+                'FL': { value: 22000000, trend: [21000000, 21500000, 22000000, 21800000, 22500000, 23000000], name: 'Florida' }
             },
             'ng': {
-                'CA': { value: 2124500, trend: [2050, 2100, 2124, 2110, 2150, 2180], name: 'California' },
-                'TX': { value: 4582100, trend: [4400, 4500, 4582, 4550, 4650, 4700], name: 'Texas' }
+                'CA': { value: 180000, trend: [170000, 175000, 180000, 178000, 182000, 185000], name: 'California' },
+                'TX': { value: 350000, trend: [330000, 340000, 350000, 345000, 360000, 370000], name: 'Texas' },
+                'NY': { value: 110000, trend: [100000, 105000, 110000, 108000, 112000, 115000], name: 'New York' },
+                'WA': { value: 25000, trend: [22000, 24000, 25000, 24500, 26000, 27000], name: 'Washington' }
             },
             'fuel': {
-                'CA': { value: 15420, trend: [148, 150, 154, 153, 156, 158], name: 'California' },
-                'WA': { value: 4200, trend: [38, 40, 42, 41, 43, 44], name: 'Washington' }
+                'CA': { value: 15420000, trend: [14800000, 15000000, 15420000, 15300000, 15600000, 15800000], name: 'California' },
+                'WA': { value: 4200000, trend: [3800000, 4000000, 4200000, 4100000, 4300000, 4400000], name: 'Washington' },
+                'TX': { value: 25000000, trend: [24000000, 24500000, 25000000, 24800000, 25500000, 26000000], name: 'Texas' },
+                'NY': { value: 8500000, trend: [8000000, 8200000, 8500000, 8400000, 8600000, 8800000], name: 'New York' }
             }
         };
 
-        const DEMO_CITIES = {
-            'San Francisco': { lat: 37.7749, lng: -122.4194, pop: 815269, state: 'CA' },
-            'San Jose': { lat: 37.3382, lng: -121.8863, pop: 983489, state: 'CA' },
-            'Seattle': { lat: 47.6062, lng: -122.3321, pop: 737015, state: 'WA' }
+                const DEMO_CITIES = {
+            'San Francisco': { lat: 37.7749, lng: -122.4194, pop: 815269, state: 'CA', acs: { elecIntensity: 1.2, gasIntensity: 0.8, incomeFactor: 1.4 } },
+            'San Jose': { lat: 37.3382, lng: -121.8863, pop: 983489, state: 'CA', acs: { elecIntensity: 1.1, gasIntensity: 0.9, incomeFactor: 1.5 } },
+            'Seattle': { lat: 47.6062, lng: -122.3321, pop: 737015, state: 'WA', acs: { elecIntensity: 1.4, gasIntensity: 0.5, incomeFactor: 1.3 } }
         };
 
         const DEMO_CENSUS = { 'CA': 39240000, 'TX': 29530000, 'NY': 19840000, 'WA': 7705281 };
@@ -292,7 +297,11 @@
             initCharts();
             initGridChart();
             setupEventListeners();
-            try { await refreshData(); } catch(e) { console.warn('Initial data refresh failed, using demo data', e); updateMap(); updateCharts(); }
+            // Load Demo Data as Baseline
+            energyData = JSON.parse(JSON.stringify(DEMO_STATES));
+            censusData = JSON.parse(JSON.stringify(DEMO_CENSUS));
+            try { await refreshData(); } catch(e) { console.warn('Initial data refresh failed, using demo data', e); }
+            updateMap(); updateCharts();
         }
 
         function initMap() {
@@ -347,7 +356,7 @@
         function getColor(d, view, metric) {
             const colors = ['#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'];
             let grades = metric === 'perCapita' ?
-                (view === 'elec' ? [0, 2000, 4000, 6000, 8000, 10000, 12000] : [0, 10, 20, 30, 40, 60, 80]) :
+                (view === 'elec' ? [0, 400, 700, 1000, 1300, 1600, 2000] : [0, 10, 20, 30, 40, 60, 80]) :
                 [0, 10, 50, 100, 200, 500, 1000]; // Scaled total
 
             for (let i = grades.length - 1; i >= 0; i--) {
@@ -364,7 +373,7 @@
             if (energyData[view] && energyData[view][stateCode]) {
                 val = energyData[view][stateCode].value;
                 if (metric === 'perCapita' && censusData[stateCode]) {
-                    val = (val * getUnits().conv / censusData[stateCode]);
+                    val = censusData[stateCode] > 0 ? (val * getUnits().conv / censusData[stateCode]) : 0;
                 } else {
                     val = view === 'elec' ? val / 500 : view === 'ng' ? val / 4000 : val / 30;
                 }
@@ -427,7 +436,7 @@
             const units = getUnits();
             const label = metric === 'perCapita' ? units.perCapita : units.main;
             div.innerHTML = `<p class="label-spec" style="margin-bottom:0.5rem">INTENSITY (${label})</p>`;
-            let grades = metric === 'perCapita' ? (view === 'elec' ? [0, 4000, 8000, 12000] : [0, 20, 40, 80]) : [0, 100, 500, 1000];
+            let grades = metric === 'perCapita' ? (view === 'elec' ? [0, 500, 1000, 1500] : [0, 20, 40, 80]) : [0, 100, 500, 1000];
             grades.forEach(g => {
                 div.innerHTML += `<i style="background:${getColor(g, view, metric)}"></i> ${g}+<br>`;
             });
@@ -470,19 +479,25 @@
         function updateCharts() {
             const view = document.getElementById('data-view').value;
             const metric = document.getElementById('metric-type').value;
+            const units = getUnits();
+            const label = metric === 'perCapita' ? units.perCapita : units.main;
+            document.getElementById('comp-title').innerText = `REGIONAL COMPARATIVE DATA (${label})`;
+
             const states = Object.keys(energyData[view] || {}).slice(0, 5);
             comparisonChart.data.labels = states;
             comparisonChart.data.datasets[0].data = states.map(s => {
                 let v = energyData[view][s].value;
-                return metric === 'perCapita' ? (v * getUnits().conv / censusData[s]) : v;
+                return metric === 'perCapita' ? (v * getUnits().conv / (censusData[s] || 1)) : v;
             });
             comparisonChart.update();
 
             document.getElementById('trend-title').innerText = `${currentRegion} MONTHLY TREND`;
             let trend = [0,0,0,0,0,0];
             if (DEMO_CITIES[currentRegion]) {
-                const city = DEMO_CITIES[currentRegion];
-                let base = (energyData[view][city.state].value / censusData[city.state]) * city.pop;
+                                const city = DEMO_CITIES[currentRegion];
+                const acs = city.acs || { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
+                const intensity = view === 'elec' ? acs.elecIntensity : (view === 'ng' ? acs.gasIntensity : 1);
+                let base = (energyData[view][city.state].value / censusData[city.state]) * city.pop * intensity * acs.incomeFactor;
                 if (metric === 'perCapita') base = (base * getUnits().conv / city.pop);
                 trend = [base*0.9, base*0.95, base, base*0.98, base*1.02, base*1.05];
             } else if (energyData[view] && energyData[view][currentRegion]) {
@@ -504,12 +519,12 @@
                     const gas = parseInt(json[1][3]);
                     const income = parseInt(json[1][4]);
                     return {
-                        elecIntensity: (elec / total) / 0.25, // Normalized to 25% avg
-                        gasIntensity: (gas / total) / 0.50, // Normalized to 50% avg
+                        elecIntensity: total > 0 ? (elec / total) / 0.25 : 1, // Normalized to 25% avg
+                        gasIntensity: total > 0 ? (gas / total) / 0.50 : 1, // Normalized to 50% avg
                         incomeFactor: income > 0 ? (income / 70000) : 1
                     };
                 }
-            } catch (e) { console.error("ACS Fetch Error:", e); }
+            } catch (e) { console.error(`ACS Fetch Error for State ${stateFips} Place ${placeFips}:`, e); }
             return { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
         }
 
@@ -553,24 +568,24 @@
             const btn = document.getElementById('search-btn');
             btn.innerText = 'INITIALIZING...';
             try {
-                const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=BASENAME='${cityName}' AND STATE='${stateFips}'&outFields=NAME,STATE,POP100&f=geojson&outSR=4326`;
+                const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=NAME LIKE '${cityName}%' OR BASENAME LIKE '${cityName}%' AND STATE='${stateFips}'&outFields=NAME,STATE,POP100,GEOID,PLACEFP&f=geojson&outSR=4326`;
                 const tigerRes = await fetch(tigerUrl);
                 const tigerJson = await tigerRes.json();
                 if (tigerJson.features && tigerJson.features.length > 0) {
                     const feature = tigerJson.features[0];
                     const fullName = feature.properties.NAME;
-                    const placeFips = feature.properties.PLACE || feature.properties.GEOID.slice(-5);
-                    const acs = await fetchACSData(stateFips, placeFips);
+                    const placeFips = feature.properties.PLACEFP || feature.properties.GEOID.slice(-5);
+                    console.log('Fetching ACS for State:', stateFips, 'Place:', placeFips); const acs = await fetchACSData(stateFips, placeFips); console.log('ACS Result:', acs);
                     DEMO_CITIES[fullName] = {
                         pop: parseInt(feature.properties.POP100) || 50000,
                         geometry: feature.geometry,
                         state: fipsToAbbr[stateFips],
                         acs: acs
                     };
-                    currentRegion = fullName;
+                    console.log(`Successfully mapped ${cityName} to ${fullName} (Place: ${placeFips})`); currentRegion = fullName;
                     updateMap(); updateCharts();
                     map.flyToBounds(L.geoJson(feature.geometry).getBounds(), { padding: [50, 50], duration: 1.5 });
-                } else { alert('City not found.'); }
+                } else { console.error('City not found:', cityName); }
             } catch (e) { console.error(e); } finally { btn.innerText = 'INITIALIZE SEARCH'; }
         }
 
