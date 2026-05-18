@@ -71,6 +71,21 @@
                 const repos = await response.json();
                 container.innerHTML = '';
 
+                // Prepend Energy Map Project
+                const mapCard = document.createElement('div');
+                mapCard.className = 'gallery-item';
+                mapCard.innerHTML = `
+                    <div class="gallery-image">
+                        <div style="width: 100%; height: 100%; background: var(--light-bg); display: flex; align-items: center; justify-content: center; font-size: 3rem;">🗺️</div>
+                    </div>
+                    <div class="gallery-info">
+                        <h3>Interactive Energy Map</h3>
+                        <p>A live subdomain project visualizing U.S. power and natural gas consumption per capita using EIA and Census data.</p>
+                        <a href="energy-map.html" class="project-link">Launch Live Map →</a>
+                    </div>
+                `;
+                container.appendChild(mapCard);
+
                 repos.forEach(repo => {
                     if (repo.fork) return;
 
