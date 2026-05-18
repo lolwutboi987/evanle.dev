@@ -486,7 +486,7 @@
             const states = Object.keys(energyData[view] || {}).slice(0, 5);
             comparisonChart.data.labels = states;
             comparisonChart.data.datasets[0].data = states.map(s => {
-                let v = (energyData[view] && energyData[view][s]) ? energyData[view][s].value : 0;
+                let v = energyData[view][s].value;
                 return metric === 'perCapita' ? (v * getUnits().conv / (censusData[s] || 1)) : v;
             });
             comparisonChart.update();
@@ -494,14 +494,10 @@
             document.getElementById('trend-title').innerText = `${currentRegion} MONTHLY TREND`;
             let trend = [0,0,0,0,0,0];
             if (DEMO_CITIES[currentRegion]) {
-                const city = DEMO_CITIES[currentRegion];
+                                const city = DEMO_CITIES[currentRegion];
                 const acs = city.acs || { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
                 const intensity = view === 'elec' ? acs.elecIntensity : (view === 'ng' ? acs.gasIntensity : 1);
-
-                let stateVal = (energyData[view] && energyData[view][city.state]) ? energyData[view][city.state].value : 0;
-                let statePop = censusData[city.state] || 1;
-
-                let base = (stateVal / statePop) * city.pop * intensity * acs.incomeFactor;
+                let base = (energyData[view][city.state].value / censusData[city.state]) * city.pop * intensity * acs.incomeFactor;
                 if (metric === 'perCapita') base = (base * getUnits().conv / city.pop);
                 trend = [base*0.9, base*0.95, base, base*0.98, base*1.02, base*1.05];
             } else if (energyData[view] && energyData[view][currentRegion]) {
@@ -570,36 +566,33 @@
 
         async function fetchCityData(cityName, stateFips) {
             const btn = document.getElementById('search-btn');
-            btn.innerText = 'Initializing...';
+            btn.innerText = 'INITIALIZING...';
             try {
-                const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=${encodeURIComponent(`(UPPER(BASENAME) = UPPER('${cityName}') OR UPPER(NAME) LIKE UPPER('${cityName}%')) AND STATE='${stateFips}'`)}&outFields=NAME,STATE,POP100,GEOID,PLACE,BASENAME&f=geojson&outSR=4326`;
-                                const tigerRes = await fetch(tigerUrl);
+                const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=NAME LIKE '${cityName}%' OR BASENAME LIKE '${cityName}%' AND STATE='${stateFips}'&outFields=NAME,STATE,POP100,GEOID,PLACEFP&f=geojson&outSR=4326`;
+                const tigerRes = await fetch(tigerUrl);
                 const tigerJson = await tigerRes.json();
                 if (tigerJson.features && tigerJson.features.length > 0) {
-                    // Prioritize exact BASENAME match if multiple returned
-                    let feature = tigerJson.features.find(f =>
-                        f.properties.BASENAME && f.properties.BASENAME.toUpperCase() === cityName.toUpperCase()
-                    ) || tigerJson.features[0];
+                    const feature = tigerJson.features[0];
                     const fullName = feature.properties.NAME;
-                    const placeFips = feature.properties.PLACE || feature.properties.GEOID.slice(-5);
-                    const acs = await fetchACSData(stateFips, placeFips);
+                    const placeFips = feature.properties.PLACEFP || feature.properties.GEOID.slice(-5);
+                    console.log('Fetching ACS for State:', stateFips, 'Place:', placeFips); const acs = await fetchACSData(stateFips, placeFips); console.log('ACS Result:', acs);
                     DEMO_CITIES[fullName] = {
                         pop: parseInt(feature.properties.POP100) || 50000,
                         geometry: feature.geometry,
                         state: fipsToAbbr[stateFips],
                         acs: acs
                     };
-                    currentRegion = fullName;
+                    console.log(`Successfully mapped ${cityName} to ${fullName} (Place: ${placeFips})`); currentRegion = fullName;
                     updateMap(); updateCharts();
                     map.flyToBounds(L.geoJson(feature.geometry).getBounds(), { padding: [50, 50], duration: 1.5 });
-                } else { console.warn('City not found:', cityName); btn.innerText = 'NOT FOUND'; setTimeout(() => btn.innerText = 'Initialize Search', 2000); }
-            } catch (e) { console.error(e); } finally { btn.innerText = 'Initialize Search'; }
+                } else { console.error('City not found:', cityName); }
+            } catch (e) { console.error(e); } finally { btn.innerText = 'INITIALIZE SEARCH'; }
         }
 
         function setupEventListeners() {
             ['data-view', 'metric-type'].forEach(id => document.getElementById(id).addEventListener('change', () => { updateMap(); updateCharts(); }));
             document.getElementById('search-btn').addEventListener('click', () => {
-                const city = document.getElementById('city-search').value.trim();
+                const city = document.getElementById('city-search').value;
                 const state = document.getElementById('state-select').value;
                 if (city) fetchCityData(city, state);
             });
