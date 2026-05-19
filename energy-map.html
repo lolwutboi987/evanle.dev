@@ -145,6 +145,33 @@
             opacity: 0.8;
         }
 
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid var(--monolith-muted);
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--monolith-surface);
+        }
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .autocomplete-items div:hover {
+            background-color: var(--monolith-bg);
+        }
+        .autocomplete-active {
+            background-color: var(--monolith-bg) !important;
+        }
+        .search-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
         /* Leaflet Overrides */
         .leaflet-container { background: #1a1a1a; }
         .leaflet-popup-content-wrapper { background: var(--monolith-surface); color: var(--monolith-fg); border-radius: 0; }
@@ -174,7 +201,10 @@
 
             <div class="control-group">
                 <p class="label-spec">Location Query</p>
-                <input type="text" id="city-search" placeholder="Enter City (e.g. Seattle)">
+                                <div class="search-container">
+                    <input type="text" id="city-search" placeholder="Enter City (e.g. Seattle)" autocomplete="off">
+                    <div id="autocomplete-list" class="autocomplete-items" style="display: none;"></div>
+                </div>
                 <select id="state-select">
                     <option value="06">California (CA)</option>
                     <option value="48">Texas (TX)</option>
@@ -308,7 +338,7 @@
                         }
                     }).addTo(map);
                 });
-        }
+        };
 
         function getUnits() {
             const types = {
@@ -324,7 +354,7 @@
             let grades = metric === 'perCapita' ? (view === 'elec' ? [0, 500, 800, 1100, 1400, 1700, 2000] : [0, 10, 20, 30, 40, 60, 80]) : [0, 100, 500, 1000, 5000, 10000, 20000];
             for (let i = grades.length - 1; i >= 0; i--) if (v >= grades[i]) return colors[i];
             return colors[0];
-        }
+        };
 
         function stateStyle(feature) {
             const code = fipsToAbbr[feature.id || feature.properties.STATE];
@@ -370,8 +400,8 @@
                         }
                     } catch (err) { console.error(err); }
                 }
-            } catch (e) { console.error(e); }
-        }
+            } catch (e) { console.error("Initial load failed:", e); }
+        };
 
         function updateLegendContent(div) {
             const view = document.getElementById('data-view').value;
@@ -402,7 +432,7 @@
                 cityLayers[name].bindPopup(`<strong>${name}</strong><br>Pop: ${data.pop.toLocaleString()}<br>Usage: ${displayVal.toLocaleString()} ${metric === 'perCapita' ? getUnits().perCapita : getUnits().main}`);
                 cityLayers[name].on('click', () => { currentRegion = name; updateCharts(); fetchGridData(APP_CONFIG.EIA_API_KEY); });
             });
-        }
+        };
 
         function updateCharts() {
             const view = document.getElementById('data-view').value;
@@ -429,7 +459,7 @@
                 trend = energyData[view][currentRegion].trend;
                 if (metric === 'perCapita') trend = trend.map(t => (t * getUnits().conv / (censusData[currentRegion] || 1)));
             }
-            trendChart.data.datasets[0].data = trend;
+            trendChart.data.datasets[0].data = trend.slice(-6);
             trendChart.update();
         }
 
@@ -463,6 +493,12 @@
 
         async function fetchCityData(cityName, stateFips) {
             const btn = document.getElementById('search-btn');
+            if (!selectedCityData || selectedCityData.name.toUpperCase() !== cityName.toUpperCase()) {
+                btn.innerText = 'SELECT FROM LIST';
+                setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000);
+                return;
+            }
+
             btn.innerText = 'INITIALIZING...';
             try {
                 const sqlWhere = `(UPPER(BASENAME) = '${cityName.toUpperCase()}' OR UPPER(NAME) LIKE '${cityName.toUpperCase()}%') AND STATE='${stateFips}'`;
