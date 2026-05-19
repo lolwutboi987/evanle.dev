@@ -13,9 +13,7 @@ def clean_project():
         "fix_scaling.py", "fix_search_final.py", "fix_search_logic.py",
         "improve_error_handling.py", "restore_grid_chart.py",
         "restore_grid_update.py", "update_demo_data.py", "master_energy_fix.py",
-        "test_tigerweb.py", "fix_css.py", "cleanup_html.py", "fix_autocomplete.py",
-        "cleanup_redundant.py", "cleanup_redundant_v2.py", "final_refactor.py",
-        "fix_html.py", "debug_data.py", "final_verify.js"
+        "test_tigerweb.py", "fix_css.py", "cleanup_html.py"
     ]
 
     for f in redundant_files:
