@@ -11,8 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <style>
-        :root {
+    <style>:root {
             --monolith-bg: #242424;
             --monolith-fg: #fdfdf5;
             --monolith-muted: #a1a19a;
@@ -146,16 +145,50 @@
             opacity: 0.8;
         }
 
+
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid var(--monolith-muted);
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: var(--monolith-surface);
+        }
+        .autocomplete-items div {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .autocomplete-items div:hover {
+            background-color: var(--monolith-bg);
+        }
+        .autocomplete-active {
+            background-color: var(--monolith-bg) !important;
+        }
+        .search-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
         /* Leaflet Overrides */
         .leaflet-container { background: #1a1a1a; }
         .leaflet-popup-content-wrapper { background: var(--monolith-surface); color: var(--monolith-fg); border-radius: 0; }
         .leaflet-popup-tip { background: var(--monolith-surface); }
-
         @media (max-width: 1000px) {
-            .dashboard-layout { grid-template-columns: 1fr; }
-            .sidebar { border-right: none; border-bottom: none; }
+            .dashboard-layout { display: flex; flex-direction: column; min-height: auto; }
+            .sidebar { width: 100% !important; padding: 1.5rem; box-sizing: border-box; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); gap: 1.5rem; }
+            .sidebar h1 { font-size: 1.8rem !important; margin-bottom: 0.2rem; }
+            .main-content { width: 100% !important; padding: 1rem; box-sizing: border-box; gap: 1.5rem; }
+            .data-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+            #map { height: 350px; width: 100%; }
+            .control-group { gap: 0.5rem; }
+            select, input, .btn-monolith { padding: 0.8rem; }
+            .data-panel { padding: 1.5rem; }
         }
     </style>
+
 </head>
 <body>
     <div class="dashboard-layout">
@@ -168,7 +201,10 @@
 
             <div class="control-group">
                 <p class="label-spec">Location Query</p>
-                <input type="text" id="city-search" placeholder="Enter City (e.g. Seattle)">
+                                <div class="search-container">
+                    <input type="text" id="city-search" placeholder="Enter City (e.g. Seattle)" autocomplete="off">
+                    <div id="autocomplete-list" class="autocomplete-items" style="display: none;"></div>
+                </div>
                 <select id="state-select">
                     <option value="06">California (CA)</option>
                     <option value="48">Texas (TX)</option>
@@ -195,11 +231,6 @@
                     <option value="total">Aggregate Usage</option>
                     <option value="perCapita">Per Capita Efficiency</option>
                 </select>
-            </div>
-
-            <div class="control-group">
-                <p class="label-spec">Auth Key (EIA)</p>
-                <input type="password" id="api-key" placeholder="••••••••••••">
             </div>
 
             <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.05);">
@@ -250,75 +281,51 @@
     </div>
 
     <script>
-        // --- Constants & Config ---
-        const EIA_API_BASE = 'https://api.eia.gov/v2';
-        const CENSUS_API_BASE = 'https://api.census.gov/data/2021/pep/population';
 
-        let map, comparisonChart, trendChart, gridChart;
-        let geojsonLayer, cityLayers = {};
-        let energyData = {};
-        let censusData = {};
-        let currentRegion = 'CA';
-        let currentMode = 'demo';
-
-        // --- Demo Data ---
-                        const DEMO_STATES = {
-            'elec': {
-                'CA': { value: 21000000, trend: [20500000, 20800000, 21000000, 20900000, 21200000, 21500000], name: 'California' },
-                'TX': { value: 35000000, trend: [34000000, 34500000, 35000000, 34800000, 35500000, 36000000], name: 'Texas' },
-                'NY': { value: 12500000, trend: [12000000, 12200000, 12500000, 12300000, 12800000, 13000000], name: 'New York' },
-                'WA': { value: 7500000, trend: [7200000, 7300000, 7500000, 7400000, 7600000, 7700000], name: 'Washington' },
-                'FL': { value: 22000000, trend: [21000000, 21500000, 22000000, 21800000, 22500000, 23000000], name: 'Florida' }
-            },
-            'ng': {
-                'CA': { value: 180000, trend: [170000, 175000, 180000, 178000, 182000, 185000], name: 'California' },
-                'TX': { value: 350000, trend: [330000, 340000, 350000, 345000, 360000, 370000], name: 'Texas' },
-                'NY': { value: 110000, trend: [100000, 105000, 110000, 108000, 112000, 115000], name: 'New York' },
-                'WA': { value: 25000, trend: [22000, 24000, 25000, 24500, 26000, 27000], name: 'Washington' }
-            },
-            'fuel': {
-                'CA': { value: 15420000, trend: [14800000, 15000000, 15420000, 15300000, 15600000, 15800000], name: 'California' },
-                'WA': { value: 4200000, trend: [3800000, 4000000, 4200000, 4100000, 4300000, 4400000], name: 'Washington' },
-                'TX': { value: 25000000, trend: [24000000, 24500000, 25000000, 24800000, 25500000, 26000000], name: 'Texas' },
-                'NY': { value: 8500000, trend: [8000000, 8200000, 8500000, 8400000, 8600000, 8800000], name: 'New York' }
-            }
+        /*
+           SECURITY NOTE: API keys are hardcoded for rapid deployment as requested.
+           In a production environment, move these to environment variables or a
+           backend proxy to prevent client-side exposure.
+        */
+        const APP_CONFIG = {
+            EIA_API_KEY: 'lfLavxliaBhZDeDOqA1zxpMiIwRLcjJKUIdLViCK',
+            CENSUS_API_KEY: '06103124f460cf01c20a27457bf84463f9b1a3d2',
+            EIA_API_BASE: 'https://api.eia.gov/v2',
+            CENSUS_API_BASE: 'https://api.census.gov/data/2021'
         };
 
-                const DEMO_CITIES = {
-            'San Francisco': { lat: 37.7749, lng: -122.4194, pop: 815269, state: 'CA', acs: { elecIntensity: 1.2, gasIntensity: 0.8, incomeFactor: 1.4 } },
-            'San Jose': { lat: 37.3382, lng: -121.8863, pop: 983489, state: 'CA', acs: { elecIntensity: 1.1, gasIntensity: 0.9, incomeFactor: 1.5 } },
-            'Seattle': { lat: 47.6062, lng: -122.3321, pop: 737015, state: 'WA', acs: { elecIntensity: 1.4, gasIntensity: 0.5, incomeFactor: 1.3 } }
-        };
+        var map, comparisonChart, trendChart, gridChart;
+        var geojsonLayer, cityLayers = {};
+        var energyData = { elec: {}, ng: {}, fuel: {} }, censusData = {};
+        var activeCities = {}, currentRegion = 'CA';
 
-        const DEMO_CENSUS = { 'CA': 39240000, 'TX': 29530000, 'NY': 19840000, 'WA': 7705281 };
+        const fipsToAbbr = { "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT", "10": "DE", "12": "FL", "13": "GA", "15": "HI", "16": "ID", "17": "IL", "18": "IN", "19": "IA", "20": "KS", "21": "KY", "22": "LA", "23": "ME", "24": "MD", "25": "MA", "26": "MI", "27": "MN", "28": "MS", "29": "MO", "30": "MT", "31": "NE", "32": "NV", "33": "NH", "34": "NJ", "35": "NM", "36": "NY", "37": "NC", "38": "ND", "39": "OH", "40": "OK", "41": "OR", "42": "PA", "44": "RI", "45": "SC", "46": "SD", "47": "TN", "48": "TX", "49": "UT", "50": "VT", "51": "VA", "53": "WA", "54": "WV", "55": "WI", "56": "WY" };
 
         async function init() {
             initMap();
             initCharts();
             initGridChart();
             setupEventListeners();
-            // Load Demo Data as Baseline
-            energyData = JSON.parse(JSON.stringify(DEMO_STATES));
-            censusData = JSON.parse(JSON.stringify(DEMO_CENSUS));
-            try { await refreshData(); } catch(e) { console.warn('Initial data refresh failed, using demo data', e); }
-            updateMap(); updateCharts();
-        }
+
+            try {
+                await fetchLiveData(APP_CONFIG.EIA_API_KEY);
+                await fetchGridData(APP_CONFIG.EIA_API_KEY);
+                setTimeout(() => {
+                    updateMap();
+                    updateCharts();
+                }, 1500);
+            } catch(e) {
+                console.error("Initial load failed:", e);
+            }
+        };
 
         function initMap() {
-            map = L.map('map', { zoomControl: false }).setView([38, -100], 4);
+            map = L.map('map', { zoomControl: false }).setView([37, -119], 6);
             map.createPane('cities');
             map.getPane('cities').style.zIndex = 650;
-
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; CARTO'
-            }).addTo(map);
-
-            const legend = L.control({position: 'bottomright'});
-            legend.onAdd = () => {
-                const div = L.DomUtil.create('div', 'info legend');
-                updateLegendContent(div);
-                return div;
-            };
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO' }).addTo(map);
+            const legend = L.control({ position: 'bottomright' });
+            legend.onAdd = () => { const div = L.DomUtil.create('div', 'legend'); updateLegendContent(div); return div; };
             legend.addTo(map);
             map.legend = legend;
 
@@ -328,206 +335,310 @@
                     geojsonLayer = L.geoJson(data, {
                         style: stateStyle,
                         onEachFeature: (f, l) => {
-                            l.on({
-                                mouseover: e => { e.target.setStyle({ weight: 2, color: '#fff', fillOpacity: 0.9 }); },
-                                mouseout: e => geojsonLayer.resetStyle(e.target),
-                                click: e => {
-                                    currentRegion = stateNameMap[e.target.feature.properties.name];
-                                    const apiKey = document.getElementById('api-key').value;
-                                    if (apiKey) fetchGridData(apiKey);
-                                    updateCharts();
-                                }
-                            });
+                            const code = fipsToAbbr[f.id || f.properties.STATE];
+                            l.on('click', () => { currentRegion = code; updateCharts(); fetchGridData(APP_CONFIG.EIA_API_KEY); });
+                            l.bindTooltip(f.properties.NAME);
                         }
                     }).addTo(map);
                 });
-        }
+        };
 
         function getUnits() {
-            const view = document.getElementById('data-view').value;
-            const units = {
+            const types = {
                 'elec': { main: 'MWh / mo', perCapita: 'kWh/person', conv: 1000 },
                 'ng': { main: 'MMCF / mo', perCapita: 'MCF/person', conv: 1000 },
                 'fuel': { main: 'BBL / mo', perCapita: 'Gallons/person', conv: 42 }
             };
-            return units[view];
-        }
+            return types[document.getElementById('data-view').value];
+        };
 
-        function getColor(d, view, metric) {
+        function getColor(v, view, metric) {
             const colors = ['#FED976', '#FEB24C', '#FD8D3C', '#FC4E2A', '#E31A1C', '#BD0026', '#800026'];
-            let grades = metric === 'perCapita' ?
-                (view === 'elec' ? [0, 400, 700, 1000, 1300, 1600, 2000] : [0, 10, 20, 30, 40, 60, 80]) :
-                [0, 10, 50, 100, 200, 500, 1000]; // Scaled total
-
-            for (let i = grades.length - 1; i >= 0; i--) {
-                if (d >= grades[i]) return colors[i];
-            }
+            let grades = metric === 'perCapita' ? (view === 'elec' ? [0, 500, 800, 1100, 1400, 1700, 2000] : [0, 10, 20, 30, 40, 60, 80]) : [0, 100, 500, 1000, 5000, 10000, 20000];
+            for (let i = grades.length - 1; i >= 0; i--) if (v >= grades[i]) return colors[i];
             return colors[0];
-        }
+        };
 
         function stateStyle(feature) {
-            const stateCode = stateNameMap[feature.properties.name];
+            const code = fipsToAbbr[feature.id || feature.properties.STATE];
             const view = document.getElementById('data-view').value;
             const metric = document.getElementById('metric-type').value;
-            let val = 0;
-            if (energyData[view] && energyData[view][stateCode]) {
-                val = energyData[view][stateCode].value;
-                if (metric === 'perCapita' && censusData[stateCode]) {
-                    val = censusData[stateCode] > 0 ? (val * getUnits().conv / censusData[stateCode]) : 0;
-                } else {
-                    val = view === 'elec' ? val / 500 : view === 'ng' ? val / 4000 : val / 30;
-                }
+            let val = (energyData[view] && energyData[view][code]) ? energyData[view][code].value : 0;
+
+            if (metric === 'perCapita' && censusData[code]) {
+                val = (val * getUnits().conv / censusData[code]);
             }
-            return { fillColor: getColor(val, view, metric), weight: 1, opacity: 1, color: '#242424', fillOpacity: 0.7 };
-        }
+
+            let normalized = val;
+            if (metric !== 'perCapita') {
+                if (view === 'elec') normalized = val / 500000;
+                if (view === 'ng') normalized = val / 1000;
+                if (view === 'fuel') normalized = val / 50000;
+            }
+
+            return { fillColor: getColor(normalized, view, metric), weight: code === 'CA' ? 2 : 1, opacity: 1, color: code === 'CA' ? '#fff' : '#242424', fillOpacity: 0.7 };
+        };
 
         function initCharts() {
             const common = {
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { color: '#a1a19a', font: { family: 'Inter', size: 10 } }, grid: { display: false } },
-                    y: { ticks: { color: '#a1a19a', font: { family: 'Inter', size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    x: { ticks: { color: '#a1a19a', font: { size: 10 } }, grid: { display: false } },
+                    y: { ticks: { color: '#a1a19a', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
                 }
             };
-            comparisonChart = new Chart(document.getElementById('comparisonChart'), {
-                type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#BD0026', data: [] }] }, options: common
-            });
-            trendChart = new Chart(document.getElementById('trendChart'), {
-                type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','May','Jun'], datasets: [{ borderColor: '#BD0026', data: [], tension: 0.4, fill: true, backgroundColor: 'rgba(189,0,38,0.1)' }] }, options: common
-            });
-        }
-
-        async function refreshData() {
-            const apiKey = document.getElementById('api-key').value;
-            if (apiKey) {
-                await fetchLiveData(apiKey);
-            } else {
-                energyData = JSON.parse(JSON.stringify(DEMO_STATES));
-                censusData = JSON.parse(JSON.stringify(DEMO_CENSUS));
-            }
-            updateMap();
-            updateCharts();
-        }
+            comparisonChart = new Chart(document.getElementById('comparisonChart'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#BD0026', data: [] }] }, options: common });
+            trendChart = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','May','Jun'], datasets: [{ borderColor: '#BD0026', data: [], tension: 0.4, fill: true, backgroundColor: 'rgba(189,0,38,0.1)' }] }, options: common });
+        };
 
         async function fetchLiveData(key) {
             try {
-                const cRes = await fetch(`${CENSUS_API_BASE}?get=POP,NAME&for=state:*`);
+                const cRes = await fetch(`${APP_CONFIG.CENSUS_API_BASE}/pep/population?get=NAME,POP_2021&for=state:*&key=${APP_CONFIG.CENSUS_API_KEY}`);
                 const cJson = await cRes.json();
-                cJson.slice(1).forEach(r => censusData[fipsToAbbr[r[2]]] = parseInt(r[0]));
-                const types = { 'elec': 'electricity/retail-sales/data/?data[]=sales&facets[sectorid][]=RES', 'ng': 'natural-gas/cons/sum/data/?data[]=value', 'fuel': 'petroleum/move/neti/data/?data[]=value&facets[product][]=MG0TP' };
-                for (const [id, path] of Object.entries(types)) {
-                    const res = await fetch(`${EIA_API_BASE}/${path}&api_key=${key}&frequency=monthly&length=50`);
-                    const json = await res.json();
-                    energyData[id] = {};
-                    json.response.data.forEach(item => {
-                        const s = item.stateid || 'US';
-                        const val = item.sales || item.value;
-                        if (!energyData[id][s]) energyData[id][s] = { value: val, trend: [] };
-                        if (energyData[id][s].trend.length < 6) energyData[id][s].trend.unshift(val);
-                    });
+                cJson.slice(1).forEach(r => { const abbr = fipsToAbbr[r[2]]; if (abbr) censusData[abbr] = parseInt(r[1]); });
+
+                const queries = [
+                    { id: 'elec', path: 'electricity/retail-sales/data/?data[]=sales&facets[sectorid][]=RES' },
+                    { id: 'ng', path: 'natural-gas/cons/sum/data/?data[]=value&facets[process][]=VRS' },
+                    { id: 'fuel', path: 'petroleum/cons/prim/data/?data[]=value&facets[product][]=EPM0' }
+                ];
+
+                for (const q of queries) {
+                    let url = "";
+                    try {
+                        url = `${APP_CONFIG.EIA_API_BASE}/${q.path}&api_key=${key}&frequency=monthly&length=5000&sort[0][column]=period&sort[0][direction]=desc`;
+                        const res = await fetch(url);
+                        const json = await res.json();
+                        console.log(`Fetched ${q.id}: ${json.response.data.length} rows`); if (json && json.response && json.response.data) {
+                            energyData[q.id] = {};
+                            json.response.data.forEach(item => {
+                                let s = item.stateid;
+                                if (!s && item.duoarea) {
+                                    if (item.duoarea.startsWith('S') && item.duoarea.length === 3) s = item.duoarea.substring(1);
+                                    else if (item.duoarea === 'NUS') s = 'US';
+                                }
+                                if (!s && item['area-name']) {
+                                    const name = item['area-name'].toUpperCase();
+                                    const mapping = { 'CALIFORNIA': 'CA', 'TEXAS': 'TX', 'NEW YORK': 'NY', 'FLORIDA': 'FL', 'ILLINOIS': 'IL', 'WASHINGTON': 'WA', 'OREGON': 'OR', 'NEVADA': 'NV', 'ARIZONA': 'AZ', 'UTAH': 'UT' };
+                                    for (const [stateName, stateAbbr] of Object.entries(mapping)) {
+                                        if (name === stateName || name.startsWith(stateName + " ")) { s = stateAbbr; break; }
+                                    }
+                                }
+
+                                if (s && s.length === 2) {
+                                    let val = parseFloat(item.sales || item.value || 0);
+                                    if (val > 0) {
+                                        if (q.id === 'elec') val = val * 1000; // Convert Million kWh to MWh
+                                        if (q.id === 'fuel') val = (val * 1000 * 30.4) / 42; // Convert Thousand Gallons/Day to Gallons/Month, then divide by 42 gal/bbl
+                                        if (!energyData[q.id][s]) energyData[q.id][s] = { value: 0, trend: [] };
+                                        if (energyData[q.id][s].trend.length < 12) energyData[q.id][s].trend.push(val);
+                                    }
+                                }
+                            });
+                            Object.keys(energyData[q.id]).forEach(state => {
+                                const entry = energyData[q.id][state];
+                                entry.value = entry.trend[0];
+                                entry.trend.reverse();
+                            });
+                        }
+                    } catch (err) { console.error(`Error fetching ${q.id}:`, err); console.log(`URL was: ${url}`); }
                 }
-            } catch (e) { console.error(e); }
-        }
+            } catch (e) { console.error("Initial load failed:", e); }
+        };
 
         function updateLegendContent(div) {
             const view = document.getElementById('data-view').value;
             const metric = document.getElementById('metric-type').value;
             const units = getUnits();
-            const label = metric === 'perCapita' ? units.perCapita : units.main;
-            div.innerHTML = `<p class="label-spec" style="margin-bottom:0.5rem">INTENSITY (${label})</p>`;
-            let grades = metric === 'perCapita' ? (view === 'elec' ? [0, 500, 1000, 1500] : [0, 20, 40, 80]) : [0, 100, 500, 1000];
+            div.innerHTML = `<p class="label-spec" style="margin-bottom:0.5rem">INTENSITY (${metric === 'perCapita' ? units.perCapita : units.main})</p>`;
+            let grades = metric === 'perCapita' ? (view === 'elec' ? [0, 400, 800, 1200, 1600, 2000] : [0, 5, 10, 20, 40, 80]) : [0, 1000000, 5000000, 10000000, 20000000];
             grades.forEach(g => {
-                div.innerHTML += `<i style="background:${getColor(g, view, metric)}"></i> ${g}+<br>`;
+                let colorVal = g;
+                if (metric !== 'perCapita') {
+                    if (view === 'elec') colorVal = g / 500000;
+                    if (view === 'ng') colorVal = g / 1000;
+                    if (view === 'fuel') colorVal = g / 50000;
+                }
+                div.innerHTML += `<i style="background:${getColor(colorVal, view, metric)}"></i> ${g.toLocaleString()}+<br>`;
             });
-        }
+        };
 
         function updateMap() {
             if (geojsonLayer) geojsonLayer.setStyle(stateStyle);
             if (map.legend) updateLegendContent(document.querySelector('.legend'));
-
-            Object.entries(DEMO_CITIES).forEach(([name, data]) => {
+            Object.entries(activeCities).forEach(([name, data]) => {
                 const view = document.getElementById('data-view').value;
                 const metric = document.getElementById('metric-type').value;
-                const stateCode = data.state;
-                let stateVal = energyData[view] && energyData[view][stateCode] ? energyData[view][stateCode].value : 0;
-                let statePop = censusData[stateCode] || 1;
-
+                const stateVal = (energyData[view] && energyData[view][data.state]) ? energyData[view][data.state].value : 0;
+                const statePop = censusData[data.state] || 1;
                 const acs = data.acs || { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
                 const intensity = view === 'elec' ? acs.elecIntensity : (view === 'ng' ? acs.gasIntensity : 1);
                 let totalUsage = (stateVal / statePop) * data.pop * intensity * acs.incomeFactor;
-
                 let displayVal = metric === 'perCapita' ? (totalUsage * getUnits().conv / data.pop) : totalUsage;
-                let normalized = metric === 'perCapita' ? displayVal : (view === 'elec' ? displayVal/10 : displayVal/100);
-                const color = getColor(normalized, view, metric);
-
-                if (data.geometry) {
-                    if (cityLayers[name]) map.removeLayer(cityLayers[name]);
-                    cityLayers[name] = L.geoJson(data.geometry, { style: { fillColor: color, weight: 2, color: '#fff', fillOpacity: 0.8 }, pane: 'cities' }).addTo(map);
-                } else {
-                    if (cityLayers[name]) {
-                        cityLayers[name].setStyle({ fillColor: color });
-                    } else {
-                        cityLayers[name] = L.circleMarker([data.lat, data.lng], { radius: 10, fillColor: color, color: "#fff", weight: 2, fillOpacity: 0.9, pane: 'cities' }).addTo(map);
-                    }
-                }
-                cityLayers[name].bindPopup(`<strong>${name}</strong><br>Pop: ${data.pop.toLocaleString()}<br>Modeled Usage (ACS Weighted): ${displayVal.toLocaleString(undefined, {maximumFractionDigits:2})} ${metric === 'perCapita' ? getUnits().perCapita : getUnits().main}`);
-                cityLayers[name].on('click', () => { currentRegion = name; updateCharts(); });
+                const color = getColor(metric === 'perCapita' ? displayVal : (view === 'elec' ? displayVal/100000 : displayVal/1000), view, metric);
+                if (cityLayers[name]) cityLayers[name].setStyle({ fillColor: color });
+                else { cityLayers[name] = L.geoJson(data.geometry, { style: { fillColor: color, weight: 2, color: '#fff', fillOpacity: 0.8 }, pane: 'cities' }).addTo(map); }
+                cityLayers[name].bindPopup(`<strong>${name}</strong><br>Pop: ${data.pop.toLocaleString()}<br>Usage: ${displayVal.toLocaleString()} ${metric === 'perCapita' ? getUnits().perCapita : getUnits().main}`);
+                cityLayers[name].on('click', () => { currentRegion = name; updateCharts(); fetchGridData(APP_CONFIG.EIA_API_KEY); });
             });
-        }
+        };
 
         function updateCharts() {
             const view = document.getElementById('data-view').value;
             const metric = document.getElementById('metric-type').value;
             const units = getUnits();
-            const label = metric === 'perCapita' ? units.perCapita : units.main;
-            document.getElementById('comp-title').innerText = `REGIONAL COMPARATIVE DATA (${label})`;
-
-            const states = Object.keys(energyData[view] || {}).slice(0, 5);
+            document.getElementById('comp-title').innerText = `REGIONAL COMPARATIVE DATA (${metric === 'perCapita' ? units.perCapita : units.main})`;
+            const states = Object.keys(energyData[view] || {}).filter(s => s !== 'US' && s.length === 2).sort((a,b) => (energyData[view][b].value - energyData[view][a].value)).slice(0, 10);
             comparisonChart.data.labels = states;
             comparisonChart.data.datasets[0].data = states.map(s => {
                 let v = energyData[view][s].value;
                 return metric === 'perCapita' ? (v * getUnits().conv / (censusData[s] || 1)) : v;
             });
             comparisonChart.update();
-
             document.getElementById('trend-title').innerText = `${currentRegion} MONTHLY TREND`;
             let trend = [0,0,0,0,0,0];
-            if (DEMO_CITIES[currentRegion]) {
-                                const city = DEMO_CITIES[currentRegion];
+            if (activeCities[currentRegion]) {
+                const city = activeCities[currentRegion];
                 const acs = city.acs || { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
                 const intensity = view === 'elec' ? acs.elecIntensity : (view === 'ng' ? acs.gasIntensity : 1);
-                let base = (energyData[view][city.state].value / censusData[city.state]) * city.pop * intensity * acs.incomeFactor;
+                let base = ((energyData[view] && energyData[view][city.state]) ? energyData[view][city.state].value : 0) / (censusData[city.state] || 1) * city.pop * intensity * acs.incomeFactor;
                 if (metric === 'perCapita') base = (base * getUnits().conv / city.pop);
                 trend = [base*0.9, base*0.95, base, base*0.98, base*1.02, base*1.05];
             } else if (energyData[view] && energyData[view][currentRegion]) {
                 trend = energyData[view][currentRegion].trend;
-                if (metric === 'perCapita') trend = trend.map(t => (t * getUnits().conv / censusData[currentRegion]));
+                if (metric === 'perCapita') trend = trend.map(t => (t * getUnits().conv / (censusData[currentRegion] || 1)));
             }
-            trendChart.data.datasets[0].data = trend;
+            trendChart.data.datasets[0].data = trend.slice(-6);
             trendChart.update();
-        }
-
+        };
 
         async function fetchACSData(stateFips, placeFips) {
             try {
-                const res = await fetch(`https://api.census.gov/data/2021/acs/acs5?get=NAME,B25040_001E,B25040_004E,B25040_002E,B19013_001E&for=place:${placeFips}&in=state:${stateFips}`);
+                const res = await fetch(`https://api.census.gov/data/2021/acs/acs5?get=NAME,B25040_001E,B25040_004E,B25040_002E,B19013_001E&for=place:${placeFips}&in=state:${stateFips}&key=${APP_CONFIG.CENSUS_API_KEY}`);
                 const json = await res.json();
                 if (json && json[1]) {
-                    const total = parseInt(json[1][1]);
-                    const elec = parseInt(json[1][2]);
-                    const gas = parseInt(json[1][3]);
-                    const income = parseInt(json[1][4]);
-                    return {
-                        elecIntensity: total > 0 ? (elec / total) / 0.25 : 1, // Normalized to 25% avg
-                        gasIntensity: total > 0 ? (gas / total) / 0.50 : 1, // Normalized to 50% avg
-                        incomeFactor: income > 0 ? (income / 70000) : 1
-                    };
+                    const total = parseInt(json[1][1]), elec = parseInt(json[1][2]), gas = parseInt(json[1][3]), income = parseInt(json[1][4]);
+                    return { elecIntensity: total > 0 ? (elec / total) / 0.25 : 1, gasIntensity: total > 0 ? (gas / total) / 0.50 : 1, incomeFactor: income > 0 ? (income / 70000) : 1 };
                 }
-            } catch (e) { console.error(`ACS Fetch Error for State ${stateFips} Place ${placeFips}:`, e); }
+            } catch (e) { console.error(e); }
             return { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
+        };
+
+        async function fetchGridData(key) {
+            const baMap = { 'CA': 'CISO', 'TX': 'ERCO', 'NY': 'NYIS', 'FL': 'FPL', 'WA': 'BPAT', 'IL': 'PJM', 'AZ': 'SRP', 'NV': 'NEVP', 'OR': 'BPAT', 'UT': 'PACE' };
+            const city = activeCities[currentRegion], state = city ? city.state : currentRegion, ba = baMap[state] || 'CISO';
+            try {
+                const res = await fetch(`https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=${key}&frequency=hourly&data[]=value&facets[respondent][]=${ba}&sort[0][column]=period&sort[0][direction]=desc&length=24`);
+                const json = await res.json();
+                if (json && json.response && json.response.data && json.response.data.length > 0) {
+                    const gridTrend = json.response.data.map(d => d.value).reverse();
+                    document.getElementById('grid-panel').style.display = 'block';
+                    document.getElementById('grid-title').innerText = `LIVE SYSTEM LOAD (MW) - ${ba}`;
+                    gridChart.data.datasets[0].data = gridTrend;
+                    gridChart.update();
+                } else { document.getElementById('grid-panel').style.display = 'none'; }
+            } catch (e) { document.getElementById('grid-panel').style.display = 'none'; }
+        };
+
+
+        let selectedCityData = null;
+
+        async function fetchAutocomplete(query, stateFips) {
+            if (query.length < 3) return [];
+            const sqlWhere = `UPPER(NAME) LIKE '${query.toUpperCase()}%' AND STATE='${stateFips}'`;
+            const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=${encodeURIComponent(sqlWhere)}&outFields=NAME,STATE,POP100,GEOID,PLACE,BASENAME&f=geojson&outSR=4326`;
+            try {
+                const res = await fetch(tigerUrl);
+                const json = await res.json();
+                return json.features || [];
+            } catch (e) { console.error(e); return []; }
         }
 
+        const citySearchInput = document.getElementById('city-search');
+        const autocompleteList = document.getElementById('autocomplete-list');
+        let debounceTimer;
+
+        citySearchInput.addEventListener('input', async (e) => {
+            const val = e.target.value;
+            const state = document.getElementById('state-select').value;
+            clearTimeout(debounceTimer);
+
+            autocompleteList.innerHTML = '';
+            if (!val) { autocompleteList.style.display = 'none'; return; }
+
+            debounceTimer = setTimeout(async () => {
+                const results = await fetchAutocomplete(val, state) || [];
+                if (results.length > 0) {
+                    autocompleteList.style.display = 'block';
+                    results.forEach(feature => {
+                        const name = feature.properties.BASENAME || feature.properties.NAME;
+                        const div = document.createElement('div');
+                        div.innerHTML = name;
+                        div.addEventListener('click', () => {
+                            citySearchInput.value = name;
+                            selectedCityData = {
+                                name: name,
+                                pop: parseInt(feature.properties.POP100),
+                                geometry: feature.geometry,
+                                stateFips: feature.properties.STATE,
+                                placeFips: feature.properties.PLACE || feature.properties.GEOID.slice(-5)
+                            };
+                            autocompleteList.style.display = 'none';
+                        });
+                        autocompleteList.appendChild(div);
+                    });
+                } else {
+                    autocompleteList.style.display = 'none';
+                }
+            }, 300);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target !== citySearchInput) autocompleteList.style.display = 'none';
+        });
+
+        async function fetchCityData(cityName, stateFips) {
+            const btn = document.getElementById('search-btn');
+            if (!selectedCityData || selectedCityData.name.trim().toUpperCase() !== cityName.trim().toUpperCase()) {
+                btn.innerText = 'SELECT FROM LIST';
+                setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000);
+                return;
+            }
+
+            btn.innerText = 'INITIALIZING...';
+            try {
+                const fullName = selectedCityData.name;
+                if (cityLayers[fullName]) map.removeLayer(cityLayers[fullName]);
+                const acs = await fetchACSData(selectedCityData.stateFips, selectedCityData.placeFips);
+                activeCities[fullName] = {
+                    pop: selectedCityData.pop || 50000,
+                    geometry: selectedCityData.geometry,
+                    state: fipsToAbbr[selectedCityData.stateFips],
+                    acs: acs
+                };
+                currentRegion = fullName;
+                updateMap();
+                updateCharts();
+                map.flyToBounds(L.geoJson(selectedCityData.geometry).getBounds(), { padding: [50, 50], duration: 1.5 });
+                fetchGridData(APP_CONFIG.EIA_API_KEY);
+            } catch (e) { console.error(e); } finally { btn.innerText = 'INITIALIZE SEARCH'; }
+        }
+
+                document.getElementById('state-select').addEventListener('change', () => {
+            selectedCityData = null;
+            citySearchInput.value = '';
+            autocompleteList.innerHTML = '';
+            autocompleteList.style.display = 'none';
+        });
+
+        function setupEventListeners() {
+            ['data-view', 'metric-type'].forEach(id => document.getElementById(id).addEventListener('change', () => { updateMap(); updateCharts(); }));
+            document.getElementById('search-btn').addEventListener('click', () => {
+                const city = document.getElementById('city-search').value, state = document.getElementById('state-select').value;
+                if (city) fetchCityData(city, state);
+            });
+        };
 
         function initGridChart() {
             gridChart = new Chart(document.getElementById('gridChart'), {
@@ -536,73 +647,13 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: {
-                        x: { ticks: { color: '#a1a19a', font: { size: 10 } } },
-                        y: { ticks: { color: '#a1a19a', font: { size: 10 } } }
-                    }
+                    scales: { x: { ticks: { color: '#a1a19a', font: { size: 10 } } }, y: { ticks: { color: '#a1a19a', font: { size: 10 } } } }
                 }
             });
-        }
-
-        function updateGridChart(data, ba) {
-            document.getElementById('grid-panel').style.display = 'block';
-            document.getElementById('grid-title').innerText = `LIVE SYSTEM LOAD (MW) - ${ba}`;
-            gridChart.data.datasets[0].data = data;
-            gridChart.update();
-        }
-
-        async function fetchGridData(key) {
-            const baMap = { 'CA': 'CISO', 'TX': 'ERCO', 'NY': 'NYIS', 'FL': 'FPL', 'WA': 'BPAT' };
-            const ba = baMap[currentRegion] || 'CISO';
-            try {
-                const res = await fetch(`https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=${key}&frequency=hourly&data[]=value&facets[respondent][]=${ba}&sort[0][column]=period&sort[0][direction]=desc&length=24`);
-                const json = await res.json();
-                if (json.response.data) {
-                    const gridTrend = json.response.data.map(d => d.value).reverse();
-                    updateGridChart(gridTrend, ba);
-                }
-            } catch (e) { console.error("Grid API Error:", e); }
-        }
-
-        async function fetchCityData(cityName, stateFips) {
-            const btn = document.getElementById('search-btn');
-            btn.innerText = 'INITIALIZING...';
-            try {
-                const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=NAME LIKE '${cityName}%' OR BASENAME LIKE '${cityName}%' AND STATE='${stateFips}'&outFields=NAME,STATE,POP100,GEOID,PLACEFP&f=geojson&outSR=4326`;
-                const tigerRes = await fetch(tigerUrl);
-                const tigerJson = await tigerRes.json();
-                if (tigerJson.features && tigerJson.features.length > 0) {
-                    const feature = tigerJson.features[0];
-                    const fullName = feature.properties.NAME;
-                    const placeFips = feature.properties.PLACEFP || feature.properties.GEOID.slice(-5);
-                    console.log('Fetching ACS for State:', stateFips, 'Place:', placeFips); const acs = await fetchACSData(stateFips, placeFips); console.log('ACS Result:', acs);
-                    DEMO_CITIES[fullName] = {
-                        pop: parseInt(feature.properties.POP100) || 50000,
-                        geometry: feature.geometry,
-                        state: fipsToAbbr[stateFips],
-                        acs: acs
-                    };
-                    console.log(`Successfully mapped ${cityName} to ${fullName} (Place: ${placeFips})`); currentRegion = fullName;
-                    updateMap(); updateCharts();
-                    map.flyToBounds(L.geoJson(feature.geometry).getBounds(), { padding: [50, 50], duration: 1.5 });
-                } else { console.error('City not found:', cityName); }
-            } catch (e) { console.error(e); } finally { btn.innerText = 'INITIALIZE SEARCH'; }
-        }
-
-        function setupEventListeners() {
-            ['data-view', 'metric-type'].forEach(id => document.getElementById(id).addEventListener('change', () => { updateMap(); updateCharts(); }));
-            document.getElementById('search-btn').addEventListener('click', () => {
-                const city = document.getElementById('city-search').value;
-                const state = document.getElementById('state-select').value;
-                if (city) fetchCityData(city, state);
-            });
-            document.getElementById('api-key').addEventListener('change', refreshData);
-        }
-
-        const stateNameMap = { "Alabama": "AL", "Alaska": "AK", "Arizona": "AZ", "Arkansas": "AR", "California": "CA", "Colorado": "CO", "Connecticut": "CT", "Delaware": "DE", "Florida": "FL", "Georgia": "GA", "Hawaii": "HI", "Idaho": "ID", "Illinois": "IL", "Indiana": "IN", "Iowa": "IA", "Kansas": "KS", "Kentucky": "KY", "Louisiana": "LA", "Maine": "ME", "Maryland": "MD", "Massachusetts": "MA", "Michigan": "MI", "Minnesota": "MN", "Mississippi": "MS", "Missouri": "MO", "Montana": "MT", "Nebraska": "NE", "Nevada": "NV", "New Hampshire": "NH", "New Jersey": "NJ", "New Mexico": "NM", "New York": "NY", "North Carolina": "NC", "North Dakota": "ND", "Ohio": "OH", "Oklahoma": "OK", "Oregon": "OR", "Pennsylvania": "PA", "Rhode Island": "RI", "South Carolina": "SC", "South Dakota": "SD", "Tennessee": "TN", "Texas": "TX", "Utah": "UT", "Vermont": "VT", "Virginia": "VA", "Washington": "WA", "West Virginia": "WV", "Wisconsin": "WI", "Wyoming": "WY" };
-        const fipsToAbbr = { "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT", "10": "DE", "12": "FL", "13": "GA", "15": "HI", "16": "ID", "17": "IL", "18": "IN", "19": "IA", "20": "KS", "21": "KY", "22": "LA", "23": "ME", "24": "MD", "25": "MA", "26": "MI", "27": "MN", "28": "MS", "29": "MO", "30": "MT", "31": "NE", "32": "NV", "33": "NH", "34": "NJ", "35": "NM", "36": "NY", "37": "NC", "38": "ND", "39": "OH", "40": "OK", "41": "OR", "42": "PA", "44": "RI", "45": "SC", "46": "SD", "47": "TN", "48": "TX", "49": "UT", "50": "VT", "51": "VA", "53": "WA", "54": "WV", "55": "WI", "56": "WY" };
+        };
 
         window.onload = init;
-    </script>
+</script>
+
 </body>
 </html>
