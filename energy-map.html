@@ -518,6 +518,13 @@
             } catch (e) { console.error(e); } finally { btn.innerText = 'INITIALIZE SEARCH'; }
         }
 
+                document.getElementById('state-select').addEventListener('change', () => {
+            selectedCityData = null;
+            citySearchInput.value = '';
+            autocompleteList.innerHTML = '';
+            autocompleteList.style.display = 'none';
+        });
+
         function setupEventListeners() {
             ['data-view', 'metric-type'].forEach(id => document.getElementById(id).addEventListener('change', () => { updateMap(); updateCharts(); }));
             document.getElementById('search-btn').addEventListener('click', () => {
