@@ -379,7 +379,7 @@
             trendChart = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','May','Jun'], datasets: [{ borderColor: '#BD0026', data: [], tension: 0.4, fill: true, backgroundColor: 'rgba(189,0,38,0.1)' }] }, options: common });
         }
 
-        async function fetchLiveData(key) {
+        async function fetchLiveData(key) { console.log('Starting data fetch...');
             try {
                 const cRes = await fetch(`${APP_CONFIG.CENSUS_API_BASE}/pep/population?get=NAME,POP&for=state:*&key=${APP_CONFIG.CENSUS_API_KEY}`);
                 const cJson = await cRes.json();
@@ -526,6 +526,12 @@
         });
 
         function setupEventListeners() {
+                        document.getElementById('state-select').addEventListener('change', () => {
+                selectedCityData = null;
+                citySearchInput.value = '';
+                autocompleteList.innerHTML = '';
+                autocompleteList.style.display = 'none';
+            });
             ['data-view', 'metric-type'].forEach(id => document.getElementById(id).addEventListener('change', () => { updateMap(); updateCharts(); }));
             document.getElementById('search-btn').addEventListener('click', () => {
                 const city = document.getElementById('city-search').value, state = document.getElementById('state-select').value;
