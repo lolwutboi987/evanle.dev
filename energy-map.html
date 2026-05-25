@@ -206,16 +206,58 @@
                     <div id="autocomplete-list" class="autocomplete-items" style="display: none;"></div>
                 </div>
                 <select id="state-select">
-                    <option value="06">California (CA)</option>
-                    <option value="48">Texas (TX)</option>
-                    <option value="36">New York (NY)</option>
-                    <option value="12">Florida (FL)</option>
-                    <option value="17">Illinois (IL)</option>
-                    <option value="53">Washington (WA)</option>
-                    <option value="41">Oregon (OR)</option>
-                    <option value="32">Nevada (NV)</option>
-                    <option value="04">Arizona (AZ)</option>
-                    <option value="49">Utah (UT)</option>
+                    <option value="">Select State</option>
+                    <option value="01">Alabama</option>
+                    <option value="02">Alaska</option>
+                    <option value="04">Arizona</option>
+                    <option value="05">Arkansas</option>
+                    <option value="06">California</option>
+                    <option value="08">Colorado</option>
+                    <option value="09">Connecticut</option>
+                    <option value="10">Delaware</option>
+                    <option value="11">District of Columbia</option>
+                    <option value="12">Florida</option>
+                    <option value="13">Georgia</option>
+                    <option value="15">Hawaii</option>
+                    <option value="16">Idaho</option>
+                    <option value="17">Illinois</option>
+                    <option value="18">Indiana</option>
+                    <option value="19">Iowa</option>
+                    <option value="20">Kansas</option>
+                    <option value="21">Kentucky</option>
+                    <option value="22">Louisiana</option>
+                    <option value="23">Maine</option>
+                    <option value="24">Maryland</option>
+                    <option value="25">Massachusetts</option>
+                    <option value="26">Michigan</option>
+                    <option value="27">Minnesota</option>
+                    <option value="28">Mississippi</option>
+                    <option value="29">Missouri</option>
+                    <option value="30">Montana</option>
+                    <option value="31">Nebraska</option>
+                    <option value="32">Nevada</option>
+                    <option value="33">New Hampshire</option>
+                    <option value="34">New Jersey</option>
+                    <option value="35">New Mexico</option>
+                    <option value="36">New York</option>
+                    <option value="37">North Carolina</option>
+                    <option value="38">North Dakota</option>
+                    <option value="39">Ohio</option>
+                    <option value="40">Oklahoma</option>
+                    <option value="41">Oregon</option>
+                    <option value="42">Pennsylvania</option>
+                    <option value="44">Rhode Island</option>
+                    <option value="45">South Carolina</option>
+                    <option value="46">South Dakota</option>
+                    <option value="47">Tennessee</option>
+                    <option value="48">Texas</option>
+                    <option value="49">Utah</option>
+                    <option value="50">Vermont</option>
+                    <option value="51">Virginia</option>
+                    <option value="53">Washington</option>
+                    <option value="54">West Virginia</option>
+                    <option value="55">Wisconsin</option>
+                    <option value="56">Wyoming</option>
                 </select>
                 <button id="search-btn" class="btn-monolith">Initialize Search</button>
             </div>
@@ -296,9 +338,10 @@
         let map, comparisonChart, trendChart, gridChart;
         let geojsonLayer, cityLayers = {};
         let energyData = {}, censusData = {};
-        let activeCities = {}, currentRegion = 'CA';
+        let activeCities = {}, currentRegion = 'US';
+        let selectedCityData = null;
 
-        const fipsToAbbr = { "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT", "10": "DE", "12": "FL", "13": "GA", "15": "HI", "16": "ID", "17": "IL", "18": "IN", "19": "IA", "20": "KS", "21": "KY", "22": "LA", "23": "ME", "24": "MD", "25": "MA", "26": "MI", "27": "MN", "28": "MS", "29": "MO", "30": "MT", "31": "NE", "32": "NV", "33": "NH", "34": "NJ", "35": "NM", "36": "NY", "37": "NC", "38": "ND", "39": "OH", "40": "OK", "41": "OR", "42": "PA", "44": "RI", "45": "SC", "46": "SD", "47": "TN", "48": "TX", "49": "UT", "50": "VT", "51": "VA", "53": "WA", "54": "WV", "55": "WI", "56": "WY" };
+        const fipsToAbbr = { "01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT", "10": "DE", "11": "DC", "12": "FL", "13": "GA", "15": "HI", "16": "ID", "17": "IL", "18": "IN", "19": "IA", "20": "KS", "21": "KY", "22": "LA", "23": "ME", "24": "MD", "25": "MA", "26": "MI", "27": "MN", "28": "MS", "29": "MO", "30": "MT", "31": "NE", "32": "NV", "33": "NH", "34": "NJ", "35": "NM", "36": "NY", "37": "NC", "38": "ND", "39": "OH", "40": "OK", "41": "OR", "42": "PA", "44": "RI", "45": "SC", "46": "SD", "47": "TN", "48": "TX", "49": "UT", "50": "VT", "51": "VA", "53": "WA", "54": "WV", "55": "WI", "56": "WY" };
 
         async function init() {
             initMap();
@@ -308,7 +351,6 @@
 
             try {
                 await fetchLiveData(APP_CONFIG.EIA_API_KEY);
-                await fetchGridData(APP_CONFIG.EIA_API_KEY);
                 updateMap();
                 updateCharts();
             } catch(e) {
@@ -379,29 +421,53 @@
             trendChart = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','May','Jun'], datasets: [{ borderColor: '#BD0026', data: [], tension: 0.4, fill: true, backgroundColor: 'rgba(189,0,38,0.1)' }] }, options: common });
         }
 
-        async function fetchLiveData(key) { console.log('Starting data fetch...');
+        async function fetchLiveData(key) { 
+            console.log('Fetching regional reference data...');
             try {
                 const cRes = await fetch(`${APP_CONFIG.CENSUS_API_BASE}/pep/population?get=NAME,POP&for=state:*&key=${APP_CONFIG.CENSUS_API_KEY}`);
                 const cJson = await cRes.json();
-                cJson.slice(1).forEach(r => { const abbr = fipsToAbbr[r[2]]; if (abbr) censusData[abbr] = parseInt(r[1]); });
-                const types = { 'elec': 'electricity/retail-sales/data/?data[]=sales&facets[sectorid][]=RES', 'ng': 'natural-gas/cons/sum/data/?data[]=value', 'fuel': 'petroleum/move/neti/data/?data[]=value&facets[product][]=MG0TP' };
+                cJson.slice(1).forEach(r => { 
+                    const abbr = fipsToAbbr[r[2]]; 
+                    if (abbr) censusData[abbr] = parseInt(r[1]); 
+                });
+
+                const types = { 
+                    'elec': 'electricity/retail-sales/data/?data[]=sales&facets[sectorid][]=RES', 
+                    'ng': 'natural-gas/cons/sum/data/?data[]=value', 
+                    'fuel': 'petroleum/move/neti/data/?data[]=value&facets[product][]=MG0TP' 
+                };
+
                 for (const [id, path] of Object.entries(types)) {
                     try {
-                        const res = await fetch(`${APP_CONFIG.EIA_API_BASE}/${path}&api_key=${key}&frequency=monthly&length=100`);
+                        const res = await fetch(`${APP_CONFIG.EIA_API_BASE}/${path}&api_key=${key}&frequency=monthly&length=1000`);
                         const json = await res.json();
                         if (json && json.response && json.response.data) {
                             energyData[id] = energyData[id] || {};
+                            // Use latest available data for each state
+                            const stateLatest = {};
                             json.response.data.forEach(item => {
                                 const s = item.stateid || 'US';
+                                if (!stateLatest[s] || item.period > stateLatest[s].period) {
+                                    stateLatest[s] = item;
+                                }
+                            });
+
+                            Object.entries(stateLatest).forEach(([s, item]) => {
                                 const val = item.sales || item.value;
-                                if (!energyData[id][s]) energyData[id][s] = { value: val, trend: [] };
-                                if (energyData[id][s].trend.length < 6) energyData[id][s].trend.unshift(val);
+                                energyData[id][s] = { value: val, trend: [] };
+                                // Extract trend from raw data for this state
+                                const stateTrend = json.response.data
+                                    .filter(d => (d.stateid || 'US') === s)
+                                    .sort((a, b) => a.period.localeCompare(b.period))
+                                    .slice(-6)
+                                    .map(d => d.sales || d.value);
+                                energyData[id][s].trend = stateTrend;
                             });
                         }
-                    } catch (err) { console.error(err); }
+                    } catch (err) { console.error(`EIA ${id} fetch failed:`, err); }
                 }
-            } catch (e) { console.error("Initial load failed:", e); }
-        };
+            } catch (e) { console.error("Initial data load failed:", e); }
+        }
 
         function updateLegendContent(div) {
             const view = document.getElementById('data-view').value;
@@ -415,24 +481,63 @@
         function updateMap() {
             if (geojsonLayer) geojsonLayer.setStyle(stateStyle);
             if (map.legend) updateLegendContent(document.querySelector('.legend'));
+            
+            // Remove any cities that are no longer in activeCities
+            Object.keys(cityLayers).forEach(name => {
+                if (!activeCities[name]) {
+                    map.removeLayer(cityLayers[name]);
+                    delete cityLayers[name];
+                }
+            });
+
             Object.entries(activeCities).forEach(([name, data]) => {
                 const view = document.getElementById('data-view').value;
                 const metric = document.getElementById('metric-type').value;
                 const stateVal = (energyData[view] && energyData[view][data.state]) ? energyData[view][data.state].value : 0;
                 const statePop = censusData[data.state] || 1;
                 const acs = data.acs || { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
+                
                 const intensity = view === 'elec' ? acs.elecIntensity : (view === 'ng' ? acs.gasIntensity : 1);
                 let totalUsage = (stateVal / statePop) * data.pop * intensity * acs.incomeFactor;
+                
+                // If it's fuel, we don't have good ACS intensity so we just use population weight
+                if (view === 'fuel') totalUsage = (stateVal / statePop) * data.pop * acs.incomeFactor;
+                
                 let displayVal = metric === 'perCapita' ? (totalUsage * getUnits().conv / data.pop) : totalUsage;
-                const color = getColor(metric === 'perCapita' ? displayVal : (view === 'elec' ? displayVal/10 : displayVal/100), view, metric);
-                if (cityLayers[name]) cityLayers[name].setStyle({ fillColor: color });
-                else {
-                    cityLayers[name] = L.geoJson(data.geometry, { style: { fillColor: color, weight: 2, color: '#fff', fillOpacity: 0.8 }, pane: 'cities' }).addTo(map);
+                
+                // Color thresholds for cities need to be adjusted compared to states
+                const colorVal = metric === 'perCapita' ? displayVal : (view === 'elec' ? displayVal/10 : displayVal/100);
+                const color = getColor(colorVal, view, metric);
+                
+                if (cityLayers[name]) {
+                    cityLayers[name].setStyle({ fillColor: color });
+                } else {
+                    cityLayers[name] = L.geoJson(data.geometry, { 
+                        style: { 
+                            fillColor: color, 
+                            weight: 2, 
+                            color: '#fff', 
+                            fillOpacity: 0.8 
+                        }, 
+                        pane: 'cities' 
+                    }).addTo(map);
+                    
+                    cityLayers[name].on('click', () => { 
+                        currentRegion = name; 
+                        updateCharts(); 
+                        fetchGridData(APP_CONFIG.EIA_API_KEY); 
+                    });
                 }
-                cityLayers[name].bindPopup(`<strong>${name}</strong><br>Pop: ${data.pop.toLocaleString()}<br>Usage: ${displayVal.toLocaleString()} ${metric === 'perCapita' ? getUnits().perCapita : getUnits().main}`);
-                cityLayers[name].on('click', () => { currentRegion = name; updateCharts(); fetchGridData(APP_CONFIG.EIA_API_KEY); });
+                
+                cityLayers[name].bindPopup(`
+                    <div style="font-family:'Inter',sans-serif; padding:5px;">
+                        <strong style="font-family:'Space Grotesk'">${name}</strong><br>
+                        <span style="color:var(--monolith-muted)">Population:</span> ${data.pop.toLocaleString()}<br>
+                        <span style="color:var(--monolith-muted)">${view.toUpperCase()} Usage:</span> ${Math.round(displayVal).toLocaleString()} ${metric === 'perCapita' ? getUnits().perCapita : getUnits().main}
+                    </div>
+                `);
             });
-        };
+        }
 
         function updateCharts() {
             const view = document.getElementById('data-view').value;
@@ -493,7 +598,7 @@
 
         async function fetchCityData(cityName, stateFips) {
             const btn = document.getElementById('search-btn');
-            if (!selectedCityData || selectedCityData.name.toUpperCase() !== cityName.toUpperCase()) {
+            if (!selectedCityData) {
                 btn.innerText = 'SELECT FROM LIST';
                 setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000);
                 return;
@@ -501,41 +606,97 @@
 
             btn.innerText = 'INITIALIZING...';
             try {
-                const sqlWhere = `(UPPER(BASENAME) = '${cityName.toUpperCase()}' OR UPPER(NAME) LIKE '${cityName.toUpperCase()}%') AND STATE='${stateFips}'`;
-                const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=${encodeURIComponent(sqlWhere)}&outFields=NAME,STATE,POP100,GEOID,PLACE,BASENAME&f=geojson&outSR=4326`;
+                const placeFips = selectedCityData.place;
+                const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=STATE='${stateFips}' AND PLACE='${placeFips}'&outFields=NAME,STATE,POP100,GEOID,PLACE,BASENAME&f=geojson&outSR=4326`;
                 const tigerRes = await fetch(tigerUrl);
                 const tigerJson = await tigerRes.json();
+                
                 if (tigerJson.features && tigerJson.features.length > 0) {
-                    let feature = tigerJson.features.find(f => f.properties.BASENAME && f.properties.BASENAME.toUpperCase() === cityName.toUpperCase()) || tigerJson.features[0];
-                    const fullName = feature.properties.NAME, placeFips = feature.properties.PLACE || feature.properties.GEOID.slice(-5);
+                    const feature = tigerJson.features[0];
+                    const fullName = feature.properties.NAME;
+                    
                     if (cityLayers[fullName]) map.removeLayer(cityLayers[fullName]);
+                    
                     const acs = await fetchACSData(stateFips, placeFips);
-                    activeCities[fullName] = { pop: parseInt(feature.properties.POP100) || 50000, geometry: feature.geometry, state: fipsToAbbr[stateFips], acs: acs };
-                    currentRegion = fullName; updateMap(); updateCharts();
+                    activeCities[fullName] = { 
+                        pop: parseInt(feature.properties.POP100) || 1, 
+                        geometry: feature.geometry, 
+                        state: fipsToAbbr[stateFips], 
+                        acs: acs 
+                    };
+                    
+                    currentRegion = fullName;
+                    updateMap();
+                    updateCharts();
                     map.flyToBounds(L.geoJson(feature.geometry).getBounds(), { padding: [50, 50], duration: 1.5 });
                     fetchGridData(APP_CONFIG.EIA_API_KEY);
-                } else { btn.innerText = 'NOT FOUND'; setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000); }
-            } catch (e) { console.error(e); } finally { btn.innerText = 'INITIALIZE SEARCH'; }
+                } else { 
+                    btn.innerText = 'NOT FOUND'; 
+                    setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000); 
+                }
+            } catch (e) { 
+                console.error(e); 
+            } finally { 
+                btn.innerText = 'INITIALIZE SEARCH'; 
+            }
         }
 
-                document.getElementById('state-select').addEventListener('change', () => {
-            selectedCityData = null;
-            citySearchInput.value = '';
-            autocompleteList.innerHTML = '';
-            autocompleteList.style.display = 'none';
-        });
-
         function setupEventListeners() {
-                        document.getElementById('state-select').addEventListener('change', () => {
-                selectedCityData = null;
-                citySearchInput.value = '';
-                autocompleteList.innerHTML = '';
-                autocompleteList.style.display = 'none';
+            const citySearchInput = document.getElementById('city-search');
+            const autocompleteList = document.getElementById('autocomplete-list');
+            const stateSelect = document.getElementById('state-select');
+
+            citySearchInput.addEventListener('input', async (e) => {
+                const val = e.target.value;
+                const stateFips = stateSelect.value;
+                if (!val || !stateFips) {
+                    autocompleteList.style.display = 'none';
+                    return;
+                }
+
+                try {
+                    const sqlWhere = `UPPER(NAME) LIKE '${val.toUpperCase()}%' AND STATE='${stateFips}'`;
+                    const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=${encodeURIComponent(sqlWhere)}&outFields=NAME,STATE,PLACE,GEOID&f=json&resultRecordCount=10`;
+                    const res = await fetch(tigerUrl);
+                    const json = await res.json();
+                    
+                    autocompleteList.innerHTML = '';
+                    if (json.features && json.features.length > 0) {
+                        autocompleteList.style.display = 'block';
+                        json.features.forEach(f => {
+                            const div = document.createElement('div');
+                            div.innerHTML = f.attributes.NAME;
+                            div.addEventListener('click', () => {
+                                citySearchInput.value = f.attributes.NAME;
+                                selectedCityData = {
+                                    name: f.attributes.NAME,
+                                    place: f.attributes.PLACE || f.attributes.GEOID.slice(-5),
+                                    state: f.attributes.STATE
+                                };
+                                autocompleteList.style.display = 'none';
+                            });
+                            autocompleteList.appendChild(div);
+                        });
+                    } else {
+                        autocompleteList.style.display = 'none';
+                    }
+                } catch (err) {
+                    console.error("Autocomplete failed:", err);
+                }
             });
+
+            document.addEventListener('click', (e) => {
+                if (e.target !== citySearchInput) {
+                    autocompleteList.style.display = 'none';
+                }
+            });
+
             ['data-view', 'metric-type'].forEach(id => document.getElementById(id).addEventListener('change', () => { updateMap(); updateCharts(); }));
+            
             document.getElementById('search-btn').addEventListener('click', () => {
-                const city = document.getElementById('city-search').value, state = document.getElementById('state-select').value;
-                if (city) fetchCityData(city, state);
+                const city = citySearchInput.value;
+                const state = stateSelect.value;
+                if (city && state) fetchCityData(city, state);
             });
         }
 
