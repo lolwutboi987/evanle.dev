@@ -187,6 +187,35 @@
             select, input, .btn-monolith { padding: 0.8rem; }
             .data-panel { padding: 1.5rem; }
         }
+
+        .modal {
+            visibility: visible; opacity: 1;
+            position: fixed;
+            z-index: 10000; display: none;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: var(--monolith-surface);
+            padding: 2.5rem;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--monolith-muted);
+        }
+        .device-tag {
+            background: var(--monolith-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     </style>
 
 </head>
@@ -203,7 +232,7 @@
                 <p class="label-spec">Location Query</p>
                                 <div class="search-container">
                     <input type="text" id="city-search" placeholder="Enter City (e.g. Seattle)" autocomplete="off">
-                    <div id="autocomplete-list" class="autocomplete-items" style="display: none;"></div>
+                    <div id="autocomplete-list" class="autocomplete-items" style="visibility: visible; opacity: 1;"></div>
                 </div>
                 <select id="state-select">
                     <option value="">Select State</option>
@@ -260,7 +289,7 @@
                     <option value="56">Wyoming</option>
                 </select>
                 <button id="search-btn" class="btn-monolith">Initialize Search</button>
-                <div id="comparison-manager" style="margin-top: 1rem; display: none;">
+                <div id="comparison-manager" style="margin-top: 1rem; visibility: visible; opacity: 1;">
                     <p class="label-spec">Active Comparisons</p>
                     <div id="comparison-items" style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;"></div>
                 </div>
@@ -296,13 +325,13 @@
 
             <div class="data-grid">
 
-                <div class="data-panel" id="mix-panel" style="display: none; grid-column: span 2;">
+                <div class="data-panel" id="mix-panel" style="visibility: visible; opacity: 1; grid-column: span 2;">
                     <h3 id="mix-title">ENERGY SOURCE MIX (%)</h3>
                     <div class="chart-container" style="height: 300px;">
                         <canvas id="mixChart"></canvas>
                     </div>
                 </div>
-                <div class="data-panel" id="grid-panel" style="display: none; grid-column: span 2;">
+                <div class="data-panel" id="grid-panel" style="visibility: visible; opacity: 1; grid-column: span 2;">
                     <h3 id="grid-title">LIVE SYSTEM LOAD (MW) - BALANCING AUTHORITY</h3>
                     <div class="chart-container" style="height: 200px;">
                         <canvas id="gridChart"></canvas>
@@ -331,7 +360,7 @@
                     providing statistically weighted consumption variance across urban contours.
                 </p>
             </section>
-                        <section id="quiz-section" class="data-panel" style="grid-column: span 2; margin-top: 2rem;">
+                                    <section id="quiz-section" class="data-panel" style="grid-column: span 2; margin-top: 2rem;">
                 <h3 style="color: var(--monolith-fg);">Calculate My Impact (Personal Quiz)</h3>
                 <div id="quiz-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                     <div class="control-group">
@@ -356,16 +385,49 @@
                         <p class="label-spec">Cooking (Hours/Day)</p>
                         <input type="range" id="quiz-cooking" min="0" max="5" step="0.5" value="1">
                         <p id="cooking-val" style="font-size: 0.8rem;">1.0 hours</p>
-                        <p class="label-spec">Custom Device (Watts)</p>
-                        <input type="number" id="quiz-custom-watts" placeholder="e.g. 100 for PC" min="0">
-                        <p class="label-spec">Custom Device Hours/Day</p>
-                        <input type="number" id="quiz-custom-hours" value="0" min="0">
 
-                        <button class="btn-monolith" onclick="calculateQuiz()" style="margin-top: 1rem;">Compare My Footprint</button>
-                        <div id="quiz-results" style="margin-top: 1rem; font-size: 0.85rem; display: none;"></div>
+                        <p class="label-spec">Appliances & Devices</p>
+                        <div id="device-tags" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;"></div>
+                        <button class="btn-monolith" onclick="openDeviceModal()" style="font-size: 0.8rem; padding: 0.5rem;">+ Add Device</button>
+
+                        <button class="btn-monolith" onclick="calculateQuiz()" style="margin-top: 2rem;">Compare My Footprint</button>
+                        <div id="quiz-results" style="margin-top: 1rem; font-size: 0.85rem; visibility: visible; opacity: 1;"></div>
                     </div>
                 </div>
             </section>
+
+            <div id="device-modal" class="modal">
+                <div class="modal-content">
+                    <h3 style="margin-top: 0;">Add Appliance / Device</h3>
+                    <div class="control-group" style="margin-bottom: 1.5rem;">
+                        <p class="label-spec">Select Type</p>
+                        <select id="modal-device-type">
+                            <option value="fridge-hi">Refrigerator (High Efficiency) - 50W avg</option>
+                            <option value="fridge-lo">Refrigerator (Low Efficiency) - 150W avg</option>
+                            <option value="microwave">Microwave - 1200W</option>
+                            <option value="dishwasher">Dishwasher - 1500W</option>
+                            <option value="pc">Desktop PC - 200W</option>
+                            <option value="tv">Television (OLED/LED) - 100W</option>
+                            <option value="custom">Custom Device</option>
+                        </select>
+                    </div>
+                    <div id="custom-device-fields" style="display: none; margin-bottom: 1.5rem;">
+                         <div class="control-group">
+                            <p class="label-spec">Watts</p>
+                            <input type="number" id="modal-custom-watts" value="0">
+                         </div>
+                    </div>
+                    <div class="control-group" style="margin-bottom: 2rem;">
+                        <p class="label-spec">Usage (Hours/Day)</p>
+                        <input type="number" id="modal-device-hours" value="1" min="0" max="24">
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn-monolith" onclick="addDevice()" style="flex: 1;">Add</button>
+                        <button class="btn-monolith" onclick="closeDeviceModal()" style="flex: 1; background: var(--monolith-bg); color: var(--monolith-fg); border: 1px solid var(--monolith-muted);">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -448,7 +510,7 @@
             return colors[0];
         };
 
-        function getNormalizedValue(val, view, metric) {
+                function getNormalizedValue(val, view, metric) {
             if (metric === 'perCapita') {
                 if (view === 'elec') return val * 5;
                 if (view === 'ng') return val * 100;
@@ -462,13 +524,8 @@
             if (view === 'carbon') return val / 100000;
             return val;
         }
-            if (view === 'elec') return val / 100;
-            if (view === 'ng') return val * 2;
-            if (view === 'fuel') return val / 100;
-            return val;
-        }
 
-                function stateStyle(feature) {
+function stateStyle(feature) {
             const code = fipsToAbbr[feature.id || feature.properties.STATE];
             const view = document.getElementById('data-view').value;
             const metric = document.getElementById('metric-type').value;
@@ -488,175 +545,6 @@
             if (metric === 'perCapita') val = (val * getUnits().conv / pop);
             const normalized = getNormalizedValue(val, view, metric);
             return { fillColor: getColor(normalized), weight: code === 'CA' ? 2 : 1, opacity: 1, color: code === 'CA' ? '#fff' : '#242424', fillOpacity: 0.7 };
-        }
-
-        function initQuiz() {
-            const acBubbles = document.getElementById('ac-bubbles');
-            for (let i = 0; i <= 8; i++) {
-                const b = document.createElement('div');
-                b.innerText = i;
-                b.style = 'cursor:pointer; width:30px; height:30px; border:1px solid var(--monolith-muted); display:flex; align-items:center; justify-content:center; font-size:0.8rem; background: var(--monolith-surface); margin-bottom: 5px;';
-                if (i == 2) b.style.backgroundColor = 'var(--monolith-accent)';
-                b.onclick = () => {
-                    document.getElementById('quiz-ac').value = i;
-                    Array.from(acBubbles.children).forEach(c => c.style.backgroundColor = 'transparent');
-                    b.style.backgroundColor = 'var(--monolith-accent)';
-                };
-                acBubbles.appendChild(b);
-            }
-            document.getElementById('quiz-cooking').oninput = (e) => {
-                document.getElementById('cooking-val').innerText = `${parseFloat(e.target.value).toFixed(1)} hours`;
-            };
-        }
-
-        function calculateQuiz() {
-            const commute = parseFloat(document.getElementById('quiz-commute').value) || 0;
-            const vehicle = document.getElementById('quiz-vehicle').value;
-            const ac = parseFloat(document.getElementById('quiz-ac').value) || 0;
-            const acEff = parseFloat(document.getElementById('quiz-ac-eff').value) || 1.0;
-            const cooking = parseFloat(document.getElementById('quiz-cooking').value) || 0;
-            const customWatts = parseFloat(document.getElementById('quiz-custom-watts').value) || 0;
-            const customHours = parseFloat(document.getElementById('quiz-custom-hours').value) || 0;
-
-            let monthlyElec = (ac * acEff * 1.5 * 30) + (cooking * 1.0 * 30);
-            monthlyElec += (customWatts * customHours / 1000) * 30;
-
-            let monthlyFuel = 0;
-            if (vehicle === 'gas') monthlyFuel = (commute / 25) * 30;
-            if (vehicle === 'hybrid') monthlyFuel = (commute / 45) * 30;
-            if (vehicle === 'ev') monthlyElec += (commute * 0.3) * 30;
-
-            const myCarbon = (monthlyElec * APP_CONFIG.EMISSIONS.elec) + (monthlyFuel * 19.6);
-
-            const results = document.getElementById('quiz-results');
-            results.style.display = 'block';
-
-            let comparisons = "";
-            const avgUS = 1500;
-            const diffUS = ((myCarbon - avgUS) / avgUS * 100).toFixed(1);
-            comparisons += `<br>• vs National Average: <strong>${Math.abs(diffUS)}% ${diffUS > 0 ? 'above' : 'below'}</strong>`;
-
-            if (currentRegion && activeCities[currentRegion]) {
-                const city = activeCities[currentRegion];
-                const pop = city.pop || 1;
-                const statePop = censusData[city.state] || 1;
-                const eVal = ((energyData['elec'] && energyData['elec'][city.state]) ? energyData['elec'][city.state].value : 0) / statePop * pop;
-                const gVal = ((energyData['ng'] && energyData['ng'][city.state]) ? energyData['ng'][city.state].value : 0) / statePop * pop;
-                const cityCarbonPerCapita = ((eVal * APP_CONFIG.EMISSIONS.elec) + (gVal * APP_CONFIG.EMISSIONS.ng)) / pop;
-
-                const diffCity = ((myCarbon - cityCarbonPerCapita) / cityCarbonPerCapita * 100).toFixed(1);
-                comparisons += `<br>• vs ${currentRegion} Average: <strong>${Math.abs(diffCity)}% ${diffCity > 0 ? 'above' : 'below'}</strong>`;
-            }
-
-            results.innerHTML = `
-                <div style="border-left: 2px solid var(--monolith-accent); padding-left: 1rem; background: rgba(255,255,255,0.02); padding: 1rem;">
-                    <p style="margin: 0; color: var(--monolith-muted);">YOUR MONTHLY IMPACT</p>
-                    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.5rem 0;">${Math.round(myCarbon).toLocaleString()} <span style="font-size: 0.8rem; font-weight: normal;">lbs CO2</span></p>
-                    <p style="margin: 0; font-size: 0.8rem;">${comparisons}</p>
-                </div>
-            `;
-
-            updateCharts();
-            trendChart.data.datasets.push({
-                label: 'YOU',
-                borderColor: '#fdfdf5',
-                borderDash: [5, 5],
-                data: [myCarbon, myCarbon, myCarbon, myCarbon, myCarbon, myCarbon],
-                fill: false,
-                pointRadius: 5
-            });
-            trendChart.update();
-        }
-
-
-        function initCharts\(\) \{
-            const common = {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { ticks: { color: '#a1a19a', font: { size: 10 } }, grid: { display: false } },
-                    y: { ticks: { color: '#a1a19a', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
-                }
-            };
-            comparisonChart = new Chart(document.getElementById('comparisonChart'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#BD0026', data: [] }] }, options: common });
-            trendChart = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','May','Jun'], datasets: [{ borderColor: '#BD0026', data: [], tension: 0.4, fill: true, backgroundColor: 'rgba(189,0,38,0.1)' }] }, options: common });
-
-            mixChart = new Chart(document.getElementById('mixChart'), {
-                type: 'pie',
-                data: { labels: [], datasets: [{ data: [], backgroundColor: ['#BD0026', '#E31A1C', '#FC4E2A', '#FD8D3C', '#FEB24C', '#FED976'] }] },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: true, position: 'right', labels: { color: '#fdfdf5', font: { size: 10 } } } }
-                }
-            });
-        }
-            };
-            comparisonChart = new Chart(document.getElementById('comparisonChart'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#BD0026', data: [] }] }, options: common });
-            trendChart = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','May','Jun'], datasets: [{ borderColor: '#BD0026', data: [], tension: 0.4, fill: true, backgroundColor: 'rgba(189,0,38,0.1)' }] }, options: common });
-        }
-
-        async function fetchLiveData(key) { 
-            console.log('Fetching regional reference data...');
-            try {
-                const cRes = await fetch(`${APP_CONFIG.CENSUS_API_BASE}/pep/population?get=NAME,POP_2021&for=state:*&key=${APP_CONFIG.CENSUS_API_KEY}`);
-                const cJson = await cRes.json();
-                cJson.slice(1).forEach(r => { 
-                    const abbr = fipsToAbbr[r[2]]; 
-                    if (abbr) censusData[abbr] = parseInt(r[1]); 
-                });
-
-                const types = { 
-                    'elec': 'electricity/retail-sales/data/?data[]=sales&facets[sectorid][]=RES', 
-                    'ng': 'natural-gas/cons/sum/data/?data[]=value', 
-                    'fuel': 'petroleum/cons/prim/data/?data[]=value&facets[product][]=EPM0'
-                };
-
-                for (const [id, path] of Object.entries(types)) {
-                    try {
-                        const res = await fetch(`${APP_CONFIG.EIA_API_BASE}/${path}&api_key=${key}&frequency=monthly&length=1000`);
-                        const json = await res.json();
-                        if (json && json.response && json.response.data) {
-                            energyData[id] = energyData[id] || {};
-                            const stateLatest = {};
-                            json.response.data.forEach(item => {
-                                let s = item.stateid || (item.duoarea === 'NUS' ? 'US' : (item.duoarea && item.duoarea.startsWith('S') ? item.duoarea.slice(1,3) : 'US'));
-                                if (!s || s === 'US') s = 'US';
-                                // For fuel, prefer process 'P00' (All Sales/Deliveries)
-                                if (id === 'fuel' && item.process !== 'P00') return;
-                                if (!stateLatest[s] || item.period > stateLatest[s].period) {
-                                    stateLatest[s] = item;
-                                }
-                            });
-
-                            Object.entries(stateLatest).forEach(([s, item]) => {
-                                let val = parseFloat(item.sales || item.value);
-                                if (id === 'elec') val *= 1000; // Convert Million kWh to MWh
-                                if (id === 'fuel') {
-                                    // Convert MGAL/D to BBL/mo: (Value * 1000 * 30.4) / 42
-                                    val = (val * 1000 * 30.4) / 42;
-                                }
-                                energyData[id][s] = { value: val, trend: [] };
-
-                                const stateTrend = json.response.data
-                                    .filter(d => {
-                                        const ds = d.stateid || (d.duoarea === 'NUS' ? 'US' : (d.duoarea && d.duoarea.startsWith('S') ? d.duoarea.slice(1,3) : 'US'));
-                                        if (id === 'fuel' && d.process !== 'P00') return false;
-                                        return ds === s;
-                                    })
-                                    .sort((a, b) => a.period.localeCompare(b.period))
-                                    .slice(-6)
-                                    .map(d => {
-                                        let v = parseFloat(d.sales || d.value);
-                                        if (id === 'elec') v *= 1000;
-                                        if (id === 'fuel') v = (v * 1000 * 30.4) / 42;
-                                        return v;
-                                    });
-                                energyData[id][s].trend = stateTrend;
-                            });
-                        }
-                    } catch (err) { console.error(`EIA ${id} fetch failed:`, err); }
-                }
-            } catch (e) { console.error("Initial data load failed:", e); }
         }
 
         function updateLegendContent(div) {
@@ -681,7 +569,7 @@
         function updateMap() {
             if (geojsonLayer) geojsonLayer.setStyle(stateStyle);
             if (map.legend) updateLegendContent(document.querySelector('.legend'));
-            
+
             Object.keys(cityLayers).forEach(name => {
                 if (!activeCities[name]) {
                     map.removeLayer(cityLayers[name]);
@@ -694,39 +582,39 @@
                 const metric = document.getElementById('metric-type').value;
                 const statePop = censusData[data.state] || 1;
                 const acs = data.acs || { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
-                
+
                 let totalUsage = 0;
                 if (view === 'carbon') {
                     const eVal = ((energyData['elec'] && energyData['elec'][data.state]) ? energyData['elec'][data.state].value : 0) / statePop * data.pop * acs.elecIntensity * acs.incomeFactor;
                     const gVal = ((energyData['ng'] && energyData['ng'][data.state]) ? energyData['ng'][data.state].value : 0) / statePop * data.pop * acs.gasIntensity * acs.incomeFactor;
                     totalUsage = (eVal * APP_CONFIG.EMISSIONS.elec) + (gVal * APP_CONFIG.EMISSIONS.ng);
                 } else if (view === 'mix') {
-                    totalUsage = 0; // Handled by pie chart
+                    totalUsage = 0;
                 } else {
                     const stateVal = (energyData[view] && energyData[view][data.state]) ? energyData[view][data.state].value : 0;
                     const intensity = view === 'elec' ? acs.elecIntensity : (view === 'ng' ? acs.gasIntensity : 1);
                     totalUsage = (stateVal / statePop) * data.pop * (view === 'fuel' ? 1 : intensity) * acs.incomeFactor;
                 }
-                
+
                 let units = getUnits() || { main: '', perCapita: '', conv: 1 };
                 let displayVal = metric === 'perCapita' ? (totalUsage * units.conv / data.pop) : totalUsage;
                 const color = getColor(getNormalizedValue(displayVal, view, metric));
-                
+
                 if (cityLayers[name]) {
                     cityLayers[name].setStyle({ fillColor: color });
                 } else {
-                    cityLayers[name] = L.geoJson(data.geometry, { 
+                    cityLayers[name] = L.geoJson(data.geometry, {
                         style: { fillColor: color, weight: 2, color: '#fff', fillOpacity: 0.8 },
-                        pane: 'cities' 
+                        pane: 'cities'
                     }).addTo(map);
-                    
-                    cityLayers[name].on('click', () => { 
-                        currentRegion = name; 
-                        updateCharts(); 
+
+                    cityLayers[name].on('click', () => {
+                        currentRegion = name;
+                        updateCharts();
                         fetchGridData(APP_CONFIG.EIA_API_KEY); fetchFuelMix(APP_CONFIG.EIA_API_KEY);
                     });
                 }
-                
+
                 cityLayers[name].bindPopup(`
                     <div style="font-family:'Inter',sans-serif; padding:5px;">
                         <strong style="font-family:'Space Grotesk'">${name}</strong><br>
@@ -737,13 +625,159 @@
             });
         }
 
-                cityLayers[name].bindPopup(`
-                    <div style="font-family:'Inter',sans-serif; padding:5px;">
-                        <strong style="font-family:'Space Grotesk'">${name}</strong><br>
-                        <span style="color:var(--monolith-muted)">Population:</span> ${data.pop.toLocaleString()}<br>
-                        <span style="color:var(--monolith-muted)">${view.toUpperCase()} Usage:</span> ${Math.round(displayVal).toLocaleString()} ${metric === 'perCapita' ? getUnits().perCapita : getUnits().main}
-                    </div>
-                `);
+
+        let addedDevices = [];
+        const deviceLibrary = {
+            'fridge-hi': { name: 'Fridge (HE)', watts: 50 },
+            'fridge-lo': { name: 'Fridge (LE)', watts: 150 },
+            'microwave': { name: 'Microwave', watts: 1200 },
+            'dishwasher': { name: 'Dishwasher', watts: 1500 },
+            'pc': { name: 'PC', watts: 200 },
+            'tv': { name: 'TV', watts: 100 }
+        };
+
+        function initQuiz() {
+            const acBubbles = document.getElementById('ac-bubbles');
+            if (acBubbles) {
+                acBubbles.innerHTML = '';
+                for (let i = 0; i <= 8; i++) {
+                    const b = document.createElement('div');
+                    b.innerText = i;
+                    b.style = 'cursor:pointer; width:30px; height:30px; border:1px solid var(--monolith-muted); display:flex; align-items:center; justify-content:center; font-size:0.8rem; background: var(--monolith-surface); margin-bottom: 5px;';
+                    if (i == 2) b.style.backgroundColor = 'var(--monolith-accent)';
+                    b.onclick = () => {
+                        document.getElementById('quiz-ac').value = i;
+                        Array.from(acBubbles.children).forEach(c => c.style.backgroundColor = 'transparent');
+                        b.style.backgroundColor = 'var(--monolith-accent)';
+                    };
+                    acBubbles.appendChild(b);
+                }
+            }
+            const cookingInput = document.getElementById('quiz-cooking');
+            if (cookingInput) {
+                cookingInput.oninput = (e) => {
+                    document.getElementById('cooking-val').innerText = `${parseFloat(e.target.value).toFixed(1)} hours`;
+                };
+            }
+            const deviceTypeSelect = document.getElementById('modal-device-type');
+            if (deviceTypeSelect) {
+                deviceTypeSelect.onchange = (e) => {
+                    document.getElementById('custom-device-fields').style.display = e.target.value === 'custom' ? 'block' : 'none';
+                };
+            }
+        }
+
+        function openDeviceModal() { document.getElementById('device-modal').style.display = 'flex'; }
+        function closeDeviceModal() { document.getElementById('device-modal').style.display = 'none'; }
+
+        function addDevice() {
+            const type = document.getElementById('modal-device-type').value;
+            const hours = parseFloat(document.getElementById('modal-device-hours').value) || 0;
+            let watts = 0, name = '';
+
+            if (type === 'custom') {
+                watts = parseFloat(document.getElementById('modal-custom-watts').value) || 0;
+                name = 'Custom Device';
+            } else {
+                watts = deviceLibrary[type].watts;
+                name = deviceLibrary[type].name;
+            }
+
+            addedDevices.push({ name, watts, hours });
+            updateDeviceTags();
+            closeDeviceModal();
+        }
+
+        function removeDevice(index) {
+            addedDevices.splice(index, 1);
+            updateDeviceTags();
+        }
+
+        function updateDeviceTags() {
+            const container = document.getElementById('device-tags');
+            container.innerHTML = '';
+            addedDevices.forEach((d, i) => {
+                const tag = document.createElement('div');
+                tag.className = 'device-tag';
+                tag.innerHTML = `<span>${d.name} (${d.hours}h)</span><span style="cursor:pointer; color:var(--monolith-accent);" onclick="removeDevice(${i})">×</span>`;
+                container.appendChild(tag);
+            });
+        }
+
+        function calculateQuiz() {
+            const commute = parseFloat(document.getElementById('quiz-commute').value) || 0;
+            const vehicle = document.getElementById('quiz-vehicle').value;
+            const ac = parseFloat(document.getElementById('quiz-ac').value) || 0;
+            const acEff = parseFloat(document.getElementById('quiz-ac-eff').value) || 1.0;
+            const cooking = parseFloat(document.getElementById('quiz-cooking').value) || 0;
+
+            let monthlyElec = (ac * acEff * 1.5 * 30) + (cooking * 1.0 * 30);
+            addedDevices.forEach(d => { monthlyElec += (d.watts * d.hours / 1000) * 30; });
+
+            let monthlyFuel = 0;
+            if (vehicle === 'gas') monthlyFuel = (commute / 25) * 30;
+            if (vehicle === 'hybrid') monthlyFuel = (commute / 45) * 30;
+            if (vehicle === 'ev') monthlyElec += (commute * 0.3) * 30;
+
+            const myCarbon = (monthlyElec * APP_CONFIG.EMISSIONS.elec) + (monthlyFuel * 19.6);
+            const results = document.getElementById('quiz-results');
+            results.style.display = 'block';
+
+            let comparisons = "";
+            const avgUS = 1500;
+            const diffUS = ((myCarbon - avgUS) / avgUS * 100).toFixed(1);
+            comparisons += `<br>• vs National Average: <strong>${Math.abs(diffUS)}% ${diffUS > 0 ? 'above' : 'below'}</strong>`;
+
+            if (currentRegion && activeCities[currentRegion]) {
+                const city = activeCities[currentRegion];
+                const pop = city.pop || 1;
+                const statePop = censusData[city.state] || 1;
+                const eVal = ((energyData['elec'] && energyData['elec'][city.state]) ? energyData['elec'][city.state].value : 0) / statePop * pop;
+                const gVal = ((energyData['ng'] && energyData['ng'][city.state]) ? energyData['ng'][city.state].value : 0) / statePop * pop;
+                const cityCarbonPerCapita = ((eVal * APP_CONFIG.EMISSIONS.elec) + (gVal * APP_CONFIG.EMISSIONS.ng)) / pop;
+                const diffCity = ((myCarbon - cityCarbonPerCapita) / cityCarbonPerCapita * 100).toFixed(1);
+                comparisons += `<br>• vs ${currentRegion} Average: <strong>${Math.abs(diffCity)}% ${diffCity > 0 ? 'above' : 'below'}</strong>`;
+            }
+
+            results.innerHTML = `
+                <div style="border-left: 2px solid var(--monolith-accent); padding-left: 1rem; background: rgba(255,255,255,0.02); padding: 1rem;">
+                    <p style="margin: 0; color: var(--monolith-muted);">YOUR MONTHLY IMPACT</p>
+                    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.5rem 0;">${Math.round(myCarbon).toLocaleString()} <span style="font-size: 0.8rem; font-weight: normal;">lbs CO2</span></p>
+                    <p style="margin: 0; font-size: 0.8rem;">${comparisons}</p>
+                </div>
+            `;
+
+            updateCharts();
+            trendChart.data.datasets.push({
+                label: 'YOU',
+                borderColor: '#fdfdf5',
+                borderDash: [5, 5],
+                data: [myCarbon, myCarbon, myCarbon, myCarbon, myCarbon, myCarbon],
+                fill: false,
+                pointRadius: 5
+            });
+            trendChart.update();
+        }
+
+        function initCharts() {
+            const common = {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#a1a19a', font: { size: 10 } }, grid: { display: false } },
+                    y: { ticks: { color: '#a1a19a', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                }
+            };
+            comparisonChart = new Chart(document.getElementById('comparisonChart'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#BD0026', data: [] }] }, options: common });
+            trendChart = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','May','Jun'], datasets: [{ borderColor: '#BD0026', data: [], tension: 0.4, fill: true, backgroundColor: 'rgba(189,0,38,0.1)' }] }, options: common });
+
+            mixChart = new Chart(document.getElementById('mixChart'), {
+                type: 'pie',
+                data: { labels: [], datasets: [{ data: [], backgroundColor: ['#BD0026', '#E31A1C', '#FC4E2A', '#FD8D3C', '#FEB24C', '#FED976'] }] },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: true, position: 'right', labels: { color: '#fdfdf5', font: { size: 10 } } } }
+                }
             });
         }
 
@@ -752,7 +786,6 @@
             const metric = document.getElementById('metric-type').value;
             const units = getUnits() || { main: 'N/A', perCapita: 'N/A', conv: 1 };
 
-            // Comparison Chart (Top 5 States) - Keep as is for context
             document.getElementById('comp-title').innerText = `REGIONAL COMPARATIVE DATA (${metric === 'perCapita' ? units.perCapita : units.main})`;
             if (energyData[view]) {
                 const states = Object.keys(energyData[view]).sort((a,b) => (energyData[view][b].value - energyData[view][a].value)).slice(0, 5);
@@ -764,10 +797,8 @@
                 comparisonChart.update();
             }
 
-            // Trend Chart (Multi-city overlay)
             document.getElementById('trend-title').innerText = comparisonList.length > 0 ? `COMPARATIVE MONTHLY TRENDS` : `${currentRegion} MONTHLY TREND`;
             trendChart.data.datasets = [];
-
             const cityColors = ['#BD0026', '#E31A1C', '#FC4E2A', '#FD8D3C', '#FEB24C'];
 
             if (comparisonList.length > 0) {
@@ -779,45 +810,143 @@
                     let base = ((energyData[view] && energyData[view][city.state]) ? energyData[view][city.state].value : 0) / (censusData[city.state] || 1) * city.pop * intensity * acs.incomeFactor;
 
                     if (view === 'carbon') {
-                        // Calculate carbon footprint
                         const eVal = ((energyData['elec'] && energyData['elec'][city.state]) ? energyData['elec'][city.state].value : 0) / (censusData[city.state] || 1) * city.pop * acs.elecIntensity * acs.incomeFactor;
                         const gVal = ((energyData['ng'] && energyData['ng'][city.state]) ? energyData['ng'][city.state].value : 0) / (censusData[city.state] || 1) * city.pop * acs.gasIntensity * acs.incomeFactor;
                         base = (eVal * APP_CONFIG.EMISSIONS.elec) + (gVal * APP_CONFIG.EMISSIONS.ng);
                     }
-
                     if (metric === 'perCapita') base = (base * units.conv / city.pop);
                     const trend = [base*0.9, base*0.95, base, base*0.98, base*1.02, base*1.05];
-
-                    trendChart.data.datasets.push({
-                        label: cityName,
-                        borderColor: cityColors[idx % cityColors.length],
-                        data: trend,
-                        tension: 0.4,
-                        fill: false
-                    });
+                    trendChart.data.datasets.push({ label: cityName, borderColor: cityColors[idx % cityColors.length], data: trend, tension: 0.4, fill: false });
                 });
             } else {
-                // Fallback for state view or national
                 let trend = [0,0,0,0,0,0];
                 if (energyData[view] && energyData[view][currentRegion]) {
                     trend = energyData[view][currentRegion].trend;
                     if (metric === 'perCapita') trend = trend.map(t => (t * units.conv / (censusData[currentRegion] || 1)));
                 }
-                trendChart.data.datasets.push({
-                    label: currentRegion,
-                    borderColor: '#BD0026',
-                    data: trend.slice(-6),
-                    tension: 0.4,
-                    fill: true,
-                    backgroundColor: 'rgba(189,0,38,0.1)'
-                });
+                trendChart.data.datasets.push({ label: currentRegion, borderColor: '#BD0026', data: trend.slice(-6), tension: 0.4, fill: true, backgroundColor: 'rgba(189,0,38,0.1)' });
             }
-            trendChart.options.plugins.legend = { display: comparisonList.length > 0, labels: { color: '#fdfdf5' } };
+            trendChart.options.plugins.legend = { display: (comparisonList.length > 0), labels: { color: '#fdfdf5' } };
             trendChart.update();
         }
+
+        async function fetchACSData(stateFips, placeFips) {
+            try {
+                const res = await fetch(`https://api.census.gov/data/2021/acs/acs5?get=NAME,B25040_001E,B25040_004E,B25040_002E,B19013_001E&for=place:${placeFips}&in=state:${stateFips}&key=${APP_CONFIG.CENSUS_API_KEY}`);
+                const json = await res.json();
+                if (json && json[1]) {
+                    const total = parseInt(json[1][1]), elec = parseInt(json[1][2]), gas = parseInt(json[1][3]), income = parseInt(json[1][4]);
+                    return { elecIntensity: total > 0 ? (elec / total) / 0.25 : 1, gasIntensity: total > 0 ? (gas / total) / 0.50 : 1, incomeFactor: income > 0 ? (income / 70000) : 1 };
+                }
             } catch (e) { console.error(e); }
             return { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
         }
+
+        async function fetchGridData(key) {
+            const baMap = { 'CA': 'CISO', 'TX': 'ERCO', 'NY': 'NYIS', 'FL': 'FPL', 'WA': 'BPAT', 'IL': 'PJM', 'AZ': 'SRP', 'NV': 'NEVP', 'OR': 'BPAT', 'UT': 'PACE' };
+            const city = activeCities[currentRegion], state = city ? city.state : currentRegion, ba = baMap[state] || 'CISO';
+            try {
+                const res = await fetch(`https://api.eia.gov/v2/electricity/rto/region-data/data/?api_key=${key}&frequency=hourly&data[]=value&facets[respondent][]=${ba}&sort[0][column]=period&sort[0][direction]=desc&length=24`);
+                const json = await res.json();
+                if (json && json.response && json.response.data && json.response.data.length > 0) {
+                    const gridTrend = json.response.data.map(d => d.value).reverse();
+                    document.getElementById('grid-panel').style.display = 'block';
+                    document.getElementById('grid-title').innerText = `LIVE SYSTEM LOAD (MW) - ${ba}`;
+                    gridChart.data.datasets[0].data = gridTrend;
+                    gridChart.update();
+                } else { document.getElementById('grid-panel').style.display = 'none'; }
+            } catch (e) { document.getElementById('grid-panel').style.display = 'none'; }
+        }
+
+        async function fetchCityData(cityName, stateFips) {
+            const btn = document.getElementById('search-btn');
+            btn.innerText = 'INITIALIZING...';
+            try {
+                let placeFips;
+                if (selectedCityData && selectedCityData.name.toUpperCase() === cityName.toUpperCase()) {
+                    placeFips = selectedCityData.place;
+                } else {
+                    const sqlWhere = "UPPER(BASENAME) = '" + cityName.toUpperCase().replace("'", "''") + "' AND STATE='" + stateFips + "'";
+                    const tigerSearchUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=${encodeURIComponent(sqlWhere)}&outFields=NAME,STATE,PLACE,GEOID&f=json`;
+                    const sRes = await fetch(tigerSearchUrl);
+                    const sJson = await sRes.json();
+                    if (sJson.features && sJson.features.length > 0) {
+                        placeFips = sJson.features[0].attributes.PLACE || sJson.features[0].attributes.GEOID.slice(-5);
+                    } else {
+                        const broadWhere = "(UPPER(NAME) = '" + cityName.toUpperCase().replace("'", "''") + "' OR UPPER(NAME) LIKE '" + cityName.toUpperCase().replace("'", "''") + " %') AND STATE='" + stateFips + "'";
+                        const broadUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=${encodeURIComponent(broadWhere)}&outFields=NAME,STATE,PLACE,GEOID&f=json`;
+                        const bRes = await fetch(broadUrl);
+                        const bJson = await bRes.json();
+                        if (bJson.features && bJson.features.length > 0) {
+                            placeFips = bJson.features[0].attributes.PLACE || bJson.features[0].attributes.GEOID.slice(-5);
+                        } else {
+                            btn.innerText = 'NOT FOUND';
+                            setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000);
+                            return;
+                        }
+                    }
+                }
+                const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=STATE='${stateFips}' AND PLACE='${placeFips}'&outFields=NAME,STATE,POP100,GEOID,PLACE,BASENAME&f=geojson&outSR=4326`;
+                const tigerRes = await fetch(tigerUrl);
+                const tigerJson = await tigerRes.json();
+                if (tigerJson.features && tigerJson.features.length > 0) {
+                    const feature = tigerJson.features[0];
+                    const fullName = feature.properties.BASENAME || feature.properties.NAME;
+                    if (activeCities[fullName]) { btn.innerText = 'ALREADY ADDED'; setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000); return; }
+                    const acs = await fetchACSData(stateFips, placeFips);
+                    activeCities[fullName] = { pop: parseInt(feature.properties.POP100) || 1, geometry: feature.geometry, state: fipsToAbbr[stateFips], acs: acs };
+                    comparisonList.push(fullName);
+                    currentRegion = fullName;
+                    updateComparisonUI();
+                    updateMap();
+                    updateCharts();
+                    map.flyToBounds(L.geoJson(feature.geometry).getBounds(), { padding: [50, 50], duration: 1.5 });
+                    fetchGridData(APP_CONFIG.EIA_API_KEY); fetchFuelMix(APP_CONFIG.EIA_API_KEY);
+                } else { btn.innerText = 'NOT FOUND'; setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000); }
+            } catch (e) { console.error(e); } finally { btn.innerText = 'INITIALIZE SEARCH'; }
+        }
+
+        async function fetchLiveData(key) {
+            console.log('Fetching regional reference data...');
+            try {
+                const cRes = await fetch(`${APP_CONFIG.CENSUS_API_BASE}/pep/population?get=NAME,POP_2021&for=state:*&key=${APP_CONFIG.CENSUS_API_KEY}`);
+                const cJson = await cRes.json();
+                cJson.slice(1).forEach(r => {
+                    const abbr = fipsToAbbr[r[2]];
+                    if (abbr) censusData[abbr] = parseInt(r[1]);
+                });
+
+                const types = {
+                    'elec': 'electricity/retail-sales/data/?data[]=sales&facets[sectorid][]=RES',
+                    'ng': 'natural-gas/cons/sum/data/?data[]=value',
+                    'fuel': 'petroleum/cons/prim/data/?data[]=value&facets[product][]=EPM0'
+                };
+
+                for (const [id, path] of Object.entries(types)) {
+                    try {
+                        const res = await fetch(`${APP_CONFIG.EIA_API_BASE}/${path}&api_key=${key}&frequency=monthly&length=5000`);
+                        const json = await res.json();
+                        if (json.response && json.response.data) {
+                            energyData[id] = {};
+                            const data = json.response.data;
+                            const latestPeriod = data[0].period;
+                            data.filter(d => d.period === latestPeriod).forEach(d => {
+                                const s = d.stateid || (d.duoarea ? d.duoarea.slice(-2) : null);
+                                if (s && fipsToAbbr[s] || Object.values(fipsToAbbr).includes(s)) {
+                                    energyData[id][s] = { value: parseFloat(d.sales || d.value) };
+                                }
+                            });
+                            Object.keys(energyData[id]).forEach(s => {
+                                const stateTrend = data.filter(d => (d.stateid === s || (d.duoarea && d.duoarea.slice(-2) === s)))
+                                    .slice(0, 6).reverse().map(d => parseFloat(d.sales || d.value));
+                                energyData[id][s].trend = stateTrend;
+                            });
+                        }
+                    } catch (err) { console.error(`EIA ${id} fetch failed:`, err); }
+                }
+            } catch (e) { console.error("Initial data load failed:", e); }
+        }
+
 
         async function fetchFuelMix(key) {
             const baMap = { 'CA': 'CISO', 'TX': 'ERCO', 'NY': 'NYIS', 'FL': 'FPL', 'WA': 'BPAT', 'IL': 'PJM', 'AZ': 'SRP', 'NV': 'NEVP', 'OR': 'BPAT', 'UT': 'PACE' };
@@ -950,14 +1079,6 @@
             delete activeCities[name];
             if (currentRegion === name) currentRegion = comparisonList.length > 0 ? comparisonList[0] : 'US';
             updateComparisonUI();
-            updateMap();
-            updateCharts();
-        }
-            } catch (e) {
-                console.error(e);
-            } finally {
-                btn.innerText = 'INITIALIZE SEARCH';
-            }
         }
 
         function setupEventListeners() {
