@@ -479,11 +479,11 @@
 
         function getUnits() {
             const types = {
-                'elec': { main: 'MWh / mo', perCapita: 'kWh/person / mo', conv: 1000 },
-                'ng': { main: 'MMCF / mo', perCapita: 'MCF/person / mo', conv: 1000 },
-                'fuel': { main: 'BBL / mo', perCapita: 'Gallons/person / mo', conv: 42 },
-                'carbon': { main: 'lbs CO2 / mo', perCapita: 'lbs/person / mo', conv: 1 },
-                'mix': { main: '% Share', perCapita: '% Share', conv: 1 }
+                'elec': { main: 'MWh / mo', perCapita: 'kWh/person / mo', totalConv: 1000, pcConv: 1000000 },
+                'ng': { main: 'MMCF / mo', perCapita: 'MCF/person / mo', totalConv: 1, pcConv: 1000 },
+                'fuel': { main: 'BBL / mo', perCapita: 'Gallons/person / mo', totalConv: (1000 * 30.4 / 42), pcConv: (1000 * 30.4) },
+                'carbon': { main: 'lbs CO2 / mo', perCapita: 'lbs/person / mo', totalConv: 1, pcConv: 1 },
+                'mix': { main: '% Share', perCapita: '% Share', totalConv: 1, pcConv: 1 }
             };
             return types[document.getElementById('data-view').value];
         }
@@ -495,39 +495,32 @@
             return colors[0];
         };
 
-                function getNormalizedValue(val, view, metric) {
+        function getNormalizedValue(val, view, metric) {
             if (metric === 'perCapita') {
                 if (view === 'elec') return val * 5;
                 if (view === 'ng') return val * 100;
                 if (view === 'fuel') return val * 125;
-                if (view === 'carbon') return val / 5;
+                if (view === 'carbon') return val * 2;
                 return val;
             }
-            if (view === 'elec') return val / 100;
-            if (view === 'ng') return val * 2;
+            if (view === 'elec') return val / 1000;
+            if (view === 'ng') return val * 0.2;
             if (view === 'fuel') return val / 100;
-            if (view === 'carbon') return val / 100000;
+            if (view === 'carbon') return val / 10000000;
             return val;
         }
 
-function stateStyle(feature) {
+        function stateStyle(feature) {
             const code = fipsToAbbr[feature.id || feature.properties.STATE];
             const view = document.getElementById('data-view').value;
             const metric = document.getElementById('metric-type').value;
-            let val = 0;
+            const units = getUnits();
             const pop = censusData[code] || 1;
+            let val = getBaseValue(view, code);
 
-            if (view === 'carbon') {
-                const eVal = ((energyData['elec'] && energyData['elec'][code]) ? energyData['elec'][code].value : 0);
-                const gVal = ((energyData['ng'] && energyData['ng'][code]) ? energyData['ng'][code].value : 0);
-                val = (eVal * APP_CONFIG.EMISSIONS.elec) + (gVal * APP_CONFIG.EMISSIONS.ng);
-            } else if (view === 'mix') {
-                val = 0;
-            } else {
-                val = (energyData[view] && energyData[view][code]) ? energyData[view][code].value : 0;
-            }
+            if (metric === 'perCapita') val = (val * units.pcConv / pop);
+            else val = val * units.totalConv;
 
-            if (metric === 'perCapita') val = (val * getUnits().conv / pop);
             const normalized = getNormalizedValue(val, view, metric);
             return { fillColor: getColor(normalized), weight: code === 'CA' ? 2 : 1, opacity: 1, color: code === 'CA' ? '#fff' : '#242424', fillOpacity: 0.7 };
         }
@@ -537,8 +530,17 @@ function stateStyle(feature) {
             const units = getUnits(); const unitLabel = metric === 'perCapita' ? units.perCapita : units.main;
             div.innerHTML = `<p class="label-spec" style="margin-bottom:0.5rem">INTENSITY (${unitLabel})</p>`;
             let displayGrades = [];
-            if (metric === 'perCapita') displayGrades = view === 'elec' ? [0, 400, 800, 1200, 1600] : (view === 'ng' ? [0, 10, 25, 50, 75] : [0, 10, 20, 40, 60]);
-            else displayGrades = view === 'elec' ? [0, 500000, 1000000, 5000000, 10000000] : [0, 1000, 5000, 25000, 50000];
+            if (metric === 'perCapita') {
+                if (view === 'elec') displayGrades = [0, 400, 800, 1200, 1600, 2000, 2500];
+                else if (view === 'ng') displayGrades = [0, 2, 5, 8, 12, 16, 20];
+                else if (view === 'fuel') displayGrades = [0, 10, 20, 30, 40, 50, 60];
+                else if (view === 'carbon') displayGrades = [0, 500, 1000, 2000, 3500, 5000, 7500];
+            } else {
+                if (view === 'elec') displayGrades = [0, 1000000, 2500000, 5000000, 7500000, 10000000, 15000000];
+                else if (view === 'ng') displayGrades = [0, 1000, 5000, 10000, 25000, 50000, 100000];
+                else if (view === 'fuel') displayGrades = [0, 1000, 5000, 10000, 25000, 50000, 100000];
+                else if (view === 'carbon') displayGrades = [0, 100000000, 500000000, 1000000000, 2500000000, 5000000000, 7500000000];
+            }
             displayGrades.forEach(g => {
                 const normalized = getNormalizedValue(g, view, metric);
                 div.innerHTML += `<i style="background:${getColor(normalized)}"></i> ${g.toLocaleString()} ${unitLabel}+<br>`;
@@ -714,15 +716,23 @@ function stateStyle(feature) {
         function updateCharts() {
             const view = document.getElementById('data-view').value;
             const metric = document.getElementById('metric-type').value;
-            const units = getUnits() || { main: 'N/A', perCapita: 'N/A', conv: 1 };
+            const units = getUnits() || { main: 'N/A', perCapita: 'N/A', totalConv: 1, pcConv: 1 };
 
             document.getElementById('comp-title').innerText = `REGIONAL COMPARATIVE DATA (${metric === 'perCapita' ? units.perCapita : units.main})`;
-            if (energyData[view]) {
-                const states = Object.keys(energyData[view]).sort((a,b) => (energyData[view][b].value - energyData[view][a].value)).slice(0, 5);
+            if (energyData[view] || view === 'carbon') {
+                let states = Object.keys(censusData);
+                if (view !== 'carbon') states = Object.keys(energyData[view]);
+
+                states = states.sort((a,b) => {
+                    let vA = getBaseValue(view, a);
+                    let vB = getBaseValue(view, b);
+                    return vB - vA;
+                }).slice(0, 5);
+
                 comparisonChart.data.labels = states;
                 comparisonChart.data.datasets[0].data = states.map(s => {
-                    let v = energyData[view][s].value;
-                    return metric === 'perCapita' ? (v * units.conv / (censusData[s] || 1)) : v;
+                    let v = getBaseValue(view, s);
+                    return metric === 'perCapita' ? (v * units.pcConv / (censusData[s] || 1)) : (v * units.totalConv);
                 });
                 comparisonChart.update();
             }
@@ -736,28 +746,57 @@ function stateStyle(feature) {
                     const city = activeCities[cityName];
                     if (!city) return;
                     const acs = city.acs || { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
-                    const intensity = view === 'elec' ? acs.elecIntensity : (view === 'ng' ? acs.gasIntensity : 1);
-                    let base = ((energyData[view] && energyData[view][city.state]) ? energyData[view][city.state].value : 0) / (censusData[city.state] || 1) * city.pop * intensity * acs.incomeFactor;
+                    let base = getBaseValue(view, city.state) / (censusData[city.state] || 1) * city.pop;
 
-                    if (view === 'carbon') {
-                        const eVal = ((energyData['elec'] && energyData['elec'][city.state]) ? energyData['elec'][city.state].value : 0) / (censusData[city.state] || 1) * city.pop * acs.elecIntensity * acs.incomeFactor;
-                        const gVal = ((energyData['ng'] && energyData['ng'][city.state]) ? energyData['ng'][city.state].value : 0) / (censusData[city.state] || 1) * city.pop * acs.gasIntensity * acs.incomeFactor;
-                        base = (eVal * APP_CONFIG.EMISSIONS.elec) + (gVal * APP_CONFIG.EMISSIONS.ng);
+                    if (view === 'elec') base *= acs.elecIntensity * acs.incomeFactor;
+                    else if (view === 'ng') base *= acs.gasIntensity * acs.incomeFactor;
+                    else if (view === 'carbon') {
+                        const eVal = (getBaseValue('elec', city.state) / (censusData[city.state] || 1)) * city.pop * acs.elecIntensity * acs.incomeFactor;
+                        const gVal = (getBaseValue('ng', city.state) / (censusData[city.state] || 1)) * city.pop * acs.gasIntensity * acs.incomeFactor;
+                        const fVal = (getBaseValue('fuel', city.state) / (censusData[city.state] || 1)) * city.pop;
+                        base = (eVal * 1000000 * APP_CONFIG.EMISSIONS.elec) +
+                               (gVal * 1000 * APP_CONFIG.EMISSIONS.ng) +
+                               (fVal * (1000 * 30.4 / 42) * APP_CONFIG.EMISSIONS.fuel);
                     }
-                    if (metric === 'perCapita') base = (base * units.conv / city.pop);
+
+                    if (metric === 'perCapita') base = (base * units.pcConv / city.pop);
+                    else base = base * units.totalConv;
+
                     const trend = [base*0.9, base*0.95, base, base*0.98, base*1.02, base*1.05];
                     trendChart.data.datasets.push({ label: cityName, borderColor: cityColors[idx % cityColors.length], data: trend, tension: 0.4, fill: false });
                 });
             } else {
                 let trend = [0,0,0,0,0,0];
-                if (energyData[view] && energyData[view][currentRegion]) {
+                if (view === 'carbon') {
+                     const eTrend = (energyData['elec'] && energyData['elec'][currentRegion]) ? energyData['elec'][currentRegion].trend : [0,0,0,0,0,0];
+                     const gTrend = (energyData['ng'] && energyData['ng'][currentRegion]) ? energyData['ng'][currentRegion].trend : [0,0,0,0,0,0];
+                     const fTrend = (energyData['fuel'] && energyData['fuel'][currentRegion]) ? energyData['fuel'][currentRegion].trend : [0,0,0,0,0,0];
+                     trend = eTrend.map((e, i) => (e * 1000000 * APP_CONFIG.EMISSIONS.elec) +
+                                                  (gTrend[i] * 1000 * APP_CONFIG.EMISSIONS.ng) +
+                                                  (fTrend[i] * (1000 * 30.4 / 42) * APP_CONFIG.EMISSIONS.fuel));
+                } else if (energyData[view] && energyData[view][currentRegion]) {
                     trend = energyData[view][currentRegion].trend;
-                    if (metric === 'perCapita') trend = trend.map(t => (t * units.conv / (censusData[currentRegion] || 1)));
                 }
+
+                if (metric === 'perCapita') trend = trend.map(t => (t * units.pcConv / (censusData[currentRegion] || 1)));
+                else trend = trend.map(t => t * units.totalConv);
+
                 trendChart.data.datasets.push({ label: currentRegion, borderColor: '#BD0026', data: trend.slice(-6), tension: 0.4, fill: true, backgroundColor: 'rgba(189,0,38,0.1)' });
             }
             trendChart.options.plugins.legend = { display: (comparisonList.length > 0), labels: { color: '#fdfdf5' } };
             trendChart.update();
+        }
+
+        function getBaseValue(view, code) {
+            if (view === 'carbon') {
+                const eVal = (energyData['elec'] && energyData['elec'][code]) ? energyData['elec'][code].value : 0;
+                const gVal = (energyData['ng'] && energyData['ng'][code]) ? energyData['ng'][code].value : 0;
+                const fVal = (energyData['fuel'] && energyData['fuel'][code]) ? energyData['fuel'][code].value : 0;
+                return (eVal * 1000000 * APP_CONFIG.EMISSIONS.elec) +
+                       (gVal * 1000 * APP_CONFIG.EMISSIONS.ng) +
+                       (fVal * (1000 * 30.4 / 42) * APP_CONFIG.EMISSIONS.fuel);
+            }
+            return (energyData[view] && energyData[view][code]) ? energyData[view][code].value : 0;
         }
 
         async function fetchACSData(stateFips, placeFips) {
@@ -846,9 +885,9 @@ function stateStyle(feature) {
                 });
 
                 const types = {
-                    'elec': 'electricity/retail-sales/data/?data[]=sales&facets[sectorid][]=RES',
-                    'ng': 'natural-gas/cons/sum/data/?data[]=value',
-                    'fuel': 'petroleum/cons/prim/data/?data[]=value&facets[product][]=EPM0'
+                    'elec': 'electricity/retail-sales/data/?data[]=sales&facets[sectorid][]=RES&sort[0][column]=period&sort[0][direction]=desc',
+                    'ng': 'natural-gas/cons/sum/data/?data[]=value&sort[0][column]=period&sort[0][direction]=desc',
+                    'fuel': 'petroleum/cons/prim/data/?data[]=value&facets[product][]=EPM0&sort[0][column]=period&sort[0][direction]=desc'
                 };
 
                 for (const [id, path] of Object.entries(types)) {
