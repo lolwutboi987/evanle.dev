@@ -362,53 +362,38 @@
             </section>
                                     <section id="quiz-section" class="data-panel" style="grid-column: span 2; margin-top: 2rem;">
                 <h3 style="color: var(--monolith-fg);">Calculate My Impact (Personal Quiz)</h3>
-                <div id="quiz-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                    <div class="control-group">
-                        <p class="label-spec">Daily Commute (Miles)</p>
-                        <input type="number" id="quiz-commute" value="20" min="0">
-                        <p class="label-spec">Vehicle Type</p>
-                        <select id="quiz-vehicle">
-                            <option value="gas">Gasoline (Average)</option>
-                            <option value="ev">Electric Vehicle (EV)</option>
-                            <option value="hybrid">Hybrid</option>
-                        </select>
-                        <p class="label-spec">AC Usage (Hours/Day)</p>
-                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;" id="ac-bubbles"></div>
-                        <input type="hidden" id="quiz-ac" value="2">
-                        <p class="label-spec">AC Efficiency</p>
-                        <select id="quiz-ac-eff">
-                            <option value="1.0">Standard / High Efficiency</option>
-                            <option value="1.5">Older / Low Efficiency</option>
-                        </select>
-                    </div>
-                    <div class="control-group">
-                        <p class="label-spec">Cooking (Hours/Day)</p>
-                        <input type="range" id="quiz-cooking" min="0" max="5" step="0.5" value="1">
-                        <p id="cooking-val" style="font-size: 0.8rem;">1.0 hours</p>
-
-                        <p class="label-spec">Appliances & Devices</p>
-                        <div id="device-tags" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;"></div>
-                        <button class="btn-monolith" onclick="openDeviceModal()" style="font-size: 0.8rem; padding: 0.5rem;">+ Add Device</button>
-
-                        <button class="btn-monolith" onclick="calculateQuiz()" style="margin-top: 2rem;">Compare My Footprint</button>
-                        <div id="quiz-results" style="margin-top: 1rem; font-size: 0.85rem; visibility: visible; opacity: 1;"></div>
-                    </div>
+                <div id="quiz-container" style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+                    <p class="label-spec">Appliances, Vehicles & Usage</p>
+                    <div id="device-tags" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;"></div>
+                    <button class="btn-monolith" onclick="openDeviceModal()" style="font-size: 0.8rem; padding: 0.5rem; width: fit-content;">+ Add Item</button>
+                    <button class="btn-monolith" onclick="calculateQuiz()" style="margin-top: 1rem; width: fit-content;">Compare My Footprint</button>
+                    <div id="quiz-results" style="margin-top: 1rem; font-size: 0.85rem; visibility: visible; opacity: 1;"></div>
                 </div>
             </section>
 
             <div id="device-modal" class="modal">
                 <div class="modal-content">
-                    <h3 style="margin-top: 0;">Add Appliance / Device</h3>
+                    <h3 style="margin-top: 0;">Add Appliance / Vehicle</h3>
                     <div class="control-group" style="margin-bottom: 1.5rem;">
                         <p class="label-spec">Select Type</p>
                         <select id="modal-device-type">
-                            <option value="fridge-hi">Refrigerator (High Efficiency) - 50W avg</option>
-                            <option value="fridge-lo">Refrigerator (Low Efficiency) - 150W avg</option>
-                            <option value="microwave">Microwave - 1200W</option>
-                            <option value="dishwasher">Dishwasher - 1500W</option>
-                            <option value="pc">Desktop PC - 200W</option>
-                            <option value="tv">Television (OLED/LED) - 100W</option>
-                            <option value="custom">Custom Device</option>
+                            <optgroup label="Appliances">
+                                <option value="fridge-hi">Refrigerator (High Efficiency) - 50W avg</option>
+                                <option value="fridge-lo">Refrigerator (Low Efficiency) - 150W avg</option>
+                                <option value="microwave">Microwave - 1200W</option>
+                                <option value="dishwasher">Dishwasher - 1500W</option>
+                                <option value="pc">Desktop PC - 200W</option>
+                                <option value="tv">Television (OLED/LED) - 100W</option>
+                                <option value="ac-std">Air Conditioner (Standard) - 3000W</option>
+                                <option value="ac-he">Air Conditioner (High Efficiency) - 1500W</option>
+                                <option value="cooking">Electric Range / Oven - 2500W</option>
+                            </optgroup>
+                            <optgroup label="Transportation">
+                                <option value="car-gas">Gasoline Vehicle (25 MPG avg)</option>
+                                <option value="car-hybrid">Hybrid Vehicle (45 MPG avg)</option>
+                                <option value="car-ev">Electric Vehicle (0.3 kWh/mi avg)</option>
+                            </optgroup>
+                            <option value="custom">Custom Device (Watts)</option>
                         </select>
                     </div>
                     <div id="custom-device-fields" style="display: none; margin-bottom: 1.5rem;">
@@ -418,8 +403,8 @@
                          </div>
                     </div>
                     <div class="control-group" style="margin-bottom: 2rem;">
-                        <p class="label-spec">Usage (Hours/Day)</p>
-                        <input type="number" id="modal-device-hours" value="1" min="0" max="24">
+                        <p class="label-spec" id="modal-usage-label">Usage (Hours/Day)</p>
+                        <input type="number" id="modal-device-hours" value="1" min="0">
                     </div>
                     <div style="display: flex; gap: 1rem;">
                         <button class="btn-monolith" onclick="addDevice()" style="flex: 1;">Add</button>
@@ -548,21 +533,15 @@ function stateStyle(feature) {
         }
 
         function updateLegendContent(div) {
-            const view = document.getElementById('data-view').value;
-            const metric = document.getElementById('metric-type').value;
-            const units = getUnits();
-            div.innerHTML = `<p class="label-spec" style="margin-bottom:0.5rem">INTENSITY (${metric === 'perCapita' ? units.perCapita : units.main})</p>`;
-
+            const view = document.getElementById('data-view').value; const metric = document.getElementById('metric-type').value;
+            const units = getUnits(); const unitLabel = metric === 'perCapita' ? units.perCapita : units.main;
+            div.innerHTML = `<p class="label-spec" style="margin-bottom:0.5rem">INTENSITY (${unitLabel})</p>`;
             let displayGrades = [];
-            if (metric === 'perCapita') {
-                displayGrades = view === 'elec' ? [0, 400, 800, 1200, 1600] : (view === 'ng' ? [0, 10, 25, 50, 75] : [0, 10, 20, 40, 60]);
-            } else {
-                displayGrades = view === 'elec' ? [0, 500000, 1000000, 5000000, 10000000] : [0, 1000, 5000, 25000, 50000];
-            }
-
+            if (metric === 'perCapita') displayGrades = view === 'elec' ? [0, 400, 800, 1200, 1600] : (view === 'ng' ? [0, 10, 25, 50, 75] : [0, 10, 20, 40, 60]);
+            else displayGrades = view === 'elec' ? [0, 500000, 1000000, 5000000, 10000000] : [0, 1000, 5000, 25000, 50000];
             displayGrades.forEach(g => {
                 const normalized = getNormalizedValue(g, view, metric);
-                div.innerHTML += `<i style="background:${getColor(normalized)}"></i> ${g.toLocaleString()}+<br>`;
+                div.innerHTML += `<i style="background:${getColor(normalized)}"></i> ${g.toLocaleString()} ${unitLabel}+<br>`;
             });
         }
 
@@ -628,155 +607,106 @@ function stateStyle(feature) {
 
         let addedDevices = [];
         const deviceLibrary = {
-            'fridge-hi': { name: 'Fridge (HE)', watts: 50 },
-            'fridge-lo': { name: 'Fridge (LE)', watts: 150 },
-            'microwave': { name: 'Microwave', watts: 1200 },
-            'dishwasher': { name: 'Dishwasher', watts: 1500 },
-            'pc': { name: 'PC', watts: 200 },
-            'tv': { name: 'TV', watts: 100 }
+            'fridge-hi': { name: 'Fridge (HE)', watts: 50, category: 'appliance' },
+            'fridge-lo': { name: 'Fridge (LE)', watts: 150, category: 'appliance' },
+            'microwave': { name: 'Microwave', watts: 1200, category: 'appliance' },
+            'dishwasher': { name: 'Dishwasher', watts: 1500, category: 'appliance' },
+            'pc': { name: 'PC', watts: 200, category: 'appliance' },
+            'tv': { name: 'TV', watts: 100, category: 'appliance' },
+            'ac-std': { name: 'AC (Standard)', watts: 3000, category: 'appliance' },
+            'ac-he': { name: 'AC (HE)', watts: 1500, category: 'appliance' },
+            'cooking': { name: 'Elec Range', watts: 2500, category: 'appliance' },
+            'car-gas': { name: 'Gasoline Car', category: 'vehicle', factor: 823 / 42 / 25, unit: 'mi/day' },
+            'car-hybrid': { name: 'Hybrid Car', category: 'vehicle', factor: 823 / 42 / 45, unit: 'mi/day' },
+            'car-ev': { name: 'Electric Car', category: 'vehicle', factor: 0.3, unit: 'mi/day' }
         };
-
         function initQuiz() {
-            const acBubbles = document.getElementById('ac-bubbles');
-            if (acBubbles) {
-                acBubbles.innerHTML = '';
-                for (let i = 0; i <= 8; i++) {
-                    const b = document.createElement('div');
-                    b.innerText = i;
-                    b.style = 'cursor:pointer; width:30px; height:30px; border:1px solid var(--monolith-muted); display:flex; align-items:center; justify-content:center; font-size:0.8rem; background: var(--monolith-surface); margin-bottom: 5px;';
-                    if (i == 2) b.style.backgroundColor = 'var(--monolith-accent)';
-                    b.onclick = () => {
-                        document.getElementById('quiz-ac').value = i;
-                        Array.from(acBubbles.children).forEach(c => c.style.backgroundColor = 'transparent');
-                        b.style.backgroundColor = 'var(--monolith-accent)';
-                    };
-                    acBubbles.appendChild(b);
-                }
-            }
-            const cookingInput = document.getElementById('quiz-cooking');
-            if (cookingInput) {
-                cookingInput.oninput = (e) => {
-                    document.getElementById('cooking-val').innerText = `${parseFloat(e.target.value).toFixed(1)} hours`;
-                };
-            }
             const deviceTypeSelect = document.getElementById('modal-device-type');
             if (deviceTypeSelect) {
                 deviceTypeSelect.onchange = (e) => {
-                    document.getElementById('custom-device-fields').style.display = e.target.value === 'custom' ? 'block' : 'none';
+                    const val = e.target.value; document.getElementById('custom-device-fields').style.display = val === 'custom' ? 'block' : 'none';
+                    const label = document.getElementById('modal-usage-label');
+                    if (val.startsWith('car-')) label.innerText = 'Commute (Miles/Day)'; else label.innerText = 'Usage (Hours/Day)';
                 };
             }
         }
-
         function openDeviceModal() { document.getElementById('device-modal').style.display = 'flex'; }
         function closeDeviceModal() { document.getElementById('device-modal').style.display = 'none'; }
-
         function addDevice() {
-            const type = document.getElementById('modal-device-type').value;
-            const hours = parseFloat(document.getElementById('modal-device-hours').value) || 0;
-            let watts = 0, name = '';
-
-            if (type === 'custom') {
-                watts = parseFloat(document.getElementById('modal-custom-watts').value) || 0;
-                name = 'Custom Device';
-            } else {
-                watts = deviceLibrary[type].watts;
-                name = deviceLibrary[type].name;
+            const type = document.getElementById('modal-device-type').value; const usage = parseFloat(document.getElementById('modal-device-hours').value) || 0;
+            let watts = 0, name = '', category = 'appliance', factor = 0, unit = 'h/day';
+            if (type === 'custom') { watts = parseFloat(document.getElementById('modal-custom-watts').value) || 0; name = 'Custom Device'; } else {
+                const dev = deviceLibrary[type]; name = dev.name; category = dev.category;
+                if (category === 'appliance') watts = dev.watts; else { factor = dev.factor; unit = dev.unit; }
             }
-
-            addedDevices.push({ name, watts, hours });
-            updateDeviceTags();
-            closeDeviceModal();
+            addedDevices.push({ name, watts, usage, category, factor, unit }); updateDeviceTags(); closeDeviceModal();
         }
-
-        function removeDevice(index) {
-            addedDevices.splice(index, 1);
-            updateDeviceTags();
-        }
-
+        function removeDevice(index) { addedDevices.splice(index, 1); updateDeviceTags(); }
         function updateDeviceTags() {
-            const container = document.getElementById('device-tags');
-            container.innerHTML = '';
+            const container = document.getElementById('device-tags'); container.innerHTML = '';
             addedDevices.forEach((d, i) => {
-                const tag = document.createElement('div');
-                tag.className = 'device-tag';
-                tag.innerHTML = `<span>${d.name} (${d.hours}h)</span><span style="cursor:pointer; color:var(--monolith-accent);" onclick="removeDevice(${i})">×</span>`;
+                const tag = document.createElement('div'); tag.className = 'device-tag';
+                const label = d.category === 'vehicle' ? `${d.usage} mi` : `${d.usage}h`;
+                tag.innerHTML = `<span>${d.name} (${label})</span><span style="cursor:pointer; color:var(--monolith-accent);" onclick="removeDevice(${i})">×</span>`;
                 container.appendChild(tag);
             });
         }
-
         function calculateQuiz() {
-            const commute = parseFloat(document.getElementById('quiz-commute').value) || 0;
-            const vehicle = document.getElementById('quiz-vehicle').value;
-            const ac = parseFloat(document.getElementById('quiz-ac').value) || 0;
-            const acEff = parseFloat(document.getElementById('quiz-ac-eff').value) || 1.0;
-            const cooking = parseFloat(document.getElementById('quiz-cooking').value) || 0;
-
-            let monthlyElec = (ac * acEff * 1.5 * 30) + (cooking * 1.0 * 30);
-            addedDevices.forEach(d => { monthlyElec += (d.watts * d.hours / 1000) * 30; });
-
-            let monthlyFuel = 0;
-            if (vehicle === 'gas') monthlyFuel = (commute / 25) * 30;
-            if (vehicle === 'hybrid') monthlyFuel = (commute / 45) * 30;
-            if (vehicle === 'ev') monthlyElec += (commute * 0.3) * 30;
-
-            const myCarbon = (monthlyElec * APP_CONFIG.EMISSIONS.elec) + (monthlyFuel * 19.6);
-            const results = document.getElementById('quiz-results');
-            results.style.display = 'block';
-
-            let comparisons = "";
-            const avgUS = 1500;
-            const diffUS = ((myCarbon - avgUS) / avgUS * 100).toFixed(1);
+            let monthlyElec = 0; let totalCarbon = 0;
+            if (addedDevices.length === 0) {
+                const results = document.getElementById('quiz-results'); results.style.display = 'block';
+                results.innerHTML = `<div style="border-left: 2px solid var(--monolith-accent); padding-left: 1rem; background: rgba(255,255,255,0.02); padding: 1rem;"><p style="margin: 0; color: var(--monolith-muted);">YOUR MONTHLY IMPACT</p><p style="font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">You don't have a carbon footprint</p></div>`;
+                return;
+            }
+            addedDevices.forEach(d => { if (d.category === 'appliance') monthlyElec += (d.watts * d.usage / 1000) * 30; else if (d.category === 'vehicle') { if (d.name.includes('Electric')) monthlyElec += (d.usage * d.factor) * 30; else totalCarbon += d.factor * d.usage * 30; } });
+            totalCarbon += (monthlyElec * APP_CONFIG.EMISSIONS.elec); const myCarbon = totalCarbon; const results = document.getElementById('quiz-results'); results.style.display = 'block';
+            let comparisons = ""; const avgUS = 1500; const diffUS = ((myCarbon - avgUS) / (avgUS || 1) * 100).toFixed(1);
             comparisons += `<br>• vs National Average: <strong>${Math.abs(diffUS)}% ${diffUS > 0 ? 'above' : 'below'}</strong>`;
-
             if (currentRegion && activeCities[currentRegion]) {
-                const city = activeCities[currentRegion];
-                const pop = city.pop || 1;
-                const statePop = censusData[city.state] || 1;
-                const eVal = ((energyData['elec'] && energyData['elec'][city.state]) ? energyData['elec'][city.state].value : 0) / statePop * pop;
-                const gVal = ((energyData['ng'] && energyData['ng'][city.state]) ? energyData['ng'][city.state].value : 0) / statePop * pop;
-                const cityCarbonPerCapita = ((eVal * APP_CONFIG.EMISSIONS.elec) + (gVal * APP_CONFIG.EMISSIONS.ng)) / pop;
-                const diffCity = ((myCarbon - cityCarbonPerCapita) / cityCarbonPerCapita * 100).toFixed(1);
+                const city = activeCities[currentRegion]; const statePop = censusData[city.state] || 1;
+                const eValState = ((energyData['elec'] && energyData['elec'][city.state]) ? energyData['elec'][city.state].value : 0);
+                const gValState = ((energyData['ng'] && energyData['ng'][city.state]) ? energyData['ng'][city.state].value : 0);
+                const cityCarbonPerCapita = ((eValState * 1000 * APP_CONFIG.EMISSIONS.elec) + (gValState * 1000 * APP_CONFIG.EMISSIONS.ng)) / statePop;
+                const diffCity = cityCarbonPerCapita > 0 ? ((myCarbon - cityCarbonPerCapita) / cityCarbonPerCapita * 100).toFixed(1) : 0;
                 comparisons += `<br>• vs ${currentRegion} Average: <strong>${Math.abs(diffCity)}% ${diffCity > 0 ? 'above' : 'below'}</strong>`;
             }
-
-            results.innerHTML = `
-                <div style="border-left: 2px solid var(--monolith-accent); padding-left: 1rem; background: rgba(255,255,255,0.02); padding: 1rem;">
-                    <p style="margin: 0; color: var(--monolith-muted);">YOUR MONTHLY IMPACT</p>
-                    <p style="font-size: 1.5rem; font-weight: bold; margin: 0.5rem 0;">${Math.round(myCarbon).toLocaleString()} <span style="font-size: 0.8rem; font-weight: normal;">lbs CO2</span></p>
-                    <p style="margin: 0; font-size: 0.8rem;">${comparisons}</p>
-                </div>
-            `;
-
+            results.innerHTML = `<div style="border-left: 2px solid var(--monolith-accent); padding-left: 1rem; background: rgba(255,255,255,0.02); padding: 1rem;"><p style="margin: 0; color: var(--monolith-muted);">YOUR MONTHLY IMPACT</p><p style="font-size: 1.5rem; font-weight: bold; margin: 0.5rem 0;">${Math.round(myCarbon).toLocaleString()} <span style="font-size: 0.8rem; font-weight: normal;">lbs CO2</span></p><p style="margin: 0; font-size: 0.8rem;">${comparisons}</p></div>`;
             updateCharts();
-            trendChart.data.datasets.push({
-                label: 'YOU',
-                borderColor: '#fdfdf5',
-                borderDash: [5, 5],
-                data: [myCarbon, myCarbon, myCarbon, myCarbon, myCarbon, myCarbon],
-                fill: false,
-                pointRadius: 5
-            });
+            trendChart.data.datasets.push({ label: 'YOU', borderColor: '#fdfdf5', borderDash: [5, 5], data: [myCarbon, myCarbon, myCarbon, myCarbon, myCarbon, myCarbon], fill: false, pointRadius: 5 });
             trendChart.update();
         }
 
         function initCharts() {
             const common = {
                 responsive: true, maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const units = getUnits(); const metric = document.getElementById('metric-type').value;
+                                const unitLabel = metric === 'perCapita' ? units.perCapita : units.main;
+                                return `${context.dataset.label || ''}: ${context.parsed.y.toLocaleString()} ${unitLabel}`;
+                            }
+                        }
+                    }
+                },
                 scales: {
                     x: { ticks: { color: '#a1a19a', font: { size: 10 } }, grid: { display: false } },
-                    y: { ticks: { color: '#a1a19a', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                    y: { ticks: { color: '#a1a19a', font: { size: 10 }, callback: function(value) { return value.toLocaleString(); } }, grid: { color: 'rgba(255,255,255,0.05)' } }
                 }
             };
             comparisonChart = new Chart(document.getElementById('comparisonChart'), { type: 'bar', data: { labels: [], datasets: [{ backgroundColor: '#BD0026', data: [] }] }, options: common });
             trendChart = new Chart(document.getElementById('trendChart'), { type: 'line', data: { labels: ['Jan','Feb','Mar','Apr','May','Jun'], datasets: [{ borderColor: '#BD0026', data: [], tension: 0.4, fill: true, backgroundColor: 'rgba(189,0,38,0.1)' }] }, options: common });
-
             mixChart = new Chart(document.getElementById('mixChart'), {
                 type: 'pie',
                 data: { labels: [], datasets: [{ data: [], backgroundColor: ['#BD0026', '#E31A1C', '#FC4E2A', '#FD8D3C', '#FEB24C', '#FED976'] }] },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: true, position: 'right', labels: { color: '#fdfdf5', font: { size: 10 } } } }
+                    plugins: {
+                        legend: { display: true, position: 'right', labels: { color: '#fdfdf5', font: { size: 10 } } },
+                        tooltip: { callbacks: { label: function(context) { return ` ${context.label}`; } } }
+                    }
                 }
             });
         }
@@ -907,7 +837,6 @@ function stateStyle(feature) {
         }
 
         async function fetchLiveData(key) {
-            console.log('Fetching regional reference data...');
             try {
                 const cRes = await fetch(`${APP_CONFIG.CENSUS_API_BASE}/pep/population?get=NAME,POP_2021&for=state:*&key=${APP_CONFIG.CENSUS_API_KEY}`);
                 const cJson = await cRes.json();
@@ -932,8 +861,9 @@ function stateStyle(feature) {
                             const latestPeriod = data[0].period;
                             data.filter(d => d.period === latestPeriod).forEach(d => {
                                 const s = d.stateid || (d.duoarea ? d.duoarea.slice(-2) : null);
-                                if (s && fipsToAbbr[s] || Object.values(fipsToAbbr).includes(s)) {
-                                    energyData[id][s] = { value: parseFloat(d.sales || d.value) };
+                                if (s && (fipsToAbbr[s] || Object.values(fipsToAbbr).includes(s))) {
+                                    const code = fipsToAbbr[s] || s;
+                                    energyData[id][code] = { value: parseFloat(d.sales || d.value) };
                                 }
                             });
                             Object.keys(energyData[id]).forEach(s => {
@@ -947,23 +877,27 @@ function stateStyle(feature) {
             } catch (e) { console.error("Initial data load failed:", e); }
         }
 
-
         async function fetchFuelMix(key) {
-            const baMap = { 'CA': 'CISO', 'TX': 'ERCO', 'NY': 'NYIS', 'FL': 'FPL', 'WA': 'BPAT', 'IL': 'PJM', 'AZ': 'SRP', 'NV': 'NEVP', 'OR': 'BPAT', 'UT': 'PACE' };
-            const city = activeCities[currentRegion], state = city ? city.state : currentRegion, ba = baMap[state] || 'CISO';
+            const baMap = { "CA": "CISO", "TX": "ERCO", "NY": "NYIS", "FL": "FPL", "WA": "BPAT", "IL": "PJM", "AZ": "SRP", "NV": "NEVP", "OR": "BPAT", "UT": "PACE" };
+            const city = activeCities[currentRegion], state = city ? city.state : currentRegion, ba = baMap[state] || "CISO";
             try {
-                const res = await fetch(`https://api.eia.gov/v2/electricity/rto/fuel-type-data/data/?api_key=${key}&frequency=hourly&data[]=value&facets[respondent][]=${ba}&sort[0][column]=period&sort[0][direction]=desc&length=10`);
+                const res = await fetch(`https://api.eia.gov/v2/electricity/rto/fuel-type-data/data/?api_key=${key}&frequency=hourly&data[]=value&facets[respondent][]=${ba}&sort[0][column]=period&sort[0][direction]=desc&length=50`);
                 const json = await res.json();
                 if (json && json.response && json.response.data && json.response.data.length > 0) {
-                    const latest = json.response.data.slice(0, 6); // Approximation for distinct fuels
-                    const mix = latest.map(d => ({ label: d['fueltype'], value: d.value }));
-
-                    if (document.getElementById('data-view').value === 'mix') document.getElementById('mix-panel').style.display = 'block';
-                    mixChart.data.labels = mix.map(m => m.label);
+                    const data = json.response.data;
+                    const latestPeriod = data[0].period;
+                    const latestData = data.filter(d => d.period === latestPeriod);
+                    const totalValue = latestData.reduce((sum, d) => sum + (parseFloat(d.value) || 0), 0);
+                    const mix = latestData.map(d => ({
+                        label: d["fueltype"],
+                        value: totalValue > 0 ? (parseFloat(d.value) / totalValue * 100) : 0
+                    })).sort((a, b) => b.value - a.value);
+                    if (document.getElementById("data-view").value === "mix") document.getElementById("mix-panel").style.display = "block";
+                    mixChart.data.labels = mix.map(m => `${m.label} (${m.value.toFixed(1)}%)`);
                     mixChart.data.datasets[0].data = mix.map(m => m.value);
                     mixChart.update();
-                } else { document.getElementById('mix-panel').style.display = 'none'; }
-            } catch (e) { document.getElementById('mix-panel').style.display = 'none'; }
+                } else { document.getElementById("mix-panel").style.display = "none"; }
+            } catch (e) { console.error(e); document.getElementById("mix-panel").style.display = "none"; }
         }
 
         async function fetchGridData(key) {
@@ -982,172 +916,70 @@ function stateStyle(feature) {
             } catch (e) { document.getElementById('grid-panel').style.display = 'none'; }
         }
 
-        async function fetchCityData(cityName, stateFips) {
-            const btn = document.getElementById('search-btn');
-            btn.innerText = 'INITIALIZING...';
-
-            try {
-                let placeFips;
-                if (selectedCityData && selectedCityData.name.toUpperCase() === cityName.toUpperCase()) {
-                    placeFips = selectedCityData.place;
-                } else {
-                    const sqlWhere = "UPPER(BASENAME) = '" + cityName.toUpperCase().replace("'", "''") + "' AND STATE='" + stateFips + "'";
-                    const tigerSearchUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=${encodeURIComponent(sqlWhere)}&outFields=NAME,STATE,PLACE,GEOID&f=json`;
-                    const sRes = await fetch(tigerSearchUrl);
-                    const sJson = await sRes.json();
-                    if (sJson.features && sJson.features.length > 0) {
-                        placeFips = sJson.features[0].attributes.PLACE || sJson.features[0].attributes.GEOID.slice(-5);
-                    } else {
-                        const broadWhere = "(UPPER(NAME) = '" + cityName.toUpperCase().replace("'", "''") + "' OR UPPER(NAME) LIKE '" + cityName.toUpperCase().replace("'", "''") + " %') AND STATE='" + stateFips + "'";
-                        const broadUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=${encodeURIComponent(broadWhere)}&outFields=NAME,STATE,PLACE,GEOID&f=json`;
-                        const bRes = await fetch(broadUrl);
-                        const bJson = await bRes.json();
-                        if (bJson.features && bJson.features.length > 0) {
-                            placeFips = bJson.features[0].attributes.PLACE || bJson.features[0].attributes.GEOID.slice(-5);
-                        } else {
-                            btn.innerText = 'NOT FOUND';
-                            setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000);
-                            return;
-                        }
-                    }
-                }
-
-                const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=STATE='${stateFips}' AND PLACE='${placeFips}'&outFields=NAME,STATE,POP100,GEOID,PLACE,BASENAME&f=geojson&outSR=4326`;
-                const tigerRes = await fetch(tigerUrl);
-                const tigerJson = await tigerRes.json();
-                
-                if (tigerJson.features && tigerJson.features.length > 0) {
-                    const feature = tigerJson.features[0];
-                    const fullName = feature.properties.BASENAME || feature.properties.NAME;
-                    
-                    if (activeCities[fullName]) {
-                        btn.innerText = 'ALREADY ADDED';
-                        setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000);
-                        return;
-                    }
-
-                    const acs = await fetchACSData(stateFips, placeFips);
-                    activeCities[fullName] = { 
-                        pop: parseInt(feature.properties.POP100) || 1, 
-                        geometry: feature.geometry, 
-                        state: fipsToAbbr[stateFips], 
-                        acs: acs 
-                    };
-                    
-                    comparisonList.push(fullName);
-                    currentRegion = fullName;
-                    updateComparisonUI();
-                    updateMap();
-                    updateCharts();
-                    map.flyToBounds(L.geoJson(feature.geometry).getBounds(), { padding: [50, 50], duration: 1.5 });
-                    fetchGridData(APP_CONFIG.EIA_API_KEY); fetchFuelMix(APP_CONFIG.EIA_API_KEY);
-                } else { 
-                    btn.innerText = 'NOT FOUND'; 
-                    setTimeout(() => btn.innerText = 'INITIALIZE SEARCH', 2000); 
-                }
-            } catch (e) { 
-                console.error(e); 
-            } finally { 
-                btn.innerText = 'INITIALIZE SEARCH'; 
-            }
-        }
-
         function updateComparisonUI() {
             const container = document.getElementById('comparison-manager');
             const list = document.getElementById('comparison-items');
             list.innerHTML = '';
-
             if (comparisonList.length > 0) {
                 container.style.display = 'block';
                 comparisonList.forEach(city => {
                     const div = document.createElement('div');
                     div.style = 'display: flex; justify-content: space-between; align-items: center; background: var(--monolith-bg); padding: 0.8rem; font-size: 0.8rem; border: 1px solid rgba(255,255,255,0.1);';
-                    div.innerHTML = `<span>${city}</span><span style="cursor: pointer; color: var(--monolith-accent); font-weight: bold;" onclick="removeCity('${city.replace("'", "\\'")}')">×</span>`;
+                    div.innerHTML = `<span>${city}</span><span style="cursor: pointer; color: var(--monolith-accent); font-weight: bold;" onclick="removeCity('${city.replace("'", "\'")}')">×</span>`;
                     list.appendChild(div);
                 });
-            } else {
-                container.style.display = 'none';
-            }
+            } else { container.style.display = 'none'; }
         }
 
         function removeCity(name) {
             comparisonList = comparisonList.filter(c => c !== name);
-            if (cityLayers[name]) {
-                map.removeLayer(cityLayers[name]);
-                delete cityLayers[name];
-            }
+            if (cityLayers[name]) { map.removeLayer(cityLayers[name]); delete cityLayers[name]; }
             delete activeCities[name];
-            if (currentRegion === name) currentRegion = comparisonList.length > 0 ? comparisonList[0] : 'US';
-            updateComparisonUI();
+            if (currentRegion === name) currentRegion = comparisonList.length > 0 ? comparisonList[0] : "US";
+            if (comparisonList.length === 0) {
+                comparisonChart.data.labels = []; comparisonChart.data.datasets[0].data = []; comparisonChart.update();
+                trendChart.data.datasets = []; trendChart.update();
+                document.getElementById("quiz-results").innerHTML = ""; document.getElementById("quiz-results").style.display = "none";
+            }
+            updateComparisonUI(); updateCharts();
         }
 
         function setupEventListeners() {
             const citySearchInput = document.getElementById('city-search');
             const autocompleteList = document.getElementById('autocomplete-list');
             const stateSelect = document.getElementById('state-select');
-
             citySearchInput.addEventListener('input', async (e) => {
-                const val = e.target.value;
-                const stateFips = stateSelect.value;
-                if (!val || !stateFips) {
-                    autocompleteList.style.display = 'none';
-                    return;
-                }
-
+                const val = e.target.value; const stateFips = stateSelect.value;
+                if (!val || !stateFips) { autocompleteList.style.display = 'none'; return; }
                 try {
                     if (val.length < 3) { autocompleteList.style.display = 'none'; return; }
                     const sqlWhere = `(UPPER(NAME) LIKE '${val.toUpperCase()}%' OR UPPER(BASENAME) LIKE '${val.toUpperCase()}%') AND STATE='${stateFips}'`;
                     const tigerUrl = `https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/Places_CouSub_ConCity_SubMCD/MapServer/25/query?where=${encodeURIComponent(sqlWhere)}&outFields=NAME,STATE,PLACE,GEOID,BASENAME&f=json&resultRecordCount=10`;
-                    const res = await fetch(tigerUrl);
-                    const json = await res.json();
-                    
+                    const res = await fetch(tigerUrl); const json = await res.json();
                     autocompleteList.innerHTML = '';
                     if (json.features && json.features.length > 0) {
                         autocompleteList.style.display = 'block';
                         json.features.forEach(f => {
-                            const div = document.createElement('div');
-                            div.innerHTML = f.attributes.NAME;
+                            const div = document.createElement('div'); div.innerHTML = f.attributes.NAME;
                             div.addEventListener('click', () => {
                                 citySearchInput.value = f.attributes.BASENAME || f.attributes.NAME;
-                                selectedCityData = {
-                                    name: citySearchInput.value,
-                                    place: f.attributes.PLACE || f.attributes.GEOID.slice(-5),
-                                    state: f.attributes.STATE
-                                };
+                                selectedCityData = { name: citySearchInput.value, place: f.attributes.PLACE || f.attributes.GEOID.slice(-5), state: f.attributes.STATE };
                                 autocompleteList.style.display = 'none';
                             });
                             autocompleteList.appendChild(div);
                         });
-                    } else {
-                        autocompleteList.style.display = 'none';
-                    }
-                } catch (err) {
-                    console.error("Autocomplete failed:", err);
-                }
+                    } else { autocompleteList.style.display = 'none'; }
+                } catch (err) { console.error("Autocomplete failed:", err); }
             });
-
-            document.addEventListener('click', (e) => {
-                if (e.target !== citySearchInput) {
-                    autocompleteList.style.display = 'none';
-                }
-            });
-
-                        ['data-view', 'metric-type'].forEach(id => document.getElementById(id).addEventListener('change', () => {
+            document.addEventListener('click', (e) => { if (e.target !== citySearchInput) autocompleteList.style.display = 'none'; });
+            ['data-view', 'metric-type'].forEach(id => document.getElementById(id).addEventListener('change', () => {
                 const view = document.getElementById('data-view').value;
                 document.getElementById('mix-panel').style.display = view === 'mix' ? 'block' : 'none';
-                updateMap();
-                updateCharts();
-                if (view === 'mix') fetchFuelMix(APP_CONFIG.EIA_API_KEY);
+                updateMap(); updateCharts(); if (view === 'mix') fetchFuelMix(APP_CONFIG.EIA_API_KEY);
             }));
-
-            stateSelect.addEventListener('change', () => {
-                citySearchInput.value = '';
-                selectedCityData = null;
-            });
-            
+            stateSelect.addEventListener('change', () => { citySearchInput.value = ''; selectedCityData = null; });
             document.getElementById('search-btn').addEventListener('click', () => {
-                const city = citySearchInput.value;
-                const state = stateSelect.value;
+                const city = citySearchInput.value; const state = stateSelect.value;
                 if (city && state) fetchCityData(city, state);
             });
         }
@@ -1158,14 +990,19 @@ function stateStyle(feature) {
                 data: { labels: Array.from({length: 24}, (_, i) => i + ':00'), datasets: [{ borderColor: '#BD0026', data: [], tension: 0.1, fill: false }] },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { x: { ticks: { color: '#a1a19a', font: { size: 10 } } }, y: { ticks: { color: '#a1a19a', font: { size: 10 } } } }
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: function(context) { return `Load: ${context.parsed.y.toLocaleString()} MW`; } } }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#a1a19a', font: { size: 10 } } },
+                        y: { ticks: { color: '#a1a19a', font: { size: 10 }, callback: function(value) { return value.toLocaleString() + ' MW'; } } }
+                    }
                 }
             });
         }
 
         window.onload = () => { init(); initQuiz(); };
     </script>
-
 </body>
 </html>
