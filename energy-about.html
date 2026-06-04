@@ -55,7 +55,7 @@
             font-size: 3rem;
             text-transform: uppercase;
             letter-spacing: -0.02em;
-            line-height: 0.9;
+            line-height: 1.1;
             margin-bottom: 1rem;
         }
 
@@ -107,6 +107,8 @@
             margin-bottom: 1rem;
             padding-left: 1.5rem;
             position: relative;
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
 
         li::before {
@@ -144,75 +146,42 @@
     <div class="container">
         <header>
             <a href="energy-map.html" class="logo">← Back to Analytics</a>
-            <h1>Environmental<br>Consciousness</h1>
+            <h1>Mapping Our<br>Daily Footprint</h1>
         </header>
 
         <main>
             <section class="section-content">
                 <h2>Project Overview</h2>
-                <p>The Interactive Energy Map (accessible at evanle.dev/energy-map.html) is a dynamic digital interface designed to visualize regional and global energy distribution, infrastructure, and the environmental impacts of the current energy mix. To maximize engagement, the platform integrates two interactive sub-features: a City Comparison Tool and an Energy Literacy Quiz.</p>
+                <p>The core mission of this project is to bridge the gap between complex environmental data and everyday human behavior. While people frequently hear about carbon footprints, the abstract nature of greenhouse gases makes it difficult to visualize the immediate environmental impact of daily routines. This project tackles a major carbon source that society interacts with every single second of the day: household and regional electricity consumption.</p>
+                <p>To make this issue highly accessible, the project takes the form of an interactive digital map hosted at <code>evanle.dev</code>. Instead of relying on dense academic text, the website uses intuitive, visual mapping to allow everyday users to see exactly where their energy comes from and the environmental toll it takes. By keeping the language simple, jargon-free, and visually driven, the platform transforms intimidating data into an engaging learning experience for the general public.</p>
             </section>
 
             <section class="section-content">
-                <h2>Topic Selection & Justification</h2>
-                <p>The project focuses on comparing fossil fuels against renewable energy sources. This topic was chosen because energy generation represents the single largest contributor to global greenhouse gas emissions. Developing a clear understanding of power sources is a critical first step toward environmental literacy and systemic infrastructure change.</p>
-            </section>
-
-            <section class="section-content">
-                <h2>Methodology & Technical Justification</h2>
-                <p>The chosen method is a custom-built, interactive web interface rather than a static presentation or report.</p>
-                <p><strong>The Problem:</strong> Traditional textbooks and spreadsheets of climate data can be dry, overwhelming, and inaccessible to the general public.</p>
-                <p><strong>The Solution:</strong> A dynamic digital map allows users to engage directly with spatial data. By toggling specific data layers, users can immediately observe the geographic relationships between energy plants, resource availability, and environmental footprints.</p>
-            </section>
-
-            <section class="section-content">
-                <h2>Target Audience & Accessibility</h2>
-                <p>The primary audience consists of the general public, specifically students, community members, and individuals without a background in environmental science.</p>
-                <p>Large-scale climate solutions require widespread community buy-in. By translating complex data into an intuitive visual format, the tool allows anyone to understand their regional power grid without needing expertise in environmental chemistry or utility engineering.</p>
-            </section>
-
-            <section class="section-content">
-                <h2>Core Features & Walkthrough</h2>
-
-                <h3>1. Geospatial Data Layers</h3>
-                <p>The interface operates through distinct, scientifically validated data layers:</p>
+                <h2>Research and Data Foundation</h2>
+                <p>To ensure the project is scientifically sound and accurate, the map integrates real-time, verified data directly from three major authoritative institutions via public APIs:</p>
                 <ul>
-                    <li><strong>The Status Quo Layer:</strong> Visualizes where non-renewable sources like coal and natural gas currently dominate, illustrating their proximity to high-emissions zones and vulnerable ecosystems.</li>
-                    <li><strong>The Renewable Potential Layer:</strong> Highlights geographic areas optimized for clean energy production, such as regions with high solar irradiance, strong wind corridors, or geothermal potential.</li>
+                    <li><strong>The U.S. Energy Information Administration (EIA):</strong> Provides live data on grid composition, showing the breakdown of energy sources (fossil fuels vs. renewables) powering different regions.</li>
+                    <li><strong>The Environmental Protection Agency (EPA):</strong> Supplies localized emissions data to calculate the exact carbon intensity associated with that regional energy use.</li>
+                    <li><strong>The U.S. Census Bureau:</strong> Offers demographic and geographic data to contextualize energy consumption patterns across different populations.</li>
                 </ul>
-
-                <h3>2. City Comparison Tool</h3>
-                <p>This feature allows users to select two different municipalities to compare their energy profiles side-by-side. It contrasts their reliance on fossil fuels versus renewables, local carbon output, and proximity to clean energy infrastructure, making global grid data tangible on a local, relatable scale.</p>
-
-                <h3>3. Interactive Energy Quiz</h3>
-                <p>To reinforce learning, the embedded quiz tests users on energy concepts and regional grid facts. It serves as a gamified checkpoint, turning passive viewers into active participants and measuring their understanding of how energy choices impact the environment.</p>
+                <p>By combining these three distinct sources, the map provides users with a comprehensive, localized look at the invisible infrastructure behind their light switches.</p>
             </section>
 
             <section class="section-content">
-                <h2>Scientific Validity & Data Integrity</h2>
-                <p>To ensure absolute scientific soundness, all spatial and statistical data is aggregated from official, peer-reviewed repositories, including:</p>
+                <h2>Solutions and a Message of Hope</h2>
+                <p>Rather than leaving users discouraged by the scale of energy-related emissions, the platform is designed to inspire action through actionable solutions and systemic hope:</p>
                 <ul>
-                    <li>The U.S. Energy Information Administration (EIA)</li>
-                    <li>The National Renewable Energy Laboratory (NREL)</li>
-                    <li>The EPA Power Profiler</li>
+                    <li><strong>Individual Empowerment:</strong> The tool helps users identify peak high-emissions times in their specific region. This knowledge empowers them to shift high-energy tasks—like running dishwashers or charging electric vehicles—to hours when the grid relies more heavily on clean, renewable energy.</li>
+                    <li><strong>Systemic Progress:</strong> By visualizing the data, the map highlights regions that have successfully integrated wind, solar, and hydro-power. This serves as a tangible proof-of-concept, showing users that a transition to a low-carbon grid is not a distant dream, but a reality already unfolding across the country.</li>
                 </ul>
-            </section>
-
-            <section class="section-content">
-                <h2>Solutions & Grid Optimization</h2>
-                <p>Rather than focusing strictly on environmental degradation, the map highlights viable paths forward:</p>
-                <ul>
-                    <li><strong>Systemic Solutions:</strong> Demonstrates the impact of grid modernization, smart microgrids, and high-efficiency transmission lines in preventing energy waste.</li>
-                    <li><strong>Individual Action:</strong> Shows how localized grid data enables consumers to optimize their household energy footprints, participate in community solar programs, or support regional clean energy initiatives.</li>
-                </ul>
-                <p>The tool ultimately demonstrates that the geographic blueprint and technology required for a transition to clean energy already exist.</p>
+                <p>Ultimately, the <code>evanle.dev</code> energy map turns passive energy consumers into conscious, informed participants in the clean energy transition.</p>
             </section>
 
             <a href="energy-map.html" class="back-link">Return to Energy Map</a>
         </main>
 
         <footer>
-            <p>&copy; 2025 EVANLE.DEV | ENERGY ANALYTICS PROJECT</p>
+            <p>&copy; 2026 EVANLE.DEV | ENERGY ANALYTICS PROJECT</p>
         </footer>
     </div>
 </body>
