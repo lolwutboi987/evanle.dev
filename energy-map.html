@@ -362,9 +362,9 @@
                 </p>
             </section>
                                     <section id="quiz-section" class="data-panel" style="grid-column: span 2; margin-top: 2rem;">
-                <h3 style="color: var(--monolith-fg);">Calculate My Impact (Personal Quiz)</h3>
+                <h3 style="color: var(--monolith-fg);">Calculate My Energy Impact</h3>
                 <div id="quiz-container" style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
-                    <p class="label-spec">Appliances, Vehicles & Usage</p>
+                    <p class="label-spec">Monthly Electricity & EV Usage</p>
                     <div id="device-tags" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;"></div>
                     <button class="btn-monolith" onclick="openDeviceModal()" style="font-size: 0.8rem; padding: 0.5rem; width: fit-content;">+ Add Item</button>
                     <button class="btn-monolith" onclick="calculateQuiz()" style="margin-top: 1rem; width: fit-content;">Compare My Footprint</button>
@@ -390,8 +390,6 @@
                                 <option value="cooking">Electric Range / Oven - 2500W</option>
                             </optgroup>
                             <optgroup label="Transportation">
-                                <option value="car-gas">Gasoline Vehicle (25 MPG avg)</option>
-                                <option value="car-hybrid">Hybrid Vehicle (45 MPG avg)</option>
                                 <option value="car-ev">Electric Vehicle (0.3 kWh/mi avg)</option>
                             </optgroup>
                             <option value="custom">Custom Device (Watts)</option>
@@ -498,10 +496,10 @@
 
         function getNormalizedValue(val, view, metric) {
             if (metric === 'perCapita') {
-                if (view === 'elec') return val * 5;
-                if (view === 'ng') return val * 100;
-                if (view === 'fuel') return val * 125;
-                if (view === 'carbon') return val * 2;
+                if (view === 'elec') return val / 5;
+                if (view === 'ng') return val * 20;
+                if (view === 'fuel') return val * 20;
+                if (view === 'carbon') return val / 10;
                 return val;
             }
             if (view === 'elec') return val / 1000;
@@ -567,10 +565,9 @@
 
                 let totalUsage = 0;
                 if (view === 'carbon') {
-                    const eVal = ((energyData['elec'] && energyData['elec'][data.state]) ? energyData['elec'][data.state].value : 0) / statePop * data.pop * acs.elecIntensity * acs.incomeFactor;
-                    const gVal = ((energyData['ng'] && energyData['ng'][data.state]) ? energyData['ng'][data.state].value : 0) / statePop * data.pop * acs.gasIntensity * acs.incomeFactor;
-                    totalUsage = (eVal * APP_CONFIG.EMISSIONS.elec) + (gVal * APP_CONFIG.EMISSIONS.ng);
-                } else if (view === 'mix') {
+                const eVal = (energyData['elec'] && energyData['elec'][code]) ? energyData['elec'][code].value : 0;
+                return (eVal * 1000000 * APP_CONFIG.EMISSIONS.elec);
+            } else if (view === 'mix') {
                     totalUsage = 0;
                 } else {
                     const stateVal = (energyData[view] && energyData[view][data.state]) ? energyData[view][data.state].value : 0;
@@ -619,8 +616,6 @@
             'ac-std': { name: 'AC (Standard)', watts: 3000, category: 'appliance' },
             'ac-he': { name: 'AC (HE)', watts: 1500, category: 'appliance' },
             'cooking': { name: 'Elec Range', watts: 2500, category: 'appliance' },
-            'car-gas': { name: 'Gasoline Car', category: 'vehicle', factor: 823 / 42 / 25, unit: 'mi/day' },
-            'car-hybrid': { name: 'Hybrid Car', category: 'vehicle', factor: 823 / 42 / 45, unit: 'mi/day' },
             'car-ev': { name: 'Electric Car', category: 'vehicle', factor: 0.3, unit: 'mi/day' }
         };
         function initQuiz() {
@@ -655,25 +650,31 @@
             });
         }
         function calculateQuiz() {
-            let monthlyElec = 0; let totalCarbon = 0;
+            let monthlyElec = 0;
             if (addedDevices.length === 0) {
                 const results = document.getElementById('quiz-results'); results.style.display = 'block';
-                results.innerHTML = `<div style="border-left: 2px solid var(--monolith-accent); padding-left: 1rem; background: rgba(255,255,255,0.02); padding: 1rem;"><p style="margin: 0; color: var(--monolith-muted);">YOUR MONTHLY IMPACT</p><p style="font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">You don't have a carbon footprint</p></div>`;
+                results.innerHTML = `<div style="border-left: 2px solid var(--monolith-accent); padding-left: 1rem; background: rgba(255,255,255,0.02); padding: 1rem;"><p style="margin: 0; color: var(--monolith-muted);">YOUR MONTHLY IMPACT</p><p style="font-size: 1.2rem; font-weight: bold; margin: 0.5rem 0;">You don't have an energy footprint</p></div>`;
                 return;
             }
-            addedDevices.forEach(d => { if (d.category === 'appliance') monthlyElec += (d.watts * d.usage / 1000) * 30; else if (d.category === 'vehicle') { if (d.name.includes('Electric')) monthlyElec += (d.usage * d.factor) * 30; else totalCarbon += d.factor * d.usage * 30; } });
-            totalCarbon += (monthlyElec * APP_CONFIG.EMISSIONS.elec); const myCarbon = totalCarbon; const results = document.getElementById('quiz-results'); results.style.display = 'block';
-            let comparisons = ""; const avgUS = 1500; const diffUS = ((myCarbon - avgUS) / (avgUS || 1) * 100).toFixed(1);
-            comparisons += `<br>• vs National Average: <strong>${Math.abs(diffUS)}% ${diffUS > 0 ? 'above' : 'below'}</strong>`;
+            addedDevices.forEach(d => {
+                if (d.category === 'appliance') monthlyElec += (d.watts * d.usage / 1000) * 30;
+                else if (d.category === 'vehicle') monthlyElec += (d.usage * d.factor) * 30;
+            });
+            const myCarbon = (monthlyElec * APP_CONFIG.EMISSIONS.elec);
+            const results = document.getElementById('quiz-results'); results.style.display = 'block';
+            let comparisons = "";
+            const avgUS = 1025 * APP_CONFIG.EMISSIONS.elec; // Midpoint of 750-1300 kWh/mo
+            const diffUS = ((myCarbon - avgUS) / (avgUS || 1) * 100).toFixed(1);
+            comparisons += `<br>• vs National Average (1,025 kWh): <strong>${Math.abs(diffUS)}% ${diffUS > 0 ? 'above' : 'below'}</strong>`;
             if (currentRegion && activeCities[currentRegion]) {
                 const city = activeCities[currentRegion]; const statePop = censusData[city.state] || 1;
                 const eValState = ((energyData['elec'] && energyData['elec'][city.state]) ? energyData['elec'][city.state].value : 0);
-                const gValState = ((energyData['ng'] && energyData['ng'][city.state]) ? energyData['ng'][city.state].value : 0);
-                const cityCarbonPerCapita = ((eValState * 1000 * APP_CONFIG.EMISSIONS.elec) + (gValState * 1000 * APP_CONFIG.EMISSIONS.ng)) / statePop;
+                const cityCarbonPerCapita = (eValState * 1000000 * APP_CONFIG.EMISSIONS.elec) / statePop;
                 const diffCity = cityCarbonPerCapita > 0 ? ((myCarbon - cityCarbonPerCapita) / cityCarbonPerCapita * 100).toFixed(1) : 0;
-                comparisons += `<br>• vs ${currentRegion} Average: <strong>${Math.abs(diffCity)}% ${diffCity > 0 ? 'above' : 'below'}</strong>`;
+                comparisons += `<br>• vs ${currentRegion} Per-Capita: <strong>${Math.abs(diffCity)}% ${diffCity > 0 ? 'above' : 'below'}</strong>`;
             }
-            results.innerHTML = `<div style="border-left: 2px solid var(--monolith-accent); padding-left: 1rem; background: rgba(255,255,255,0.02); padding: 1rem;"><p style="margin: 0; color: var(--monolith-muted);">YOUR MONTHLY IMPACT</p><p style="font-size: 1.5rem; font-weight: bold; margin: 0.5rem 0;">${Math.round(myCarbon).toLocaleString()} <span style="font-size: 0.8rem; font-weight: normal;">lbs CO2</span></p><p style="margin: 0; font-size: 0.8rem;">${comparisons}</p></div>`;
+            const benchmarkInfo = `<div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--monolith-muted); border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.5rem;">Benchmarks: San Ramon/CA (450-700 kWh), US Avg (750-1,300 kWh)</div>`;
+            results.innerHTML = `<div style="border-left: 2px solid var(--monolith-accent); padding-left: 1rem; background: rgba(255,255,255,0.02); padding: 1rem;"><p style="margin: 0; color: var(--monolith-muted);">YOUR MONTHLY ELECTRICITY IMPACT</p><p style="font-size: 1.5rem; font-weight: bold; margin: 0.5rem 0;">${Math.round(myCarbon).toLocaleString()} <span style="font-size: 0.8rem; font-weight: normal;">lbs CO2</span> <span style="font-size: 0.7rem; font-weight: normal;">(${Math.round(monthlyElec)} kWh)</span></p><p style="margin: 0; font-size: 0.8rem;">${comparisons}</p>${benchmarkInfo}</div>`;
             updateCharts();
             trendChart.data.datasets.push({ label: 'YOU', borderColor: '#fdfdf5', borderDash: [5, 5], data: [myCarbon, myCarbon, myCarbon, myCarbon, myCarbon, myCarbon], fill: false, pointRadius: 5 });
             trendChart.update();
@@ -714,7 +715,7 @@
             });
         }
 
-        function updateCharts() {
+                function updateCharts() {
             const view = document.getElementById('data-view').value;
             const metric = document.getElementById('metric-type').value;
             const units = getUnits() || { main: 'N/A', perCapita: 'N/A', totalConv: 1, pcConv: 1 };
@@ -749,16 +750,8 @@
                     const acs = city.acs || { elecIntensity: 1, gasIntensity: 1, incomeFactor: 1 };
                     let base = getBaseValue(view, city.state) / (censusData[city.state] || 1) * city.pop;
 
-                    if (view === 'elec') base *= acs.elecIntensity * acs.incomeFactor;
+                    if (view === 'elec' || view === 'carbon') base *= acs.elecIntensity * acs.incomeFactor;
                     else if (view === 'ng') base *= acs.gasIntensity * acs.incomeFactor;
-                    else if (view === 'carbon') {
-                        const eVal = (getBaseValue('elec', city.state) / (censusData[city.state] || 1)) * city.pop * acs.elecIntensity * acs.incomeFactor;
-                        const gVal = (getBaseValue('ng', city.state) / (censusData[city.state] || 1)) * city.pop * acs.gasIntensity * acs.incomeFactor;
-                        const fVal = (getBaseValue('fuel', city.state) / (censusData[city.state] || 1)) * city.pop;
-                        base = (eVal * 1000000 * APP_CONFIG.EMISSIONS.elec) +
-                               (gVal * 1000 * APP_CONFIG.EMISSIONS.ng) +
-                               (fVal * (1000 * 30.4 / 42) * APP_CONFIG.EMISSIONS.fuel);
-                    }
 
                     if (metric === 'perCapita') base = (base * units.pcConv / city.pop);
                     else base = base * units.totalConv;
@@ -769,12 +762,9 @@
             } else {
                 let trend = [0,0,0,0,0,0];
                 if (view === 'carbon') {
-                     const eTrend = (energyData['elec'] && energyData['elec'][currentRegion]) ? energyData['elec'][currentRegion].trend : [0,0,0,0,0,0];
-                     const gTrend = (energyData['ng'] && energyData['ng'][currentRegion]) ? energyData['ng'][currentRegion].trend : [0,0,0,0,0,0];
-                     const fTrend = (energyData['fuel'] && energyData['fuel'][currentRegion]) ? energyData['fuel'][currentRegion].trend : [0,0,0,0,0,0];
-                     trend = eTrend.map((e, i) => (e * 1000000 * APP_CONFIG.EMISSIONS.elec) +
-                                                  (gTrend[i] * 1000 * APP_CONFIG.EMISSIONS.ng) +
-                                                  (fTrend[i] * (1000 * 30.4 / 42) * APP_CONFIG.EMISSIONS.fuel));
+                    if (energyData['elec'] && energyData['elec'][currentRegion]) {
+                        trend = energyData['elec'][currentRegion].trend.map(v => v * 1000000 * APP_CONFIG.EMISSIONS.elec);
+                    }
                 } else if (energyData[view] && energyData[view][currentRegion]) {
                     trend = energyData[view][currentRegion].trend;
                 }
@@ -791,11 +781,7 @@
         function getBaseValue(view, code) {
             if (view === 'carbon') {
                 const eVal = (energyData['elec'] && energyData['elec'][code]) ? energyData['elec'][code].value : 0;
-                const gVal = (energyData['ng'] && energyData['ng'][code]) ? energyData['ng'][code].value : 0;
-                const fVal = (energyData['fuel'] && energyData['fuel'][code]) ? energyData['fuel'][code].value : 0;
-                return (eVal * 1000000 * APP_CONFIG.EMISSIONS.elec) +
-                       (gVal * 1000 * APP_CONFIG.EMISSIONS.ng) +
-                       (fVal * (1000 * 30.4 / 42) * APP_CONFIG.EMISSIONS.fuel);
+                return (eVal * 1000000 * APP_CONFIG.EMISSIONS.elec);
             }
             return (energyData[view] && energyData[view][code]) ? energyData[view][code].value : 0;
         }
