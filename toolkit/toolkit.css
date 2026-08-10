@@ -6,8 +6,6 @@
     --chrome-mid: #808080;
     --chrome-dark: #404040;
     --title: #000080;
-    --screen: #101410;
-    --screen-text: #76ff7b;
     --ink: #000000;
     --paper: #ffffff;
 }
@@ -150,39 +148,6 @@ a {
     outline-offset: 2px;
 }
 
-.machine-strip {
-    margin: 6px;
-    padding: 8px 10px;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    background: var(--screen);
-    color: var(--screen-text);
-    border: 2px solid;
-    border-color: var(--chrome-dark) var(--chrome-light) var(--chrome-light) var(--chrome-dark);
-    font-family: "Lucida Console", "Courier New", monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
-
-.machine-strip span {
-    padding: 1px 10px;
-}
-
-.machine-strip span:first-child {
-    padding-left: 0;
-}
-
-.machine-strip span + span {
-    border-left: 1px solid #426845;
-}
-
-.machine-strip strong {
-    margin-right: 0.6em;
-    color: var(--paper);
-    font-weight: 400;
-}
-
 .editor {
     flex: 1;
     margin: 0 6px;
@@ -305,22 +270,6 @@ h1 {
         min-height: 100vh;
         border-width: 0;
         box-shadow: none;
-    }
-
-    .machine-strip {
-        grid-template-columns: 1fr;
-        gap: 4px;
-    }
-
-    .machine-strip span,
-    .machine-strip span:first-child {
-        padding: 2px 0;
-    }
-
-    .machine-strip span + span {
-        padding-top: 6px;
-        border-top: 1px solid #426845;
-        border-left: 0;
     }
 
     .editor {
