@@ -35,12 +35,10 @@ body {
     color: var(--ink);
     font-family: Tahoma, Verdana, "MS Sans Serif", Arial, sans-serif;
     font-size: 15px;
-    cursor: url("assets/screwdriver-cursor.png") 2 2, default;
 }
 
 a {
     color: inherit;
-    cursor: url("assets/screwdriver-cursor.png") 2 2, pointer;
 }
 
 .skip-link {
@@ -131,7 +129,6 @@ a {
     font-weight: 700;
     line-height: 1;
     text-shadow: var(--cleartype-on-light);
-    cursor: url("assets/screwdriver-cursor.png") 2 2, pointer;
 }
 
 .window-button:hover {
