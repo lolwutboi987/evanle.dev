@@ -8,6 +8,12 @@
     --title: #000080;
     --ink: #000000;
     --paper: #ffffff;
+    --cleartype-on-light:
+        -0.22px 0 0 rgba(0, 72, 180, 0.2),
+        0.22px 0 0 rgba(190, 42, 0, 0.16);
+    --cleartype-on-dark:
+        -0.22px 0 0 rgba(92, 158, 255, 0.24),
+        0.22px 0 0 rgba(255, 132, 96, 0.18);
 }
 
 * {
@@ -27,12 +33,14 @@ body {
     place-items: center;
     background: var(--desktop);
     color: var(--ink);
-    font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
-    font-size: 16px;
+    font-family: Tahoma, Verdana, "MS Sans Serif", Arial, sans-serif;
+    font-size: 15px;
+    cursor: url("assets/screwdriver-cursor.png") 2 2, default;
 }
 
 a {
     color: inherit;
+    cursor: url("assets/screwdriver-cursor.png") 2 2, pointer;
 }
 
 .skip-link {
@@ -59,6 +67,11 @@ a {
     border: 2px solid;
     border-color: var(--chrome-light) var(--ink) var(--ink) var(--chrome-light);
     box-shadow: 8px 8px 0 #1e3a57;
+    font-kerning: none;
+    font-variant-ligatures: none;
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
 }
 
 .title-bar {
@@ -73,6 +86,7 @@ a {
     color: var(--paper);
     font-size: 0.83rem;
     font-weight: 700;
+    text-shadow: var(--cleartype-on-dark);
 }
 
 .title-bar__label {
@@ -116,6 +130,13 @@ a {
     font-size: 0.75rem;
     font-weight: 700;
     line-height: 1;
+    text-shadow: var(--cleartype-on-light);
+    cursor: url("assets/screwdriver-cursor.png") 2 2, pointer;
+}
+
+.window-button:hover {
+    outline: 1px dotted var(--ink);
+    outline-offset: -5px;
 }
 
 .menu-bar {
@@ -125,6 +146,7 @@ a {
     padding: 3px 5px;
     border-bottom: 1px solid var(--chrome-mid);
     font-size: 0.8rem;
+    text-shadow: var(--cleartype-on-light);
 }
 
 .menu-bar a {
@@ -139,6 +161,11 @@ a {
 .menu-bar a[aria-current="page"] {
     background: var(--title);
     color: var(--paper);
+}
+
+.menu-bar a:hover {
+    outline: 1px dotted var(--paper);
+    outline-offset: -5px;
 }
 
 .menu-bar a:focus-visible,
@@ -159,6 +186,7 @@ a {
     border: 2px solid;
     border-color: var(--chrome-dark) var(--chrome-light) var(--chrome-light) var(--chrome-dark);
     font-family: "Lucida Console", "Courier New", monospace;
+    text-shadow: var(--cleartype-on-light);
 }
 
 .editor--empty {
@@ -210,6 +238,7 @@ h1 {
     line-height: 1.2;
     text-align: center;
     text-decoration: none;
+    text-shadow: var(--cleartype-on-light);
     text-transform: uppercase;
 }
 
@@ -217,6 +246,7 @@ h1 {
     background: var(--title);
     color: var(--paper);
     border-color: #8c8cff var(--ink) var(--ink) #8c8cff;
+    text-shadow: var(--cleartype-on-dark);
 }
 
 .machine-button:hover {
@@ -239,6 +269,7 @@ h1 {
     grid-template-columns: 1fr auto;
     gap: 4px;
     font-size: 0.68rem;
+    text-shadow: var(--cleartype-on-light);
 }
 
 .status-bar span {
