@@ -3,120 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Showcase — Evan Le</title>
+    <meta name="description" content="Selected machines, workshop tools, and hardware projects by Evan Le.">
+    <title>Work &mdash; Evan Le</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="theme.js"></script>
-    <style>
-        .loading {
-            padding: 4rem;
-            text-align: center;
-            color: var(--text-muted);
-            grid-column: 1 / -1;
-        }
-    </style>
 </head>
-<body>
-    <nav class="navbar">
+<body class="portfolio-site">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <nav class="navbar" aria-label="Primary navigation">
         <div class="nav-container">
             <a href="index.html" class="logo">evanle.dev</a>
             <ul class="nav-menu">
                 <li><a href="index.html">Home</a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="showcase.html" class="active">Showcase</a></li>
-                <li><a href="blog.html">Blog</a></li>
-                <li><button id="theme-toggle" aria-label="Toggle theme">Theme</button></li>
+                <li><a href="showcase.html" class="active" aria-current="page">Work</a></li>
             </ul>
+            <button id="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false">Dark</button>
         </div>
     </nav>
 
-    <main>
-        <section class="hero">
+    <main id="main-content">
+        <section class="hero hero--page">
             <div class="container">
-                <p class="subtitle">Showcase</p>
-                <h1>Selected Projects</h1>
-                <p class="hero-text">A dynamic collection of tools, libraries, and experiments sourced directly from GitHub.</p>
+                <p class="kicker">Work / Selected projects</p>
+                <h1>Machines, tools, and experiments.</h1>
+                <p class="hero-text">A short list of projects I can actually point to. The full repository history lives on GitHub.</p>
             </div>
         </section>
 
-        <section class="gallery-content">
+        <section class="site-section" aria-labelledby="project-index-title">
             <div class="container">
-                <div id="github-repos" class="gallery-grid">
-                    <div class="loading">Fetching repositories...</div>
+                <header class="section-heading section-heading--compact">
+                    <p class="section-number">01 / Project index</p>
+                    <h2 id="project-index-title">Selected work</h2>
+                </header>
+
+                <div class="work-list">
+                    <article class="work-row">
+                        <p class="work-index" aria-hidden="true">01</p>
+                        <div class="work-summary">
+                            <p class="work-meta">Workshop program / 2026</p>
+                            <h3><a href="toolkit/">Toolkit</a></h3>
+                            <p>A You Ship, We Ship program for designing and building tools or amenities that make a workshop better.</p>
+                        </div>
+                        <a class="project-link" href="toolkit/">Open program <span aria-hidden="true">&rarr;</span></a>
+                    </article>
+
+                    <article class="work-row">
+                        <p class="work-index" aria-hidden="true">02</p>
+                        <div class="work-summary">
+                            <p class="work-meta">Motion hardware / Open source</p>
+                            <h3><a href="https://github.com/lolwutboi987/Ninebot-Simwheel" target="_blank" rel="noopener noreferrer">Ninebot Simwheel</a></h3>
+                            <p>A direct-drive sim wheel using a Ninebot G30 motor, ODrive, and OpenFFB.</p>
+                        </div>
+                        <a class="project-link" href="https://github.com/lolwutboi987/Ninebot-Simwheel" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">&nearr;</span></a>
+                    </article>
+
+                    <article class="work-row">
+                        <p class="work-index" aria-hidden="true">03</p>
+                        <div class="work-summary">
+                            <p class="work-meta">Machine design / Open source</p>
+                            <h3><a href="https://github.com/lolwutboi987/PANDA-V2" target="_blank" rel="noopener noreferrer">Panda V2</a></h3>
+                            <p>A compact printer redesign focused on reliability and repeatability.</p>
+                        </div>
+                        <a class="project-link" href="https://github.com/lolwutboi987/PANDA-V2" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">&nearr;</span></a>
+                    </article>
+
+                    <article class="work-row">
+                        <p class="work-index" aria-hidden="true">04</p>
+                        <div class="work-summary">
+                            <p class="work-meta">Machine design / Open source</p>
+                            <h3><a href="https://github.com/lolwutboi987/ThingOmega" target="_blank" rel="noopener noreferrer">ThingOmega</a></h3>
+                            <p>A MakerBot Thing-O-Matic-inspired machine built to push speed.</p>
+                        </div>
+                        <a class="project-link" href="https://github.com/lolwutboi987/ThingOmega" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">&nearr;</span></a>
+                    </article>
+
+                    <article class="work-row">
+                        <p class="work-index" aria-hidden="true">05</p>
+                        <div class="work-summary">
+                            <p class="work-meta">Data tool / Interactive</p>
+                            <h3><a href="energy-map.html">Interactive Energy Map</a></h3>
+                            <p>U.S. electricity and natural-gas consumption per capita, using EIA and Census data.</p>
+                        </div>
+                        <a class="project-link" href="energy-map.html">Open map <span aria-hidden="true">&rarr;</span></a>
+                    </article>
+
+                    <article class="work-row">
+                        <p class="work-index" aria-hidden="true">06</p>
+                        <div class="work-summary">
+                            <p class="work-meta">Wearable hardware / Open source</p>
+                            <h3><a href="https://github.com/lolwutboi987/dumbwatch" target="_blank" rel="noopener noreferrer">dumbwatch</a></h3>
+                            <p>A compact watch project focused on long battery life.</p>
+                        </div>
+                        <a class="project-link" href="https://github.com/lolwutboi987/dumbwatch" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">&nearr;</span></a>
+                    </article>
                 </div>
+
+                <p class="index-footer"><a href="https://github.com/lolwutboi987?tab=repositories" target="_blank" rel="noopener noreferrer" class="text-link">All public repositories <span aria-hidden="true">&nearr;</span></a></p>
             </div>
         </section>
     </main>
 
-    <footer>
+    <footer class="site-footer">
         <div class="container">
-            <p>&copy; 2025 Evan Le</p>
-            <div class="social-links">
-                <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer">GitHub</a>
-            </div>
+            <p>&copy; 2026 Evan Le</p>
+            <nav class="footer-links" aria-label="Footer navigation">
+                <a href="toolkit/">Toolkit</a>
+                <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">&nearr;</span></a>
+            </nav>
         </div>
     </footer>
-
-    <script>
-        async function fetchRepos() {
-            const container = document.getElementById('github-repos');
-            const username = 'lolwutboi987';
-
-            try {
-                const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=12`);
-                if (!response.ok) throw new Error('Failed to fetch');
-
-                const repos = await response.json();
-                container.innerHTML = '';
-
-                // Prepend Energy Map Project
-                const mapCard = document.createElement('div');
-                mapCard.className = 'gallery-item';
-                mapCard.innerHTML = `
-                    <div class="gallery-image">
-                        <div style="width: 100%; height: 100%; background: var(--light-bg); display: flex; align-items: center; justify-content: center; font-size: 3rem;">🗺️</div>
-                    </div>
-                    <div class="gallery-info">
-                        <h3>Interactive Energy Map</h3>
-                        <p>A live subdomain project visualizing U.S. power and natural gas consumption per capita using EIA and Census data.</p>
-                        <a href="energy-map.html" class="project-link">Launch Live Map →</a>
-                    </div>
-                `;
-                container.appendChild(mapCard);
-
-                repos.forEach(repo => {
-                    if (repo.fork) return;
-
-                    const card = document.createElement('div');
-                    card.className = 'gallery-item';
-
-                    const imageUrl = `https://opengraph.githubassets.com/1/${username}/${repo.name}`;
-
-                    card.innerHTML = `
-                        <div class="gallery-image">
-                            <img src="${imageUrl}" alt="${repo.name}" loading="lazy" onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'font-size: 2rem; color: var(--border-color)\'>📂</div>'">
-                        </div>
-                        <div class="gallery-info">
-                            <h3>${repo.name}</h3>
-                            <p>${repo.description || 'No description available for this project.'}</p>
-                            <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="project-link">Source Code →</a>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-
-                if (container.children.length === 0) {
-                    container.innerHTML = '<div class="loading">No public repositories found.</div>';
-                }
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = '<div class="loading">Failed to load repositories. Please check back later.</div>';
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', fetchRepos);
-    </script>
 </body>
 </html>
