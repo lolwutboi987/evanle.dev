@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Toolkit documentation.">
+    <title>Toolkit Docs — Evan Le</title>
+    <link rel="stylesheet" href="../toolkit.css">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <main class="app-window" id="main-content" aria-labelledby="docs-title">
+        <header class="title-bar">
+            <div class="title-bar__label">
+                <span class="title-bar__icon" aria-hidden="true"></span>
+                <span>docs.txt - Notepad</span>
+            </div>
+            <div class="window-controls" aria-hidden="true">
+                <span class="window-button">&#8212;</span>
+                <span class="window-button">&#9633;</span>
+                <span class="window-button">&#10005;</span>
+            </div>
+        </header>
+
+        <nav class="menu-bar" aria-label="Toolkit navigation">
+            <a href="../">Toolkit</a>
+            <a href="./" aria-current="page">Docs</a>
+            <a href="https://slack.hackclub.com/">Slack</a>
+        </nav>
+
+        <div class="machine-strip" aria-label="Document status">
+            <span><strong>FILE</strong> docs.txt</span>
+            <span><strong>STATE</strong> EMPTY</span>
+            <span><strong>PROGRAM</strong> TOOLKIT</span>
+        </div>
+
+        <section class="editor editor--empty" aria-label="Documentation editor">
+            <h1 class="visually-hidden" id="docs-title">Toolkit documentation</h1>
+        </section>
+
+        <footer class="status-bar" aria-label="Document cursor position">
+            <span>toolkit/docs/docs.txt</span>
+            <span>Ln 1, Col 1</span>
+        </footer>
+    </main>
+</body>
+</html>
