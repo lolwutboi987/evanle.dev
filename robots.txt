@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /blog.html
+
+Sitemap: https://www.evanle.dev/sitemap.xml
