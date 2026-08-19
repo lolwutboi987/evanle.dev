@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="The Long Way Home is a quiet browser story about memory, distance, and the roads we take back.">
+    <meta name="theme-color" content="#0a0d12">
+    <link rel="canonical" href="https://www.evanle.dev/walk/">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.evanle.dev/walk/">
+    <meta property="og:title" content="The Long Way Home">
+    <meta property="og:description" content="A quiet browser story about memory, distance, and the roads we take back.">
+    <meta property="og:image" content="https://www.evanle.dev/walk/assets/the-long-way-home.png">
+    <meta property="og:image:alt" content="The Long Way Home, a figure walking beneath a vast nocturnal sky">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="The Long Way Home">
+    <meta name="twitter:description" content="A quiet browser story about memory, distance, and the roads we take back.">
+    <meta name="twitter:image" content="https://www.evanle.dev/walk/assets/the-long-way-home.png">
+    <title>The Long Way Home</title>
+    <link rel="stylesheet" href="game.css">
+</head>
+<body class="game-page">
+    <a class="skip-link" href="#transcriptPanel">Skip to story transcript</a>
+
+    <main id="gameRoot" class="game-shell" aria-busy="true">
+        <div class="game-stage">
+            <canvas
+                id="gameCanvas"
+                tabindex="0"
+                aria-label="The Long Way Home game world. Use the left and right arrow keys to walk and E, Enter, or Space to interact."
+            >
+                Your browser does not support the canvas used by The Long Way Home. The story transcript remains available below.
+            </canvas>
+
+            <div class="frame-lines" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <header id="gameHud" class="game-hud" aria-label="Game information" hidden>
+                <div class="story-mark" aria-hidden="true">
+                    <span>TLWH</span>
+                    <i></i>
+                </div>
+
+                <div class="place-readout">
+                    <span class="hud-label">Chapter</span>
+                    <strong id="chapterLabel">I · Departure</strong>
+                    <span id="yearLabel" class="hud-year">1998</span>
+                </div>
+
+                <div class="memory-readout">
+                    <span class="memory-symbol" aria-hidden="true"></span>
+                    <span><strong id="memoryCount">0</strong> <span class="hud-label">memories</span></span>
+                </div>
+
+                <nav class="utility-controls" aria-label="Game controls">
+                    <button id="soundToggle" class="icon-button" type="button" aria-pressed="false" aria-label="Mute sound">
+                        <span aria-hidden="true">SND</span>
+                    </button>
+                    <button id="motionToggle" class="icon-button" type="button" aria-pressed="false" aria-label="Reduce motion">
+                        <span aria-hidden="true">FX</span>
+                    </button>
+                    <button id="pauseButton" class="icon-button" type="button" aria-label="Pause game">
+                        <span aria-hidden="true">II</span>
+                    </button>
+                </nav>
+            </header>
+
+            <section id="loadingScreen" class="screen-layer loading-screen is-visible" role="status" aria-live="polite" aria-label="Loading game">
+                <div class="loading-card">
+                    <p class="eyebrow">A road in five chapters</p>
+                    <div class="loading-title" aria-hidden="true">THE LONG WAY HOME</div>
+                    <progress id="loadingProgress" max="100" value="0">0%</progress>
+                    <div class="loading-meta">
+                        <span id="loadingText">Gathering the pieces…</span>
+                        <span aria-hidden="true">EAST / 6:14 PM</span>
+                    </div>
+                </div>
+            </section>
+
+            <section id="titleScreen" class="screen-layer title-screen" aria-labelledby="gameTitle" hidden>
+                <div class="title-landscape" aria-hidden="true">
+                    <span class="moon"></span>
+                    <span class="road road-one"></span>
+                    <span class="road road-two"></span>
+                    <span class="milepost">217</span>
+                </div>
+
+                <div class="title-copy">
+                    <p class="eyebrow"><span>01</span> A story told on foot</p>
+                    <h1 id="gameTitle"><span>The Long</span><span>Way Home</span></h1>
+                    <p class="title-deck">Some roads remember you before you remember them.</p>
+                    <div class="title-actions">
+                        <button id="startButton" class="action-button action-button--primary" type="button">
+                            <span>Begin the walk</span>
+                            <span aria-hidden="true">→</span>
+                        </button>
+                        <button id="continueButton" class="action-button" type="button" hidden>
+                            <span>Continue</span>
+                            <span aria-hidden="true">→</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="title-footer">
+                    <a href="../" class="back-link"><span aria-hidden="true">←</span> evanle.dev</a>
+                    <p>Headphones recommended · Saves on this device</p>
+                </div>
+            </section>
+
+            <section id="pauseMenu" class="screen-layer pause-screen" aria-labelledby="pauseTitle" hidden>
+                <div class="pause-card">
+                    <p class="eyebrow">The road waits</p>
+                    <h2 id="pauseTitle">Paused</h2>
+                    <div class="pause-actions">
+                        <button id="resumeButton" class="menu-button" type="button"><span>Resume</span><kbd>Esc</kbd></button>
+                        <button id="restartButton" class="menu-button" type="button"><span>Restart chapter</span><span aria-hidden="true">↺</span></button>
+                        <a class="menu-button" href="../"><span>Leave the road</span><span aria-hidden="true">←</span></a>
+                    </div>
+                    <p class="pause-note">Progress is saved at each memory.</p>
+                </div>
+            </section>
+
+            <section id="dialoguePanel" class="dialogue-panel" aria-labelledby="speakerName" aria-describedby="dialogueText" hidden>
+                <div class="dialogue-rule" aria-hidden="true"><span></span></div>
+                <div class="dialogue-copy">
+                    <p id="speakerName" class="speaker-name">Mara</p>
+                    <p id="dialogueText" class="dialogue-text">The last bus left hours ago. Maybe walking was always the point.</p>
+                </div>
+                <div id="choiceList" class="choice-list" aria-label="Dialogue choices">
+                    <button class="choice-button" type="button" data-choice="0"><span class="choice-number">1</span><span>Keep walking.</span></button>
+                    <button class="choice-button" type="button" data-choice="1"><span class="choice-number">2</span><span>Look back.</span></button>
+                </div>
+            </section>
+
+            <div class="control-hint" aria-hidden="true">
+                <span><kbd>←</kbd><kbd>→</kbd> Walk</span>
+                <span><kbd>E</kbd> Remember</span>
+                <span><kbd>Esc</kbd> Pause</span>
+            </div>
+
+            <div id="touchControls" class="touch-controls" aria-label="Touch controls">
+                <button id="moveLeft" class="touch-button" type="button" aria-label="Walk left"><span aria-hidden="true">←</span></button>
+                <button id="interactButton" class="touch-button touch-button--interact" type="button"><span>Remember</span></button>
+                <button id="moveRight" class="touch-button" type="button" aria-label="Walk right"><span aria-hidden="true">→</span></button>
+            </div>
+
+            <details id="transcriptPanel" class="transcript-panel">
+                <summary>Story transcript</summary>
+                <div class="transcript-body">
+                    <p class="transcript-help">Dialogue and important story events appear here.</p>
+                    <ol id="transcriptLog" aria-live="polite" aria-relevant="additions text"></ol>
+                </div>
+            </details>
+        </div>
+
+        <p id="gameStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true">Loading The Long Way Home.</p>
+    </main>
+
+    <noscript>
+        <div class="noscript-message">
+            <p class="eyebrow">The road is closed</p>
+            <h1>JavaScript is required to play.</h1>
+            <p>Enable JavaScript and reload this page to begin The Long Way Home.</p>
+            <a href="../">Return to evanle.dev</a>
+        </div>
+    </noscript>
+
+    <script type="module" src="game.js"></script>
+</body>
+</html>
