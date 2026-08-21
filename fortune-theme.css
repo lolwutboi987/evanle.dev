@@ -1,0 +1,266 @@
+/* The personal-site scrapbook layer. Standalone project pages keep their own styles. */
+.portfolio-site {
+    --page-bg: #f5ecd8;
+    --ink: #2e261f;
+    --muted: #66594d;
+    --rule: #cdbfa6;
+    --panel: #fffdf4;
+    --inverse: #fffaf0;
+    --fortune-red: #d94f45;
+    --fortune-blue: #3f6da5;
+    --fortune-yellow: #f7df69;
+    --paper-shadow: rgba(51, 40, 30, 0.18);
+}
+
+[data-theme="dark"] .portfolio-site {
+    --page-bg: #25211e;
+    --ink: #f5ecd8;
+    --muted: #cbbfae;
+    --rule: #6a5e51;
+    --panel: #38312b;
+    --inverse: #fffaf0;
+    --fortune-red: #ed746a;
+    --fortune-blue: #81a5cf;
+    --fortune-yellow: #d6bb55;
+    --paper-shadow: rgba(0, 0, 0, 0.34);
+}
+
+body.portfolio-site {
+    background-color: var(--page-bg);
+    background-image:
+        linear-gradient(color-mix(in srgb, var(--fortune-blue) 10%, transparent) 1px, transparent 1px),
+        linear-gradient(90deg, color-mix(in srgb, var(--fortune-blue) 10%, transparent) 1px, transparent 1px),
+        radial-gradient(circle at 14% 7%, color-mix(in srgb, var(--panel) 70%, transparent), transparent 32%);
+    background-size: 24px 24px, 24px 24px, 100% 100%;
+    font-family: "Trebuchet MS", system-ui, sans-serif;
+}
+
+.portfolio-site .navbar {
+    position: relative;
+    margin: 18px auto 0;
+    width: min(100% - 32px, 1120px);
+    color: var(--ink);
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    box-shadow: 5px 6px 0 var(--paper-shadow);
+    transform: rotate(-0.25deg);
+}
+
+.portfolio-site .navbar::before {
+    position: absolute;
+    z-index: 2;
+    top: -14px;
+    left: 7%;
+    width: 112px;
+    height: 27px;
+    content: "";
+    background: rgba(226, 197, 113, 0.78);
+    transform: rotate(-3deg);
+    mix-blend-mode: multiply;
+}
+
+.portfolio-site .logo {
+    font-family: "Comic Sans MS", "Segoe Print", cursive;
+    font-size: 0.94rem;
+    text-transform: none;
+    letter-spacing: -0.02em;
+}
+
+.portfolio-site .nav-menu { gap: 6px; }
+.portfolio-site .nav-menu a {
+    padding: 7px 10px;
+    border-bottom: 0;
+    font-family: "Comic Sans MS", "Segoe Print", cursive;
+    font-size: 0.76rem;
+    text-transform: lowercase;
+    letter-spacing: 0;
+}
+.portfolio-site .nav-menu a:hover,
+.portfolio-site .nav-menu a.active {
+    color: var(--fortune-red);
+    background: color-mix(in srgb, var(--fortune-yellow) 40%, transparent);
+    transform: rotate(-2deg);
+}
+
+.portfolio-site #theme-toggle {
+    color: var(--ink);
+    background: transparent;
+    border: 1px solid var(--ink);
+    font-family: "Comic Sans MS", "Segoe Print", cursive;
+    text-transform: lowercase;
+    box-shadow: 2px 2px 0 var(--ink);
+}
+
+.portfolio-site .hero {
+    border: 0;
+    padding-top: clamp(64px, 10vw, 118px);
+    padding-bottom: clamp(52px, 8vw, 92px);
+}
+
+.portfolio-site .hero .container {
+    position: relative;
+}
+
+.portfolio-site .hero .container::before,
+.portfolio-site .hero .container::after {
+    position: absolute;
+    z-index: -1;
+    color: var(--fortune-red);
+    font-family: "Comic Sans MS", "Segoe Print", cursive;
+}
+.portfolio-site .hero .container::before { content: "✦"; top: -42px; left: -24px; font-size: 3rem; transform: rotate(-12deg); }
+.portfolio-site .hero .container::after { content: "good things take a few tries →"; right: 2%; bottom: -43px; font-size: 0.9rem; transform: rotate(4deg); }
+
+.portfolio-site .hero--home .container {
+    padding: clamp(30px, 6vw, 64px);
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    box-shadow: 9px 11px 0 var(--paper-shadow);
+    transform: rotate(-0.6deg);
+}
+.portfolio-site .hero--home .container::before {
+    content: "";
+    z-index: 2;
+    top: -15px;
+    left: 16%;
+    width: 140px;
+    height: 29px;
+    background: rgba(226, 197, 113, 0.78);
+    transform: rotate(2deg);
+    mix-blend-mode: multiply;
+}
+
+.portfolio-site .kicker,
+.portfolio-site .section-number,
+.portfolio-site .work-meta {
+    color: var(--fortune-red);
+    font-family: "Comic Sans MS", "Segoe Print", cursive;
+    font-weight: 700;
+    text-transform: lowercase;
+    letter-spacing: 0.03em;
+}
+
+.portfolio-site .hero h1,
+.portfolio-site .site-section h2,
+.portfolio-site .work-summary h3 {
+    font-family: Georgia, "Times New Roman", serif;
+    letter-spacing: -0.045em;
+}
+.portfolio-site .hero h1 { max-width: 880px; font-size: clamp(3rem, 7.5vw, 6.8rem); line-height: 0.94; text-transform: none; }
+.portfolio-site .hero--page h1 { max-width: 880px; font-size: clamp(2.8rem, 7vw, 6.4rem); }
+.portfolio-site .hero-text { max-width: 700px; font-size: clamp(1.05rem, 2vw, 1.28rem); }
+
+.portfolio-site .build-brief {
+    position: relative;
+    background: var(--fortune-yellow);
+    border: 0;
+    box-shadow: 6px 7px 0 var(--paper-shadow);
+    transform: rotate(3deg);
+}
+.portfolio-site .build-brief::before {
+    position: absolute;
+    top: -14px;
+    right: 24px;
+    width: 90px;
+    height: 26px;
+    content: "";
+    background: rgba(226, 197, 113, 0.82);
+    transform: rotate(5deg);
+    mix-blend-mode: multiply;
+}
+.portfolio-site .build-brief dt { color: #75433d; font-family: "Comic Sans MS", "Segoe Print", cursive; }
+.portfolio-site .build-brief dd { color: #2e261f; }
+
+.portfolio-site .btn { border-radius: 0; }
+.portfolio-site .btn-primary {
+    color: #fffaf0;
+    background: var(--fortune-red);
+    border-color: var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    transform: rotate(-1deg);
+}
+.portfolio-site .btn-primary:hover { color: #fffaf0; background: var(--fortune-blue); transform: translate(-1px, -1px) rotate(1deg); }
+.portfolio-site .text-link { font-family: "Comic Sans MS", "Segoe Print", cursive; text-decoration-thickness: 2px; }
+
+.portfolio-site .site-section { border-top: 0; padding-block: clamp(42px, 7vw, 88px); }
+.portfolio-site .section-heading,
+.portfolio-site .content-grid {
+    position: relative;
+    padding: clamp(28px, 5vw, 54px);
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    box-shadow: 7px 8px 0 var(--paper-shadow);
+    transform: rotate(0.35deg);
+}
+.portfolio-site .section-heading::before,
+.portfolio-site .content-grid::before {
+    position: absolute;
+    top: -14px;
+    left: 48%;
+    width: 112px;
+    height: 27px;
+    content: "";
+    background: rgba(226, 197, 113, 0.75);
+    transform: rotate(-2deg);
+    mix-blend-mode: multiply;
+}
+
+.portfolio-site .work-list { border-top: 0; display: grid; gap: 22px; margin-top: 30px; }
+.portfolio-site .work-row {
+    position: relative;
+    padding: clamp(24px, 4vw, 42px);
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    box-shadow: 6px 7px 0 var(--paper-shadow);
+    transform: rotate(-0.45deg);
+}
+.portfolio-site .work-row:nth-child(even) { transform: rotate(0.65deg); }
+.portfolio-site .work-row::before {
+    position: absolute;
+    top: -11px;
+    right: 12%;
+    width: 84px;
+    height: 22px;
+    content: "";
+    background: rgba(226, 197, 113, 0.7);
+    transform: rotate(4deg);
+    mix-blend-mode: multiply;
+}
+.portfolio-site .work-row:hover { background: color-mix(in srgb, var(--panel) 85%, var(--fortune-yellow)); transform: translateY(-3px) rotate(0); }
+.portfolio-site .work-index { color: var(--fortune-blue); font-family: "Comic Sans MS", "Segoe Print", cursive; }
+.portfolio-site .work-summary h3 { font-size: clamp(1.8rem, 4vw, 3rem); text-transform: none; }
+.portfolio-site .project-link { color: var(--fortune-red); font-family: "Comic Sans MS", "Segoe Print", cursive; }
+
+.portfolio-site .capability-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; border-top: 0; }
+.portfolio-site .capability-list > div {
+    padding: 28px;
+    background: var(--fortune-yellow);
+    border: 0;
+    box-shadow: 5px 6px 0 var(--paper-shadow);
+    transform: rotate(-1deg);
+}
+.portfolio-site .capability-list > div:nth-child(even) { background: color-mix(in srgb, var(--fortune-blue) 25%, var(--panel)); transform: rotate(1.3deg); }
+.portfolio-site .capability-list dt { font-family: "Comic Sans MS", "Segoe Print", cursive; }
+
+.portfolio-site .empty-state { padding: 30px; background: var(--fortune-yellow); color: #2e261f; box-shadow: 5px 6px 0 var(--paper-shadow); transform: rotate(-1deg); }
+.portfolio-site .site-footer { border-top: 0; }
+.portfolio-site .site-footer .container { padding-top: 24px; border-top: 2px dashed var(--rule); font-family: "Comic Sans MS", "Segoe Print", cursive; }
+.portfolio-site .footer-links { flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+    .portfolio-site .navbar { margin-top: 10px; }
+    .portfolio-site .nav-container { width: calc(100% - 24px); }
+    .portfolio-site .nav-menu { order: 3; width: 100%; justify-content: center; flex-wrap: wrap; overflow: visible; }
+    .portfolio-site .nav-menu a { padding-inline: 8px; }
+    .portfolio-site .hero { padding-top: 48px; }
+    .portfolio-site .hero--home .container { padding: 34px 22px; }
+    .portfolio-site .hero .container::after { right: 4%; bottom: -38px; font-size: 0.72rem; }
+    .portfolio-site .section-heading,
+    .portfolio-site .content-grid { padding: 28px 22px; }
+    .portfolio-site .work-row { padding: 28px 22px; }
+    .portfolio-site .capability-list { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .portfolio-site *, .portfolio-site *::before, .portfolio-site *::after { transition-duration: 0.01ms !important; }
+}
