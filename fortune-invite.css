@@ -1,0 +1,19 @@
+.fortune-invite { width: min(92vw, 470px); margin: auto; padding: 0; border: 0; overflow: visible; background: transparent; color: #2d241d; }
+.fortune-invite::backdrop { background: rgba(23, 18, 14, 0.62); backdrop-filter: blur(2px); }
+.fortune-invite__card { position: relative; padding: 42px 38px 34px; border: 1px solid #d6c29f; background: #fff8e9; box-shadow: 8px 10px 0 rgba(29, 23, 17, 0.24); transform: rotate(-1deg); text-align: center; }
+.fortune-invite__card::before, .fortune-invite__card::after { position: absolute; content: "★"; color: #d7493e; font-size: 26px; }
+.fortune-invite__card::before { top: 15px; left: 22px; transform: rotate(-14deg); }
+.fortune-invite__card::after { right: 24px; bottom: 18px; transform: rotate(12deg); }
+.fortune-invite__tape { position: absolute; width: 126px; height: 28px; top: -14px; left: 50%; background: rgba(231, 206, 133, 0.78); transform: translateX(-50%) rotate(2deg); }
+.fortune-invite__scribble { margin: 0 0 8px; color: #a54138; font: 700 15px/1.2 "Comic Sans MS", "Segoe Print", cursive; }
+.fortune-invite h2 { margin: 0; font: 700 clamp(30px, 7vw, 46px)/1.02 Georgia, serif; letter-spacing: -0.03em; }
+.fortune-invite__card > p:not(.fortune-invite__scribble) { max-width: 350px; margin: 18px auto 24px; font-size: 17px; line-height: 1.55; }
+.fortune-invite__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.fortune-invite__yes, .fortune-invite__no { border: 1px solid #2d241d; padding: 11px 17px; font: 700 14px/1 system-ui, sans-serif; cursor: pointer; }
+.fortune-invite__yes { background: #d7493e; color: #fffaf0; text-decoration: none; box-shadow: 3px 3px 0 #2d241d; }
+.fortune-invite__no { background: transparent; color: #2d241d; }
+@media (max-width: 520px) { .fortune-invite__card { padding: 38px 24px 28px; } }
+@media (prefers-reduced-motion: no-preference) {
+    .fortune-invite[open] .fortune-invite__card { animation: fortune-note-in 360ms ease-out both; }
+    @keyframes fortune-note-in { from { opacity: 0; transform: translateY(14px) rotate(-3deg) scale(0.96); } to { opacity: 1; transform: translateY(0) rotate(-1deg) scale(1); } }
+}

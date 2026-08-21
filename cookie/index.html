@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Crack open a fortune cookie and get a tiny prediction from evanle.dev.">
+    <meta name="theme-color" content="#d94f45">
+    <link rel="canonical" href="https://www.evanle.dev/cookie/">
+    <title>Your fortune cookie — evanle.dev</title>
+    <link rel="stylesheet" href="cookie.css">
+    <script src="cookie.js" defer></script>
+</head>
+<body>
+    <main class="scrapbook">
+        <a class="back-link" href="../">← back to evanle.dev</a>
+        <header class="title-note">
+            <span class="tape tape--title" aria-hidden="true"></span>
+            <p class="eyebrow">a tiny snack from the internet</p>
+            <h1>Your fortune cookie</h1>
+            <p>Tap the photo to crack it. No wisdom until you break something.</p>
+        </header>
+        <section class="cookie-stage" aria-labelledby="cookie-instruction">
+            <span class="doodle doodle--one" aria-hidden="true">✦</span>
+            <span class="doodle doodle--two" aria-hidden="true">good luck!</span>
+            <button class="cookie-photo" id="cookie-button" type="button" aria-describedby="cookie-instruction">
+                <span class="tape tape--photo" aria-hidden="true"></span>
+                <img id="cookie-image" src="assets/fortune-cookie-closed.jpg" width="2004" height="1600" alt="A whole fortune cookie on a white background">
+                <span class="photo-caption" id="cookie-instruction">click to crack open</span>
+            </button>
+        </section>
+        <section class="fortune-area" id="fortune-area" hidden aria-live="polite">
+            <p class="fortune-label">your fortune says</p>
+            <blockquote id="fortune-text"></blockquote>
+            <div class="lucky-row"><span>lucky numbers:</span> <strong id="lucky-numbers"></strong></div>
+            <button class="another-button" id="another-button" type="button">crack another one</button>
+        </section>
+        <aside class="keep-note"><span class="tape tape--note" aria-hidden="true"></span><p>keep the fortune.<br>leave the crumbs.</p></aside>
+    </main>
+    <footer class="credits">
+        <p>Real cookie photos by G. Edward Johnson (Lorax), via Wikimedia Commons. <a href="https://commons.wikimedia.org/wiki/File:Fortune_cookie.jpg">Whole cookie</a> + <a href="https://commons.wikimedia.org/wiki/File:Fortune_cookie_broken_20040628_223252_1.jpg">broken cookie</a>, <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>. Color-adjusted broken photo by Hohum.</p>
+    </footer>
+</body>
+</html>

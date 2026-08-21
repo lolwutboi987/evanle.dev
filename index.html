@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Evan Le designs competitive robots, open-source hardware, and machines built to work at speed.">
+    <meta name="description" content="Evan Le enjoys developing technologies, building robots, and seeing how far an idea can go.">
     <link rel="canonical" href="https://www.evanle.dev/">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.evanle.dev/">
     <meta property="og:title" content="Evan Le — Hardware Designer">
-    <meta property="og:description" content="Evan Le designs competitive robots, open-source hardware, and machines built to work at speed.">
+    <meta property="og:description" content="Evan Le enjoys developing technologies, building robots, and seeing how far an idea can go.">
     <meta name="twitter:card" content="summary">
     <meta name="google-site-verification" content="cI8-tVzP51W6s22dAfChvh1UZVC5UymUAidZ-FT9Nzw">
     <title>Evan Le &mdash; Hardware Designer</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="fortune-invite.css">
     <script src="theme.js"></script>
+    <script src="fortune-invite.js" defer></script>
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -44,9 +46,9 @@
         <section class="hero hero--home">
             <div class="container hero-grid">
                 <div class="hero-copy">
-                    <p class="kicker">Evan Le / Hardware design</p>
-                    <h1>I build mechanical systems that have to work at speed.</h1>
-                    <p class="hero-text">I design competitive robots and open-source hardware, from CAD through fabrication. I lead mechanical design for Team 1516A.</p>
+                    <p class="kicker">Evan Le / making things</p>
+                    <h1>I enjoy developing technologies that push limits further.</h1>
+                    <p class="hero-text">I like robots, hardware, and turning weird ideas into real things. Right now, a lot of that happens with Team 1516A.</p>
                     <div class="cta-buttons">
                         <a href="showcase.html" class="btn btn-primary">See the work</a>
                         <a href="about.html" class="text-link">How I build <span aria-hidden="true">&rarr;</span></a>
@@ -135,5 +137,18 @@
             </nav>
         </div>
     </footer>
+
+    <dialog class="fortune-invite" id="fortune-invite" aria-labelledby="fortune-invite-title">
+        <form method="dialog" class="fortune-invite__card">
+            <span class="fortune-invite__tape" aria-hidden="true"></span>
+            <p class="fortune-invite__scribble">psst... one small question</p>
+            <h2 id="fortune-invite-title">Want a fortune cookie?</h2>
+            <p>I found one for you. You get to crack it open and keep whatever it says.</p>
+            <div class="fortune-invite__actions">
+                <a class="fortune-invite__yes" href="cookie/">yes, obviously</a>
+                <button class="fortune-invite__no" value="no">maybe later</button>
+            </div>
+        </form>
+    </dialog>
 </body>
 </html>
