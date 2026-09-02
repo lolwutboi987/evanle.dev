@@ -208,6 +208,12 @@ h1 {
     line-height: 24px;
 }
 
+.sponsor-note {
+    margin: 14px 0 0;
+    font-size: 13px;
+    line-height: 18px;
+}
+
 .actions {
     margin-top: 34px;
     display: flex;
