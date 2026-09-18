@@ -1,0 +1,15 @@
+.app-window[hidden], .skip-link[hidden] { display: none; }
+button.window-button { padding: 0; border-radius: 0; cursor: pointer; }
+button.window-button:focus-visible { outline: 2px dotted black; outline-offset: -5px; }
+.glep-scene {
+    max-width: 560px;
+    padding: 24px;
+    text-align: center;
+    color: white;
+    font-family: "Lucida Console", "Courier New", monospace;
+}
+.glep-scene img { display: block; width: 260px; max-width: 100%; height: auto; margin: 0 auto 24px; }
+.glep-scene h1 { font-size: 24px; line-height: 32px; }
+.glep-scene p { line-height: 22px; }
+.close-notice:empty { display: none; }
+.close-notice { margin: 8px 12px; line-height: 20px; }

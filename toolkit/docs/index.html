@@ -13,6 +13,8 @@
     <title>Toolkit Docs — Evan Le</title>
     <link rel="stylesheet" href="../toolkit.css?v=20260810-6">
     <link rel="stylesheet" href="docs.css?v=20260918">
+    <link rel="stylesheet" href="../window.css?v=20260918">
+    <script src="../window.js?v=20260918" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -23,10 +25,10 @@
                 <span class="title-bar__icon" aria-hidden="true"></span>
                 <span>docs.txt - Notepad</span>
             </div>
-            <div class="window-controls" aria-hidden="true">
-                <span class="window-button">&#8212;</span>
-                <span class="window-button">&#9633;</span>
-                <span class="window-button">&#10005;</span>
+            <div class="window-controls">
+                <button class="window-button" type="button" data-minimize aria-label="Minimize window">&#8212;</button>
+                <span class="window-button" aria-hidden="true">&#9633;</span>
+                <button class="window-button" type="button" data-close aria-label="Close tab">&#10005;</button>
             </div>
         </header>
 
