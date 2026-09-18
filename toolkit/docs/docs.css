@@ -1,0 +1,35 @@
+.docs {
+    display: block;
+    min-width: 0;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}
+.docs h2 {
+    margin: 40px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--chrome-mid);
+    font-size: 22px;
+    line-height: 1.4;
+    font-weight: 400;
+}
+.docs h3 {
+    margin: 26px 0 12px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+.docs p, .docs ul { margin: 16px 0; }
+.docs ul { padding-left: 24px; }
+.docs li { margin: 10px 0; }
+.docs code { font-family: inherit; }
+.docs .checklist { list-style-type: square; }
+.table-scroll { overflow-x: auto; margin: 20px 0; }
+.table-scroll:focus-visible { outline: 2px solid var(--title); outline-offset: 2px; }
+.docs table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.docs th, .docs td { padding: 10px; border: 1px solid var(--chrome-mid); text-align: left; vertical-align: top; }
+.docs thead { background: var(--chrome); }
+.docs-policies { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--chrome-mid); font-size: 12px; }
+@media (max-width: 640px) {
+    .docs { padding: 28px 16px; }
+    .docs h2 { font-size: 20px; }
+    .docs th, .docs td { padding: 6px; }
+}

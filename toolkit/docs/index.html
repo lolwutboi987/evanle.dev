@@ -12,6 +12,7 @@
     <meta name="twitter:card" content="summary">
     <title>Toolkit Docs — Evan Le</title>
     <link rel="stylesheet" href="../toolkit.css?v=20260810-6">
+    <link rel="stylesheet" href="docs.css?v=20260918">
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -35,9 +36,120 @@
             <a href="https://slack.hackclub.com/">Slack</a>
         </nav>
 
-        <section class="editor editor--empty" aria-label="Documentation editor">
-            <h1 class="visually-hidden" id="docs-title">Toolkit documentation</h1>
-        </section>
+        <article class="editor docs">
+            <h1 id="docs-title">Hack Club Toolkit</h1>
+            <p>Make something your workshop needs. Design it, get funding for parts, and build it!</p>
+            <p>a ysws by Evan Le, sponsored by 1mon</p>
+
+            <h2>Before you start</h2>
+            <p>Post your idea in <strong>#toolkit-pitches</strong> with concept sketches and a description of what you’re making.</p>
+            <p><strong>WAIT FOR PITCH APPROVAL BEFORE STARTING YOUR PROJECT.</strong> Only work after approval qualifies. A reviewer will approve or reject your pitch and assign a tier. No form is needed for pitches.</p>
+
+            <h2>What can I make?</h2>
+            <p>Tools and devices that improve your workshop! Here are the tiers:</p>
+            <div class="table-scroll" role="region" aria-label="Project tiers" tabindex="0">
+                <table>
+                    <thead><tr><th scope="col">Tier</th><th scope="col">Examples</th><th scope="col">Rough hours</th><th scope="col">Funding</th></tr></thead>
+                    <tbody>
+                        <tr><th scope="row">Gadget</th><td>Screwdriver, fume extractor</td><td>5–10</td><td>Up to $20</td></tr>
+                        <tr><th scope="row">Appliance</th><td>Soldering iron, 3D pen, hotplate</td><td>11–20</td><td>Up to $50</td></tr>
+                        <tr><th scope="row">Machine</th><td>Whiteboard bot, oscilloscope, cleaning robot</td><td>25+</td><td>Up to $100</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>Tiers depend on <strong>effort and quality</strong>, not hours. These estimates just help you understand the scope. Taking longer is okay.</p>
+            <p>CNCs, laser cutters, and 3D printers are allowed. They must be designed for functionality, not just the silly factor. The $100 Machine cap still applies.</p>
+
+            <h2>Design submission</h2>
+            <p>Finished designing? Check your repository before submitting.</p>
+            <h3>PROJECT FILES</h3>
+            <ul class="checklist">
+                <li>Your GitHub repository is public and your project is open source.</li>
+                <li>Your CAD includes the complete assembly and purchased components, including electronics.</li>
+                <li>You included a STEP export and editable CAD files, where applicable.</li>
+                <li>PCB projects include editable board/schematic files and manufacturing files.</li>
+                <li>All firmware and other project code are in the repository.</li>
+                <li><code>BOM.csv</code> lists the parts, quantities, prices, purchase links, and total cost.</li>
+            </ul>
+            <p>Only include requirements relevant to your project. A screwdriver does not need firmware.</p>
+            <h3>README</h3>
+            <ul class="checklist">
+                <li>Explain what you’re making and why.</li>
+                <li>Show the design with screenshots.</li>
+                <li>Include PCB screenshots or a wiring diagram where applicable.</li>
+                <li>Include a readable parts-cost table.</li>
+            </ul>
+            <h3>JOURNAL</h3>
+            <p>Your journal is an engineer’s diary. Keep detailed, dated entries as you work. Include screenshots, diagrams, decisions, experiments, mistakes, and what you changed.</p>
+            <p><strong>AI-WRITTEN JOURNALS ARE NOT ALLOWED.</strong></p>
+            <p>You do not need to record hours in the journal. You do need to show your work. A few sentences written at the end are not enough.</p>
+            <h3>Ready?</h3>
+            <p>Post in <strong>#toolkit-submissions</strong> and complete the design submission form. Include your project name, repository, description, and design pictures.</p>
+            <p>Missing requirements will be sent back for changes. Fix them and resubmit immediately—there is no waiting period.</p>
+            <p>Once approved, you’ll receive a grant card to purchase parts. <strong>Shipping must fit within the funding cap.</strong> You can pay the difference yourself if needed.</p>
+
+            <h2>Build submission</h2>
+            <p>Got your parts? Build your project, then post in <strong>#toolkit-submissions</strong> and complete the build submission form.</p>
+            <p>Include:</p>
+            <ul class="checklist">
+                <li>Four photos of the physical build from different angles.</li>
+                <li>A short video demonstrating it, or explaining what went wrong if it does not work.</li>
+            </ul>
+            <p><strong>YOU MUST PHYSICALLY BUILD THE PROJECT.</strong> CAD screenshots do not count as build proof. It does not have to match the CAD exactly, and a failed build can still qualify.</p>
+
+            <h2>Earning nuts</h2>
+            <p>You earn <strong>5 nuts per hour of design work recorded in Lapse</strong>, awarded when your build submission is approved.</p>
+            <ul>
+                <li>Only design time counts. Coding does not earn nuts.</li>
+                <li>Lapse is optional for your first submission. Without it, you can still get a grant, but you will not earn nuts.</li>
+                <li><strong>Lapse does not replace your journal.</strong> The journal requirements stay exactly the same.</li>
+                <li>AI-generated code is allowed. The code still needs to be in your repository.</li>
+            </ul>
+            <p>Spend nuts in the shop on hardware and tools, such as a Hack Club soldering iron, Orpheus Pico, or iFixit screwdrivers. Items depend on availability. Orders cost only nuts, including shipping.</p>
+
+            <h2>Iterations</h2>
+            <p>Want to improve your project? <strong>Your previous build submission must be approved first.</strong></p>
+            <p>You can start designing an iteration without another pitch approval, but that does not guarantee funding. Reviewers decide whether the changes qualify.</p>
+            <p>Update the same repository, post in <strong>#toolkit-submissions</strong> as <strong>“Project Name v2”</strong>, and complete the submission form with the type marked <strong>iteration</strong>.</p>
+            <p>Include:</p>
+            <ul class="checklist">
+                <li>A description of what changed.</li>
+                <li>Updated design files.</li>
+                <li>A parts list showing what you need for the iteration.</li>
+                <li>Dated journal entries explaining what you updated, why, and how.</li>
+                <li>Lapse recordings of the new design work.</li>
+            </ul>
+            <p><strong>JOURNAL AND LAPSE ARE BOTH REQUIRED FOR ITERATIONS</strong>, even if you did not use Lapse originally.</p>
+            <div class="table-scroll" role="region" aria-label="Iteration funding" tabindex="0">
+                <table>
+                    <thead><tr><th scope="col">Tier</th><th scope="col">Maximum additional funding per iteration</th></tr></thead>
+                    <tbody>
+                        <tr><th scope="row">Gadget</th><td>$10</td></tr>
+                        <tr><th scope="row">Appliance</th><td>$25</td></tr>
+                        <tr><th scope="row">Machine</th><td>$50</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p>Wait for approval and your grant-card top-up before buying parts.</p>
+            <p>Build the iteration and submit the same photo/video proof. Once approved, new recorded design hours earn <strong>5 nuts per hour</strong>. Do not claim hours you have already received nuts for.</p>
+            <p>There is no limit on iterations. Each one is reviewed separately, and the project stays in its assigned tier.</p>
+
+            <h2>FAQ</h2>
+            <h3>Who can participate?</h3>
+            <p>All Hack Clubbers are welcome!</p>
+            <h3>Can I work on multiple projects?</h3>
+            <p>Yes. Each project needs its own approved pitch.</p>
+            <h3>Can I submit an existing project?</h3>
+            <p>Eligible work must begin after pitch approval. Work completed beforehand does not qualify.</p>
+            <h3>What if my build fails?</h3>
+            <p>Submit the physical build with the required photos and a video explaining the failure. It can still earn nuts. Once the build submission is approved, you can apply for an iteration to fix it.</p>
+            <h3>When does Toolkit close?</h3>
+            <p>The closure date will be announced well in advance. <strong>All submissions, including builds and iterations, stop on that date.</strong> Existing grants remain usable.</p>
+            <p>The shop stays open for one more week. After that, it closes and <strong>all unspent nuts expire</strong>.</p>
+            <h3>What is Hack Club?</h3>
+            <p>Hack Club is a 501(c)(3) nonprofit and a community of young people who make things, share their work, and help each other learn.</p>
+            <footer class="docs-policies">Privacy policy · Fulfillment bounty</footer>
+        </article>
 
         <footer class="status-bar" aria-label="Document cursor position">
             <span>toolkit/docs/docs.txt</span>
