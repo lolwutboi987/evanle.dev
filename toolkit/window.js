@@ -5,11 +5,6 @@
     const close = document.querySelector('[data-close]');
     if (!app || !minimize || !close) return;
 
-    const message = document.createElement('p');
-    message.className = 'close-notice';
-    message.setAttribute('role', 'status');
-    app.append(message);
-
     minimize.addEventListener('click', () => {
         app.hidden = true;
         document.querySelector('.skip-link').hidden = true;
@@ -30,8 +25,6 @@
     }, { once: true });
 
     close.addEventListener('click', () => {
-        window.close();
-        // User-opened tabs may refuse window.close(). Leave the page usable.
-        message.textContent = 'your browser won’t let this page close the tab. use the tab’s × button.';
+        window.location.assign('https://evanle.dev/');
     });
 })();
