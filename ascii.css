@@ -239,28 +239,13 @@ main {
   margin-bottom: 27px;
 }
 
-.hero-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  align-items: center;
-  gap: clamp(32px, 5vw, 72px);
-  margin-bottom: 65px;
+.home-intro {
+  margin-bottom: 48px;
 }
 
 .hero-copy,
 .project-copy {
   min-width: 0;
-}
-
-.ascii-wordmark {
-  width: max-content;
-  max-width: 100%;
-  margin-bottom: 27px;
-  color: var(--ink);
-  font-size: clamp(11.8px, 1.5vw, 17px);
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: 0;
 }
 
 .intro {
@@ -293,32 +278,6 @@ main {
   font-size: 13px;
 }
 
-.ascii-figure {
-  justify-self: center;
-  max-width: 100%;
-  padding-top: 5px;
-}
-
-.ascii-drawing,
-.ascii-drawing--small {
-  color: var(--link);
-  font-size: clamp(10px, 1.2vw, 13px);
-  line-height: 1.2;
-  letter-spacing: 0;
-}
-
-.ascii-drawing--small {
-  display: none;
-}
-
-.ascii-figure figcaption {
-  margin-top: 15px;
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.6;
-  text-align: center;
-}
-
 .text-title {
   max-width: 28ch;
   margin-bottom: 21px;
@@ -347,24 +306,11 @@ main {
   font-size: 11px;
 }
 
-.ascii-rule {
-  position: relative;
-  max-width: 100%;
-  overflow: hidden;
-  color: var(--rule);
-  font-size: 12px;
-  line-height: 1;
-  white-space: pre;
-  user-select: none;
-}
-
-.ascii-rule::after {
-  content: '+';
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 1ch;
-  background: var(--paper);
+.site-rule {
+  height: 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px dashed var(--rule);
 }
 
 .project-list {
@@ -650,31 +596,12 @@ main {
     padding-top: 34px;
   }
 
-  .hero-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 34px;
-    margin-bottom: 43px;
-  }
-
-  .ascii-wordmark {
-    font-size: clamp(10px, 2.4vw, 17px);
+  .home-intro {
+    margin-bottom: 36px;
   }
 
   .intro {
     font-size: 15px;
-  }
-
-  .ascii-figure {
-    justify-self: start;
-    margin-left: 1ch;
-  }
-
-  .ascii-drawing {
-    font-size: 12px;
-  }
-
-  .ascii-figure figcaption {
-    text-align: left;
   }
 
   .about-grid {
@@ -725,20 +652,6 @@ main {
 
   .page-kicker {
     margin-bottom: 23px;
-  }
-
-  .ascii-wordmark {
-    margin-bottom: 24px;
-    font-size: clamp(9.6px, 3vw, 12.5px);
-  }
-
-  .ascii-drawing {
-    display: none;
-  }
-
-  .ascii-drawing--small {
-    display: block;
-    font-size: 12px;
   }
 
   .project-row {
@@ -815,8 +728,7 @@ main {
     padding-top: 24px;
   }
 
-  .project-row,
-  .ascii-figure {
+  .project-row {
     break-inside: avoid;
   }
 }
