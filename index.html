@@ -12,9 +12,7 @@
     <meta name="twitter:card" content="summary">
     <meta name="google-site-verification" content="cI8-tVzP51W6s22dAfChvh1UZVC5UymUAidZ-FT9Nzw">
     <title>Evan Le &mdash; Hardware Designer</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="fortune-theme.css">
-    <link rel="stylesheet" href="fortune-invite.css">
+    <link rel="stylesheet" href="ascii.css">
     <script src="theme.js"></script>
     <script src="fortune-invite.js" defer></script>
     <script type="application/ld+json">
@@ -28,138 +26,142 @@
     }
     </script>
 </head>
-<body class="portfolio-site">
+<body class="ascii-site">
     <a class="skip-link" href="#main-content">Skip to content</a>
-
-    <nav class="navbar" aria-label="Primary navigation">
-        <div class="nav-container">
-            <a href="index.html" class="logo">evanle.dev</a>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="active" aria-current="page">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="showcase.html">Work</a></li>
-                <li><a href="cookie/">Fortune</a></li>
-            </ul>
-            <button id="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false">Dark</button>
-        </div>
-    </nav>
-
-    <main id="main-content">
-        <section class="hero hero--home">
-            <div class="container hero-grid">
+    <div class="site-shell">
+        <header class="site-header">
+            <nav class="site-nav" aria-label="Primary navigation">
+                <a class="site-id" href="index.html">evanle.dev</a>
+                <button id="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false">[ ] dark</button>
+                <ul class="nav-links">
+                    <li><a href="index.html" aria-current="page">[ home ]</a></li>
+                    <li><a href="about.html">[ about ]</a></li>
+                    <li><a href="showcase.html">[ work ]</a></li>
+                    <li><a href="cookie/">[ fortune ]</a></li>
+                </ul>
+            </nav>
+            <pre class="ascii-rule" aria-hidden="true">+-----------------------------------------------------------------------------------------------------------------------------------------------------+</pre>
+        </header>
+        <main id="main-content">
+            <p class="page-kicker">~/home</p>
+            <section class="hero-grid" aria-labelledby="home-title">
                 <div class="hero-copy">
-                    <p class="kicker">Evan Le / making things</p>
-                    <h1>I enjoy developing technologies that push limits further.</h1>
-                    <p class="hero-text">I like robots, hardware, and turning weird ideas into real things. Right now, a lot of that happens with Team 1516A.</p>
-                    <div class="cta-buttons">
-                        <a href="showcase.html" class="btn btn-primary">See the work</a>
-                        <a href="about.html" class="text-link">How I build <span aria-hidden="true">&rarr;</span></a>
-                    </div>
+                    <h1 class="sr-only" id="home-title">Evan Le</h1>
+                    <pre class="ascii-wordmark" aria-hidden="true">#####  #   #   ###   #   #      #      #####
+#      #   #  #   #  ##  #      #      #
+####   #   #  #####  # # #      #      ####
+#       # #   #   #  #  ##      #      #
+#####    #    #   #  #   #      #####  #####</pre>
+                    <p class="hero-greeting">hi, i'm evan.</p>
+                    <p class="intro">I design and build robots, printers, and workshop tools. I'm the captain and lead designer of Team 1516A.</p>
+                    <p class="subtle">CAD -&gt; prototype -&gt; test -&gt; repeat.</p>
                 </div>
-
-                <dl class="build-brief" aria-label="Current work">
-                    <div>
-                        <dt>Role</dt>
-                        <dd>Captain + Lead Designer<br>Team 1516A</dd>
-                    </div>
-                    <div>
-                        <dt>Work</dt>
-                        <dd>Robots, printers,<br>workshop tools</dd>
-                    </div>
-                    <div>
-                        <dt>Method</dt>
-                        <dd>CAD &rarr; prototype &rarr; test</dd>
-                    </div>
-                </dl>
-            </div>
-        </section>
-
-        <section class="site-section" aria-labelledby="selected-work-title">
-            <div class="container">
-                <header class="section-heading">
-                    <p class="section-number">01 / Selected work</p>
-                    <div>
-                        <h2 id="selected-work-title">Projects with names and constraints.</h2>
-                        <p>A short list of things I am running, building, or actively refining.</p>
-                    </div>
-                </header>
-
-                <div class="work-list">
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">01</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Interactive story / Art &amp; agency</p>
+                <figure class="ascii-figure" role="img" aria-label="ASCII drawing of a small robot on a workbench">
+                    <pre class="ascii-drawing" aria-hidden="true">       __
+      /_/\        .------.
+     / /          | o  o |
+    /_/           | .--. |
+     \            '---+--'
+      \         .-----+-----.
+       \        | []     [] |
+        |     __|___________|__
+       _|_   /  .--.   .--.   \
+ _____(___)__'--(____)-(____)--'_
+|________________________________|
+   | |                    | |
+   | |    [ bolts + bits ]| |
+   |_|                    |_|</pre>
+                    <pre class="ascii-drawing--small" aria-hidden="true">          .------.
+          | o  o |
+          | .--. |
+          '---+--'
+        .-----+-----.
+        | []     [] |
+      __|___________|__
+     /  .--.   .--.   \
+ ____'--(____)-(____)--'___
+|_________________________|
+  | |                 | |
+  |_|                 |_|</pre>
+                    <figcaption aria-hidden="true">not to scale.</figcaption>
+                </figure>
+            </section>
+            <section aria-labelledby="selected-work-title">
+                <div class="section-heading">
+                    <h2 id="selected-work-title">[ selected work ]</h2>
+                    <a class="note" href="showcase.html">all work -&gt;</a>
+                </div>
+                <pre class="ascii-rule" aria-hidden="true">+-----------------------------------------------------------------------------------------------------------------------------------------------------+</pre>
+                <ol class="project-list">
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">01</span>
+                        <div class="project-copy">
                             <h3><a href="grounded/">The Grounded Movement</a></h3>
                             <p>A hand-drawn story about art, freedom, and the cost of belonging. Scroll through in about a minute.</p>
+                            <p class="project-tags">interactive story / art &amp; agency</p>
                         </div>
-                        <a class="project-link" href="grounded/">Read the story <span aria-hidden="true">&rarr;</span></a>
-                    </article>
+                        <a class="project-go" href="grounded/" aria-label="Open The Grounded Movement">[ open -&gt; ]</a>
+                    </li>
 
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">02</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Interactive story / Browser game</p>
-                            <h3><a href="walk/">The Long Way Home</a></h3>
-                            <p>One sidewalk. Five ages. A lifetime hidden in the walk home.</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">02</span>
+                        <div class="project-copy">
+                            <h3><a href="walk/">Rooftop Run</a></h3>
+                            <p>A rooftop-running browser game.</p>
+                            <p class="project-tags">browser game</p>
                         </div>
-                        <a class="project-link" href="walk/">Play now <span aria-hidden="true">&rarr;</span></a>
-                    </article>
+                        <a class="project-go" href="walk/" aria-label="Open Rooftop Run">[ open -&gt; ]</a>
+                    </li>
 
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">03</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Program / Workshop tools</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">03</span>
+                        <div class="project-copy">
                             <h3><a href="toolkit/">Toolkit</a></h3>
                             <p>Design a tool or amenity that makes your workshop better, then get funding to build it.</p>
+                            <p class="project-tags">workshop program / 2026</p>
                         </div>
-                        <a class="project-link" href="toolkit/">Open Toolkit <span aria-hidden="true">&rarr;</span></a>
-                    </article>
+                        <a class="project-go" href="toolkit/" aria-label="Open Toolkit">[ open -&gt; ]</a>
+                    </li>
 
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">04</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Motion hardware / Open source</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">04</span>
+                        <div class="project-copy">
                             <h3><a href="https://github.com/lolwutboi987/Ninebot-Simwheel" target="_blank" rel="noopener noreferrer">Ninebot Simwheel</a></h3>
                             <p>A direct-drive sim wheel built around a Ninebot G30 motor, ODrive, and OpenFFB.</p>
+                            <p class="project-tags">motion hardware / open source</p>
                         </div>
-                        <a class="project-link" href="https://github.com/lolwutboi987/Ninebot-Simwheel" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">&nearr;</span></a>
-                    </article>
+                        <a class="project-go" href="https://github.com/lolwutboi987/Ninebot-Simwheel" aria-label="Open Ninebot Simwheel" target="_blank" rel="noopener noreferrer">[ open -&gt; ]</a>
+                    </li>
 
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">05</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Machine design / Open source</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">05</span>
+                        <div class="project-copy">
                             <h3><a href="https://github.com/lolwutboi987/PANDA-V2" target="_blank" rel="noopener noreferrer">Panda V2</a></h3>
                             <p>A compact printer redesign focused on reliability and repeatability.</p>
+                            <p class="project-tags">machine design / open source</p>
                         </div>
-                        <a class="project-link" href="https://github.com/lolwutboi987/PANDA-V2" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">&nearr;</span></a>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 Evan Le</p>
+                        <a class="project-go" href="https://github.com/lolwutboi987/PANDA-V2" aria-label="Open Panda V2" target="_blank" rel="noopener noreferrer">[ open -&gt; ]</a>
+                    </li>
+                </ol>
+            </section>
+        </main>
+        <footer class="site-footer">
+            <p>(c) 2026 Evan Le</p>
             <nav class="footer-links" aria-label="Footer navigation">
                 <a href="toolkit/">Toolkit</a>
-                <a href="cookie/">Fortune cookie</a>
-                <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">&nearr;</span></a>
+                <a href="cookie/">Fortune</a>
+                <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer">GitHub</a>
             </nav>
-        </div>
-    </footer>
-
-    <dialog class="fortune-invite" id="fortune-invite" aria-labelledby="fortune-invite-title">
-        <form method="dialog" class="fortune-invite__card">
-            <span class="fortune-invite__tape" aria-hidden="true"></span>
-            <p class="fortune-invite__scribble">psst... one small question</p>
-            <h2 id="fortune-invite-title">Want a fortune cookie?</h2>
-            <p>I found one for you. You get to crack it open and keep whatever it says.</p>
-            <div class="fortune-invite__actions">
-                <a class="fortune-invite__yes" href="cookie/">yes, obviously</a>
-                <button class="fortune-invite__no" value="no">maybe later</button>
+        </footer>
+    </div>
+    <dialog class="ascii-prompt" id="fortune-invite" aria-labelledby="fortune-invite-title">
+        <form method="dialog">
+            <p class="page-kicker">one small detour</p>
+            <h2 id="fortune-invite-title">open a fortune cookie?</h2>
+            <p>If you feel like it.</p>
+            <div class="prompt-actions">
+                <a class="fortune-invite__yes" href="cookie/">[ yes, obviously ]</a>
+                <button class="fortune-invite__no" value="no">[ maybe later ]</button>
             </div>
         </form>
     </dialog>

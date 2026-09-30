@@ -23,6 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateToggleButton = () => {
         const isDark = htmlElement.getAttribute('data-theme') === 'dark';
         themeToggle.setAttribute('aria-pressed', String(isDark));
+        if (document.body.classList.contains('ascii-site')) {
+            themeToggle.textContent = isDark ? '[x] dark' : '[ ] dark';
+        }
     };
 
     updateToggleButton();

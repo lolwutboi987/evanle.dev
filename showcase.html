@@ -3,136 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Selected machines, workshop tools, and hardware projects by Evan Le.">
+    <meta name="description" content="Robots, machines, workshop tools, and things for the web by Evan Le.">
     <link rel="canonical" href="https://www.evanle.dev/showcase.html">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://www.evanle.dev/showcase.html">
     <meta property="og:title" content="Work — Evan Le">
-    <meta property="og:description" content="Selected machines, workshop tools, and hardware projects by Evan Le.">
+    <meta property="og:description" content="Robots, machines, workshop tools, and things for the web by Evan Le.">
     <meta name="twitter:card" content="summary">
     <title>Work &mdash; Evan Le</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="fortune-theme.css">
+    <link rel="stylesheet" href="ascii.css">
     <script src="theme.js"></script>
 </head>
-<body class="portfolio-site">
+<body class="ascii-site">
     <a class="skip-link" href="#main-content">Skip to content</a>
-
-    <nav class="navbar" aria-label="Primary navigation">
-        <div class="nav-container">
-            <a href="index.html" class="logo">evanle.dev</a>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="showcase.html" class="active" aria-current="page">Work</a></li>
-                <li><a href="cookie/">Fortune</a></li>
-            </ul>
-            <button id="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false">Dark</button>
-        </div>
-    </nav>
-
-    <main id="main-content">
-        <section class="hero hero--page">
-            <div class="container">
-                <p class="kicker">Work / Selected projects</p>
-                <h1>Machines, tools, and experiments.</h1>
-                <p class="hero-text">A short list of projects I can actually point to. The full repository history lives on GitHub.</p>
-            </div>
-        </section>
-
-        <section class="site-section" aria-labelledby="project-index-title">
-            <div class="container">
-                <header class="section-heading section-heading--compact">
-                    <p class="section-number">01 / Project index</p>
-                    <h2 id="project-index-title">Selected work</h2>
-                </header>
-
-                <div class="work-list">
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">01</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Interactive story / Art &amp; agency</p>
+    <div class="site-shell">
+        <header class="site-header">
+            <nav class="site-nav" aria-label="Primary navigation">
+                <a class="site-id" href="index.html">evanle.dev</a>
+                <button id="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false">[ ] dark</button>
+                <ul class="nav-links">
+                    <li><a href="index.html">[ home ]</a></li>
+                    <li><a href="about.html">[ about ]</a></li>
+                    <li><a href="showcase.html" aria-current="page">[ work ]</a></li>
+                    <li><a href="cookie/">[ fortune ]</a></li>
+                </ul>
+            </nav>
+            <pre class="ascii-rule" aria-hidden="true">+-----------------------------------------------------------------------------------------------------------------------------------------------------+</pre>
+        </header>
+        <main id="main-content">
+            <p class="page-kicker">~/work</p>
+            <h1 class="text-title">things I've made</h1>
+            <p class="intro">Robots, printers, workshop tools, and a few things for the browser.</p>
+            <section class="with-heading" aria-labelledby="project-index-title">
+                <div class="section-heading">
+                    <h2 id="project-index-title">[ project index ]</h2>
+                    <span class="note">8 projects</span>
+                </div>
+                <pre class="ascii-rule" aria-hidden="true">+-----------------------------------------------------------------------------------------------------------------------------------------------------+</pre>
+                <ol class="project-list">
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">01</span>
+                        <div class="project-copy">
                             <h3><a href="grounded/">The Grounded Movement</a></h3>
                             <p>A hand-drawn story about art, freedom, and the cost of belonging. Scroll through in about a minute.</p>
+                            <p class="project-tags">interactive story / art &amp; agency</p>
                         </div>
-                        <a class="project-link" href="grounded/">Read the story <span aria-hidden="true">&rarr;</span></a>
-                    </article>
+                        <a class="project-go" href="grounded/" aria-label="Open The Grounded Movement">[ open -&gt; ]</a>
+                    </li>
 
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">02</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Workshop program / 2026</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">02</span>
+                        <div class="project-copy">
                             <h3><a href="toolkit/">Toolkit</a></h3>
-                            <p>A You Ship, We Ship program for designing and building tools or amenities that make a workshop better.</p>
+                            <p>Design a tool or amenity that makes your workshop better, then get funding to build it.</p>
+                            <p class="project-tags">workshop program / 2026</p>
                         </div>
-                        <a class="project-link" href="toolkit/">Open program <span aria-hidden="true">&rarr;</span></a>
-                    </article>
+                        <a class="project-go" href="toolkit/" aria-label="Open Toolkit">[ open -&gt; ]</a>
+                    </li>
 
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">03</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Motion hardware / Open source</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">03</span>
+                        <div class="project-copy">
                             <h3><a href="https://github.com/lolwutboi987/Ninebot-Simwheel" target="_blank" rel="noopener noreferrer">Ninebot Simwheel</a></h3>
-                            <p>A direct-drive sim wheel using a Ninebot G30 motor, ODrive, and OpenFFB.</p>
+                            <p>A direct-drive sim wheel built around a Ninebot G30 motor, ODrive, and OpenFFB.</p>
+                            <p class="project-tags">motion hardware / open source</p>
                         </div>
-                        <a class="project-link" href="https://github.com/lolwutboi987/Ninebot-Simwheel" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">&nearr;</span></a>
-                    </article>
+                        <a class="project-go" href="https://github.com/lolwutboi987/Ninebot-Simwheel" aria-label="Open Ninebot Simwheel" target="_blank" rel="noopener noreferrer">[ open -&gt; ]</a>
+                    </li>
 
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">04</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Machine design / Open source</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">04</span>
+                        <div class="project-copy">
                             <h3><a href="https://github.com/lolwutboi987/PANDA-V2" target="_blank" rel="noopener noreferrer">Panda V2</a></h3>
                             <p>A compact printer redesign focused on reliability and repeatability.</p>
+                            <p class="project-tags">machine design / open source</p>
                         </div>
-                        <a class="project-link" href="https://github.com/lolwutboi987/PANDA-V2" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">&nearr;</span></a>
-                    </article>
+                        <a class="project-go" href="https://github.com/lolwutboi987/PANDA-V2" aria-label="Open Panda V2" target="_blank" rel="noopener noreferrer">[ open -&gt; ]</a>
+                    </li>
 
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">05</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Machine design / Open source</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">05</span>
+                        <div class="project-copy">
                             <h3><a href="https://github.com/lolwutboi987/ThingOmega" target="_blank" rel="noopener noreferrer">ThingOmega</a></h3>
                             <p>A MakerBot Thing-O-Matic-inspired machine built to push speed.</p>
+                            <p class="project-tags">machine design / open source</p>
                         </div>
-                        <a class="project-link" href="https://github.com/lolwutboi987/ThingOmega" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">&nearr;</span></a>
-                    </article>
+                        <a class="project-go" href="https://github.com/lolwutboi987/ThingOmega" aria-label="Open ThingOmega" target="_blank" rel="noopener noreferrer">[ open -&gt; ]</a>
+                    </li>
 
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">06</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Data tool / Interactive</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">06</span>
+                        <div class="project-copy">
                             <h3><a href="energy-map.html">Interactive Energy Map</a></h3>
                             <p>U.S. electricity and natural-gas consumption per capita, using EIA and Census data.</p>
+                            <p class="project-tags">data tool / interactive</p>
                         </div>
-                        <a class="project-link" href="energy-map.html">Open map <span aria-hidden="true">&rarr;</span></a>
-                    </article>
+                        <a class="project-go" href="energy-map.html" aria-label="Open Interactive Energy Map">[ open -&gt; ]</a>
+                    </li>
 
-                    <article class="work-row">
-                        <p class="work-index" aria-hidden="true">07</p>
-                        <div class="work-summary">
-                            <p class="work-meta">Wearable hardware / Open source</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">07</span>
+                        <div class="project-copy">
                             <h3><a href="https://github.com/lolwutboi987/dumbwatch" target="_blank" rel="noopener noreferrer">dumbwatch</a></h3>
                             <p>A compact watch project focused on long battery life.</p>
+                            <p class="project-tags">wearable hardware / open source</p>
                         </div>
-                        <a class="project-link" href="https://github.com/lolwutboi987/dumbwatch" target="_blank" rel="noopener noreferrer">Source <span aria-hidden="true">&nearr;</span></a>
-                    </article>
-                </div>
+                        <a class="project-go" href="https://github.com/lolwutboi987/dumbwatch" aria-label="Open dumbwatch" target="_blank" rel="noopener noreferrer">[ open -&gt; ]</a>
+                    </li>
 
-                <p class="index-footer"><a href="https://github.com/lolwutboi987?tab=repositories" target="_blank" rel="noopener noreferrer" class="text-link">All public repositories <span aria-hidden="true">&nearr;</span></a></p>
-            </div>
-        </section>
-    </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 Evan Le</p>
+                    <li class="project-row">
+                        <span class="project-number" aria-hidden="true">08</span>
+                        <div class="project-copy">
+                            <h3><a href="walk/">Rooftop Run</a></h3>
+                            <p>A rooftop-running browser game.</p>
+                            <p class="project-tags">browser game</p>
+                        </div>
+                        <a class="project-go" href="walk/" aria-label="Open Rooftop Run">[ open -&gt; ]</a>
+                    </li>
+                </ol>
+            </section>
+            <p class="site-note"><a href="https://github.com/lolwutboi987?tab=repositories" target="_blank" rel="noopener noreferrer">all public repositories -&gt;</a></p>
+        </main>
+        <footer class="site-footer">
+            <p>(c) 2026 Evan Le</p>
             <nav class="footer-links" aria-label="Footer navigation">
                 <a href="toolkit/">Toolkit</a>
-                <a href="cookie/">Fortune cookie</a>
-                <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">&nearr;</span></a>
+                <a href="cookie/">Fortune</a>
+                <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer">GitHub</a>
             </nav>
-        </div>
-    </footer>
+        </footer>
+    </div>
 </body>
 </html>

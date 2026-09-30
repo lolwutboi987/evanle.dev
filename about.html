@@ -11,97 +11,84 @@
     <meta property="og:description" content="About Evan Le, a hardware designer and robotics lead working across CAD, fabrication, and competitive robotics.">
     <meta name="twitter:card" content="summary">
     <title>About &mdash; Evan Le</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="fortune-theme.css">
+    <link rel="stylesheet" href="ascii.css">
     <script src="theme.js"></script>
 </head>
-<body class="portfolio-site">
+<body class="ascii-site">
     <a class="skip-link" href="#main-content">Skip to content</a>
-
-    <nav class="navbar" aria-label="Primary navigation">
-        <div class="nav-container">
-            <a href="index.html" class="logo">evanle.dev</a>
-            <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html" class="active" aria-current="page">About</a></li>
-                <li><a href="showcase.html">Work</a></li>
-                <li><a href="cookie/">Fortune</a></li>
-            </ul>
-            <button id="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false">Dark</button>
-        </div>
-    </nav>
-
-    <main id="main-content">
-        <section class="hero hero--page">
-            <div class="container">
-                <p class="kicker">About / Evan Le</p>
-                <h1>I like the part where an idea has to survive contact with hardware.</h1>
-                <p class="hero-text">My work moves between CAD, fabrication, physics, and the fast iteration that competitive robotics demands.</p>
-            </div>
-        </section>
-
-        <section class="site-section" aria-labelledby="current-work-title">
-            <div class="container content-grid">
-                <p class="section-number">01 / Current work</p>
-                <div class="prose-block">
-                    <h2 id="current-work-title">Team 1516A, Panda, and Anvil.</h2>
-                    <p>I am the 2025&ndash;2027 Captain and Lead Designer of Robotics Team 1516A. I help set technical direction and move mechanisms from first CAD layout to tested hardware.</p>
-                    <p>Outside the team, I work on open-source machines including the Panda printer platform and Anvil toolhead. I care most about packaging, iteration, and learning which assumptions fail once a design becomes physical.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="site-section" aria-labelledby="areas-title">
-            <div class="container content-grid">
-                <p class="section-number">02 / Areas</p>
+    <div class="site-shell">
+        <header class="site-header">
+            <nav class="site-nav" aria-label="Primary navigation">
+                <a class="site-id" href="index.html">evanle.dev</a>
+                <button id="theme-toggle" type="button" aria-label="Dark mode" aria-pressed="false">[ ] dark</button>
+                <ul class="nav-links">
+                    <li><a href="index.html">[ home ]</a></li>
+                    <li><a href="about.html" aria-current="page">[ about ]</a></li>
+                    <li><a href="showcase.html">[ work ]</a></li>
+                    <li><a href="cookie/">[ fortune ]</a></li>
+                </ul>
+            </nav>
+            <pre class="ascii-rule" aria-hidden="true">+-----------------------------------------------------------------------------------------------------------------------------------------------------+</pre>
+        </header>
+        <main id="main-content">
+            <p class="page-kicker">~/about</p>
+            <h1 class="text-title">about me</h1>
+            <div class="about-grid">
                 <div>
-                    <h2 id="areas-title">What I actually work on.</h2>
-                    <dl class="capability-list">
+                    <p>I'm Evan. I design robots, build printers, and spend a lot of time turning CAD into parts. I'm the 2025-2027 Captain and Lead Designer of Team 1516A, where I take mechanisms from early layouts to tested hardware.</p>
+                    <p>Outside the team, I work on the Panda printer platform and Anvil toolhead. I like figuring out how things fit together, making a prototype, and seeing what needs to change.</p>
+                </div>
+                <aside class="fact-list" aria-label="A few details">
+                    <dl>
                         <div>
-                            <dt><span>01</span> Mechanical design</dt>
-                            <dd>System architecture and CAD for competitive robots and machines.</dd>
+                            <dt>team</dt>
+                            <dd>1516A / 2025-2027</dd>
                         </div>
                         <div>
-                            <dt><span>02</span> Fabrication</dt>
-                            <dd>FDM printing, hardware prototypes, and parts designed to be revised.</dd>
+                            <dt>role</dt>
+                            <dd>Captain + Lead Designer</dd>
                         </div>
                         <div>
-                            <dt><span>03</span> Performance</dt>
-                            <dd>Using physics to reason about mechanical efficiency, speed, and reliability.</dd>
-                        </div>
-                        <div>
-                            <dt><span>04</span> Team leadership</dt>
-                            <dd>Technical roadmaps, design reviews, and execution for Team 1516A.</dd>
+                            <dt>usually working on</dt>
+                            <dd>Robots, printers, tools</dd>
                         </div>
                     </dl>
-                </div>
+                </aside>
             </div>
-        </section>
-
-        <section class="site-section site-section--compact" aria-labelledby="connect-title">
-            <div class="container content-grid">
-                <p class="section-number">03 / Connect</p>
-                <div class="prose-block">
-                    <h2 id="connect-title">Working on a robot, printer, or strange mechanical problem?</h2>
-                    <p>GitHub is the best place to see what I am building and where the work currently stands.</p>
-                    <div class="cta-buttons">
-                        <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Open GitHub <span aria-hidden="true">&nearr;</span></a>
-                        <a href="showcase.html" class="text-link">Browse selected work <span aria-hidden="true">&rarr;</span></a>
+            <section aria-labelledby="areas-title">
+                <div class="section-heading">
+                    <h2 id="areas-title">[ what I work on ]</h2>
+                </div>
+                <pre class="ascii-rule" aria-hidden="true">+-----------------------------------------------------------------------------------------------------------------------------------------------------+</pre>
+                <dl class="skills-list">
+                    <div>
+                        <dt>mechanical design</dt>
+                        <dd>CAD and mechanisms for robots and machines.</dd>
                     </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 Evan Le</p>
+                    <div>
+                        <dt>fabrication</dt>
+                        <dd>FDM printing, prototypes, and parts I can revise.</dd>
+                    </div>
+                    <div>
+                        <dt>performance</dt>
+                        <dd>Using physics to work through speed, efficiency, and reliability.</dd>
+                    </div>
+                    <div>
+                        <dt>teamwork</dt>
+                        <dd>Planning builds and working through designs with Team 1516A.</dd>
+                    </div>
+                </dl>
+            </section>
+            <p class="site-note">You can find my projects <a href="showcase.html">here</a>, or follow the code on <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
+        </main>
+        <footer class="site-footer">
+            <p>(c) 2026 Evan Le</p>
             <nav class="footer-links" aria-label="Footer navigation">
                 <a href="toolkit/">Toolkit</a>
-                <a href="cookie/">Fortune cookie</a>
-                <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">&nearr;</span></a>
+                <a href="cookie/">Fortune</a>
+                <a href="https://github.com/lolwutboi987" target="_blank" rel="noopener noreferrer">GitHub</a>
             </nav>
-        </div>
-    </footer>
+        </footer>
+    </div>
 </body>
 </html>
