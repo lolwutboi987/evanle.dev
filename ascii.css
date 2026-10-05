@@ -1,4 +1,4 @@
-/* A small personal site, set in type. */
+/* A small personal site. The room was assembled from spare punctuation. */
 @font-face {
   font-family: 'IBM Plex Mono';
   src: url('assets/fonts/ibm-plex-mono-regular.ttf') format('truetype');
@@ -17,23 +17,22 @@
 
 :root {
   color-scheme: light;
-  --paper: #f4f3eb;
-  --ink: #242824;
-  --muted: #646c61;
-  --link: #405640;
-  --rule: #b9beb1;
-  --selection: #d9e0cb;
+  --paper: #f6f5ed;
+  --ink: #22231f;
+  --muted: #65685b;
+  --link: var(--ink);
+  --rule: #9ea091;
+  --selection: var(--ink);
+  --accent: #e8df52;
   --mono: 'IBM Plex Mono', 'Courier New', monospace;
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --paper: #171c18;
-  --ink: #e7ebe4;
-  --muted: #a4ad9c;
-  --link: #c7d2ac;
-  --rule: #4f594b;
-  --selection: #3b4833;
+  --paper: #141711;
+  --ink: #e9ecdf;
+  --muted: #a8aca0;
+  --rule: #717762;
 }
 
 *,
@@ -61,7 +60,7 @@ body.ascii-site {
 }
 
 ::selection {
-  color: var(--ink);
+  color: var(--paper);
   background: var(--selection);
 }
 
@@ -160,6 +159,11 @@ pre {
   padding-top: 23px;
 }
 
+.site-header > .site-rule {
+  width: 37%;
+  margin-left: auto;
+}
+
 .site-nav {
   display: flex;
   align-items: center;
@@ -239,11 +243,6 @@ main {
   margin-bottom: 27px;
 }
 
-.home-intro {
-  margin-bottom: 48px;
-}
-
-.hero-copy,
 .project-copy {
   min-width: 0;
 }
@@ -254,17 +253,6 @@ main {
   line-height: 1.75;
 }
 
-.hero-greeting {
-  margin-bottom: 12px;
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.hero-greeting + .intro {
-  margin-top: 0;
-}
-
 .subtle,
 .note,
 .site-note,
@@ -272,19 +260,215 @@ main {
   color: var(--muted);
 }
 
-.hero-copy .subtle {
-  max-width: 51ch;
-  margin-top: 17px;
-  font-size: 13px;
+.text-title {
+  max-width: 23ch;
+  margin-left: 32px;
+  margin-bottom: 21px;
+  padding-right: 1.3ch;
+  font-size: clamp(34px, 5vw, 60px);
+  font-weight: 400;
+  line-height: 1.13;
+  letter-spacing: -0.07em;
 }
 
-.text-title {
-  max-width: 28ch;
-  margin-bottom: 21px;
-  font-size: clamp(25px, 3.2vw, 34px);
-  font-weight: 500;
-  line-height: 1.3;
+.room {
+  --floor-drop: 0px;
+  position: relative;
+  margin-bottom: 49px;
+  padding: 0 0 24px 42px;
+}
+
+.room::before {
+  content: '[';
+  position: absolute;
+  top: 117px;
+  left: -8px;
+  color: var(--rule);
+  font-size: 60px;
+  line-height: 1;
+}
+
+.room-note {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.room-note--ceiling {
+  width: fit-content;
+  margin: 0 0 23px 42%;
+}
+
+.room-name {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 34px;
+  font-size: clamp(60px, 9vw, 110px);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.075em;
+}
+
+.first-name {
+  display: block;
+}
+
+.last-name {
+  margin: 0 12% -19px 0;
+  font-size: 20px;
   letter-spacing: -0.055em;
+}
+
+.room-bio {
+  max-width: 52ch;
+  margin-left: 6ch;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.room-basement {
+  position: relative;
+  height: 120px;
+  margin-top: 23px;
+  font-size: 15px;
+  line-height: 1;
+  user-select: none;
+}
+
+.room-wall {
+  position: absolute;
+  top: 13px;
+  left: -3ch;
+  color: var(--rule);
+}
+
+.room-object,
+.room-floor {
+  position: absolute;
+  transform: translateY(var(--floor-drop));
+}
+
+.room-object {
+  top: 3px;
+  left: 21%;
+}
+
+.room-floor {
+  top: 14px;
+  left: 0;
+  width: min(75%, 76ch);
+  overflow: hidden;
+  white-space: pre;
+}
+
+.room-stair {
+  position: absolute;
+  top: 35px;
+  right: 4ch;
+  color: var(--muted);
+  line-height: 1.2;
+  white-space: pre;
+}
+
+.room[data-floor='1'] {
+  --floor-drop: 24px;
+}
+
+.room[data-floor='2'] {
+  --floor-drop: 48px;
+}
+
+.room[data-floor='3'] {
+  --floor-drop: 72px;
+}
+
+.room[data-floor='4'] .room-floor,
+.room[data-floor='4'] .room-object {
+  visibility: hidden;
+}
+
+.room-gap-note {
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+  padding-right: 7ch;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.room-controls {
+  display: grid;
+  grid-template-columns: max-content 20ch;
+  align-items: center;
+  gap: 8px 20px;
+  min-height: 44px;
+  margin-top: 14px;
+}
+
+#lower-floor {
+  width: 25ch;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #22231f;
+  border-radius: 0;
+  color: #22231f;
+  background: var(--accent);
+  font-size: 12px;
+}
+
+#lower-floor[hidden] {
+  display: none;
+}
+
+#lower-floor:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+#floor-status {
+  min-height: 1.7em;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.room-corner {
+  position: absolute;
+  top: 44px;
+  left: -2px;
+  color: var(--rule);
+  line-height: 1;
+}
+
+.room-corner--bottom {
+  top: auto;
+  bottom: 112px;
+}
+
+.room-page {
+  position: relative;
+}
+
+.room-page > .intro {
+  margin-left: 38px;
+}
+
+.margin-note {
+  max-width: 30ch;
+  margin: 0 5ch 30px auto;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.unmatched-bracket {
+  position: absolute;
+  top: 75px;
+  right: 18px;
+  color: var(--rule);
+  font-size: 60px;
+  line-height: 1;
 }
 
 .section-heading {
@@ -313,28 +497,57 @@ main {
   border-top: 1px dashed var(--rule);
 }
 
+.section-heading + .site-rule {
+  width: 14ch;
+}
+
 .project-list {
   margin: 0;
-  padding: 0;
+  padding: 14px 0 0;
   list-style: none;
 }
 
 .project-row {
+  --branch-indent: 0ch;
+  position: relative;
   display: grid;
-  grid-template-columns: 3ch minmax(0, 1fr) 8ch;
+  grid-template-columns: 3ch minmax(0, 1fr) 9ch;
   align-items: start;
-  gap: 22px;
+  gap: 18px;
+  margin-left: var(--branch-indent);
   padding-block: 24px;
 }
 
-.project-row + .project-row {
-  border-top: 1px dashed var(--rule);
+.project-row::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 0.45ch;
+  height: 26px;
+  border-left: 1px dotted var(--rule);
+}
+
+.project-row:nth-child(5n + 2) {
+  --branch-indent: 4ch;
+}
+
+.project-row:nth-child(5n + 3) {
+  --branch-indent: 1ch;
+}
+
+.project-row:nth-child(5n + 4) {
+  --branch-indent: 7ch;
+}
+
+.project-row:nth-child(5n + 5) {
+  --branch-indent: 3ch;
 }
 
 .project-number {
   padding-top: 2px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .project-copy h3 {
@@ -353,7 +566,7 @@ main {
 }
 
 .project-copy p {
-  max-width: 70ch;
+  max-width: 64ch;
   color: var(--muted);
   font-size: 13px;
   line-height: 1.75;
@@ -485,7 +698,19 @@ main {
   margin-bottom: 8px;
 }
 
+.end-note {
+  max-width: 36ch;
+  margin: 61px 0 0 37%;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.end-note + .site-footer {
+  margin-top: 23px;
+}
+
 .site-footer {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -493,9 +718,17 @@ main {
   gap: 7px 28px;
   margin-top: 57px;
   padding-block: 19px 29px;
-  border-top: 1px dashed var(--rule);
   color: var(--muted);
   font-size: 11px;
+}
+
+.site-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 41%;
+  border-top: 1px dashed var(--rule);
 }
 
 .footer-links {
@@ -596,8 +829,57 @@ main {
     padding-top: 34px;
   }
 
-  .home-intro {
+  .room {
     margin-bottom: 36px;
+    padding-left: 28px;
+  }
+
+  .room::before {
+    top: 101px;
+    left: -12px;
+    font-size: 48px;
+  }
+
+  .room-name {
+    margin-bottom: 31px;
+  }
+
+  .last-name {
+    margin-right: 5%;
+  }
+
+  .room-bio {
+    margin-left: 2ch;
+    font-size: 15px;
+  }
+
+  .room-wall {
+    left: -2ch;
+  }
+
+  .room-stair {
+    right: 0;
+  }
+
+  .room-gap-note {
+    padding-right: 0;
+  }
+
+  .text-title {
+    margin-left: 16px;
+  }
+
+  .room-page > .intro {
+    margin-left: 19px;
+  }
+
+  .margin-note {
+    margin-right: 0;
+  }
+
+  .unmatched-bracket {
+    top: 60px;
+    right: 0;
   }
 
   .intro {
@@ -624,6 +906,18 @@ main {
 
   .project-row {
     column-gap: 15px;
+  }
+
+  .project-row:nth-child(5n + 2) {
+    --branch-indent: 2ch;
+  }
+
+  .project-row:nth-child(5n + 4) {
+    --branch-indent: 3ch;
+  }
+
+  .project-row:nth-child(5n + 5) {
+    --branch-indent: 1ch;
   }
 
   .plain-section,
@@ -654,8 +948,76 @@ main {
     margin-bottom: 23px;
   }
 
+  .room {
+    padding-left: 16px;
+  }
+
+  .room::before {
+    top: 103px;
+    left: -14px;
+    font-size: 40px;
+  }
+
+  .room-note--ceiling {
+    margin-left: 38%;
+  }
+
+  .room-name {
+    gap: 12px;
+    font-size: clamp(60px, 18vw, 78px);
+  }
+
+  .last-name {
+    margin: 0 0 -19px;
+    font-size: 18px;
+  }
+
+  .room-bio {
+    margin-left: 0;
+    font-size: 14px;
+  }
+
+  .room-basement {
+    margin-top: 19px;
+  }
+
+  .room-wall {
+    left: -1.6ch;
+  }
+
+  .room-floor {
+    width: 78%;
+  }
+
+  .room-stair {
+    font-size: 12px;
+  }
+
+  .room-corner {
+    left: -6px;
+  }
+
+  .room-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  .text-title {
+    margin-left: 0;
+    font-size: 34px;
+  }
+
+  .room-page > .intro {
+    margin-left: 0;
+  }
+
+  .unmatched-bracket {
+    top: 66px;
+    font-size: 48px;
+  }
+
   .project-row {
-    grid-template-columns: 2.5ch minmax(0, 1fr);
+    grid-template-columns: 3ch minmax(0, 1fr);
     gap: 8px 12px;
     padding-block: 21px;
   }
@@ -694,6 +1056,10 @@ main {
   .footer-links {
     margin-top: 5px;
     gap: 18px;
+  }
+
+  .end-note {
+    margin-left: 3ch;
   }
 }
 

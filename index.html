@@ -12,8 +12,9 @@
     <meta name="twitter:card" content="summary">
     <meta name="google-site-verification" content="cI8-tVzP51W6s22dAfChvh1UZVC5UymUAidZ-FT9Nzw">
     <title>Evan Le &mdash; Hardware Designer</title>
-    <link rel="stylesheet" href="ascii.css">
+    <link rel="stylesheet" href="ascii.css?v=20261004-room">
     <script src="theme.js"></script>
+    <script src="room.js" defer></script>
     <script src="fortune-invite.js" defer></script>
     <script type="application/ld+json">
     {
@@ -43,23 +44,34 @@
             <hr class="site-rule">
         </header>
         <main id="main-content">
-            <p class="page-kicker">~/home</p>
-            <section class="home-intro" aria-labelledby="home-title">
-                <div class="hero-copy">
-                    <h1 class="hero-greeting" id="home-title">hi, i'm evan.</h1>
-                    <p class="intro">I design and build robots, printers, and workshop tools. I'm the captain and lead designer of Team 1516A.</p>
-                    <p class="subtle">CAD -&gt; prototype -&gt; test -&gt; repeat.</p>
+            <p class="page-kicker">room 001 / home</p>
+            <section class="room" data-floor="0" aria-labelledby="home-title">
+                <span class="room-corner room-corner--top" aria-hidden="true">+</span>
+                <p class="room-note room-note--ceiling">no ceiling</p>
+                <h1 class="room-name" id="home-title"><span class="first-name">evan</span> <span class="last-name">le</span></h1>
+                <p class="room-bio">I design and build robots, printers, and workshop tools.<br>Captain and lead designer of Team 1516A.</p>
+                <p class="room-gap-note">this gap is load-bearing.</p>
+                <div class="room-basement" aria-hidden="true">
+                    <span class="room-wall">|<br>|<br>|</span>
+                    <span class="room-object">o</span>
+                    <span class="room-floor">________________________________________________________</span>
+                    <span class="room-stair">__<br>  |__<br>     |</span>
                 </div>
+                <div class="room-controls">
+                    <button id="lower-floor" type="button" hidden>[ lower the floor ]</button>
+                    <span id="floor-status" aria-live="polite" aria-atomic="true">floor 0</span>
+                </div>
+                <span class="room-corner room-corner--bottom" aria-hidden="true">+</span>
             </section>
             <section aria-labelledby="selected-work-title">
                 <div class="section-heading">
-                    <h2 id="selected-work-title">[ selected work ]</h2>
+                    <h2 id="selected-work-title">things that came out of here</h2>
                     <a class="note" href="showcase.html">all work -&gt;</a>
                 </div>
                 <hr class="site-rule">
                 <ol class="project-list">
                     <li class="project-row">
-                        <span class="project-number" aria-hidden="true">01</span>
+                        <span class="project-number" aria-hidden="true">+--</span>
                         <div class="project-copy">
                             <h3><a href="grounded/">The Grounded Movement</a></h3>
                             <p>A hand-drawn story about art, freedom, and the cost of belonging. Scroll through in about a minute.</p>
@@ -69,7 +81,7 @@
                     </li>
 
                     <li class="project-row">
-                        <span class="project-number" aria-hidden="true">02</span>
+                        <span class="project-number" aria-hidden="true">+--</span>
                         <div class="project-copy">
                             <h3><a href="walk/">Rooftop Run</a></h3>
                             <p>A rooftop-running browser game.</p>
@@ -79,7 +91,7 @@
                     </li>
 
                     <li class="project-row">
-                        <span class="project-number" aria-hidden="true">03</span>
+                        <span class="project-number" aria-hidden="true">+--</span>
                         <div class="project-copy">
                             <h3><a href="toolkit/">Toolkit</a></h3>
                             <p>Design a tool or amenity that makes your workshop better, then get funding to build it.</p>
@@ -89,7 +101,7 @@
                     </li>
 
                     <li class="project-row">
-                        <span class="project-number" aria-hidden="true">04</span>
+                        <span class="project-number" aria-hidden="true">+--</span>
                         <div class="project-copy">
                             <h3><a href="https://github.com/lolwutboi987/Ninebot-Simwheel" target="_blank" rel="noopener noreferrer">Ninebot Simwheel</a></h3>
                             <p>A direct-drive sim wheel built around a Ninebot G30 motor, ODrive, and OpenFFB.</p>
@@ -99,7 +111,7 @@
                     </li>
 
                     <li class="project-row">
-                        <span class="project-number" aria-hidden="true">05</span>
+                        <span class="project-number" aria-hidden="true">+--</span>
                         <div class="project-copy">
                             <h3><a href="https://github.com/lolwutboi987/PANDA-V2" target="_blank" rel="noopener noreferrer">Panda V2</a></h3>
                             <p>A compact printer redesign focused on reliability and repeatability.</p>
@@ -110,6 +122,7 @@
                 </ol>
             </section>
         </main>
+        <p class="end-note">this edge continues somewhere else.</p>
         <footer class="site-footer">
             <p>(c) 2026 Evan Le</p>
             <nav class="footer-links" aria-label="Footer navigation">
@@ -121,9 +134,9 @@
     </div>
     <dialog class="ascii-prompt" id="fortune-invite" aria-labelledby="fortune-invite-title">
         <form method="dialog">
-            <p class="page-kicker">one small detour</p>
-            <h2 id="fortune-invite-title">open a fortune cookie?</h2>
-            <p>If you feel like it.</p>
+            <p class="page-kicker">there is something at the door</p>
+            <h2 id="fortune-invite-title">it's a fortune cookie.</h2>
+            <p>Its reasons are unclear.</p>
             <div class="prompt-actions">
                 <a class="fortune-invite__yes" href="cookie/">[ yes, obviously ]</a>
                 <button class="fortune-invite__no" value="no">[ maybe later ]</button>
