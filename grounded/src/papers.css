@@ -1,0 +1,82 @@
+/* The documents use the story's paper, ink, and lettering. */
+@layer components {
+  .papers-page .site-header { position: static; border-bottom: 1px solid var(--line); gap: 24px; }
+  .papers-page .site-header nav { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; font-size: 13px; }
+  .papers-page .site-header nav a { min-height: 44px; display: inline-flex; align-items: center; }
+  .papers-shell { position: relative; z-index: 1; max-width: 1160px; padding: 64px 48px 96px; margin-inline: auto; }
+  .papers-intro { max-width: 760px; padding-bottom: 40px; }
+  .papers-intro h1 { font-size: clamp(64px, 8vw, 112px); line-height: .95; margin-block: 20px 28px; }
+  .papers-intro > p:not(.eyebrow) { max-width: 650px; font-size: 17px; line-height: 1.8; }
+  .papers-intro > p + p { margin-top: 16px; }
+  .papers-return { display: inline-flex; align-items: center; min-height: 44px; margin-top: 16px; font-size: 14px; gap: 12px; }
+  .papers-download { display: flex; align-items: center; width: fit-content; min-height: 44px; font-size: 14px; gap: 12px; }
+  .papers-contents { border-block: 1px solid var(--ink); padding-block: 28px; margin-bottom: 64px; }
+  .papers-contents h2 { margin: 0 0 16px; font-size: 38px; transform: none; }
+  .papers-contents ol { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 48px; margin: 0; padding-left: 24px; }
+  .papers-contents li { padding-left: 6px; }
+  .papers-contents a { display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 60px; padding-block: 8px; line-height: 1.5; text-decoration: none; }
+  .papers-contents a span:first-child { text-decoration: underline; text-underline-offset: 4px; }
+  .papers-contents a span + span { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .paper-section { max-width: 760px; margin: 0 auto; padding-block: 48px 56px; border-top: 1px solid var(--line); scroll-margin-top: 24px; }
+  .paper-section:first-of-type { border-top: 0; padding-top: 0; }
+  .paper-section h2 { font-size: clamp(42px, 5vw, 64px); line-height: 1.05; margin-block: 12px 26px; }
+  .paper-meta { font: 12px/1.7 var(--mono); color: var(--muted); letter-spacing: .025em; margin-bottom: 16px; }
+  .paper-prose { font-size: 17px; line-height: 1.85; overflow-wrap: anywhere; }
+  .paper-prose p + p, .paper-prose p + ul, .paper-prose p + ol { margin-top: 18px; }
+  .paper-prose h3 { margin: 32px 0 12px; font-size: 20px; line-height: 1.5; font-weight: 600; }
+  .paper-prose h3:first-child { margin-top: 0; }
+  .paper-prose ul, .paper-prose ol { padding-left: 26px; }
+  .paper-prose li { padding-left: 5px; margin-block: 12px; }
+  .paper-prose strong { font-weight: 700; }
+  .paper-prose blockquote { font-size: clamp(28px, 3.5vw, 36px); line-height: 1.55; margin-block: 20px 36px; padding-left: 24px; border-left: 2px solid var(--gold); }
+  .sacred-passage { margin-block: 32px 40px; }
+  .sacred-passage p { font-family: var(--serif); font-size: clamp(28px, 3.5vw, 36px); line-height: 1.55; }
+  .paper-prose a { text-decoration-style: dotted; }
+  .paper-prose a:hover { text-decoration-style: solid; }
+  .paper-sources { margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; line-height: 1.7; }
+  .papers-footer { position: relative; z-index: 1; border-top: 1px solid var(--line); margin-inline: auto; max-width: 1064px; padding: 28px 24px 56px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 13px; line-height: 1.7; }
+  .papers-footer a { display: inline-flex; min-height: 44px; align-items: center; }
+  .papers-footer nav { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+  .papers-footer .colophon { flex-basis: 100%; margin-top: 12px; }
+}
+
+@layer responsive {
+  @media (max-width: 700px) {
+    .papers-page .site-header { padding: 12px 6vw; flex-wrap: wrap; gap: 4px 20px; }
+    .papers-page .site-header nav { gap: 8px 20px; font-size: 12px; }
+    .papers-shell { padding: 40px 7vw 56px; }
+    .papers-intro h1 { font-size: clamp(56px, 13vw, 82px); }
+    .papers-intro > p:not(.eyebrow), .paper-prose { font-size: 16px; line-height: 1.8; }
+    .papers-contents { margin-bottom: 40px; padding-block: 24px; }
+    .papers-contents ol { grid-template-columns: 1fr; gap: 4px; }
+    .paper-section { padding-block: 36px 40px; }
+    .paper-section h2 { font-size: 44px; }
+    .paper-meta { font-size: 11px; }
+    .paper-prose h3 { font-size: 18px; }
+    .paper-prose blockquote { padding-left: 16px; font-size: 29px; }
+  }
+  @media print {
+    @page { margin: 0.75in; }
+    .papers-page { background: white; color: black; }
+    .papers-page::before, .papers-page::after, .papers-page .site-header, .papers-footer, .papers-page .skip-link, .papers-return, .papers-download { display: none !important; }
+    .papers-shell { padding: 0; max-width: none; }
+    .papers-intro { padding-bottom: 24px; }
+    .papers-intro h1 { font-size: 40pt; transform: none; }
+    .papers-intro > p:not(.eyebrow), .paper-prose { font-size: 11pt; line-height: 1.5; }
+    .papers-contents { margin: 24px 0 0; padding-block: 16px; }
+    .papers-contents ol { grid-template-columns: 1fr 1fr; }
+    .papers-contents a { font-size: 11pt; }
+    .paper-section { max-width: none; padding: 0; border: 0; break-before: page; }
+    .paper-section h2 { font-size: 26pt; transform: none; margin-block: 8px 16px; }
+    .paper-prose h3 { font-size: 12pt; margin: 20px 0 8px; break-after: avoid; }
+    .paper-prose p + p { margin-top: 12px; }
+    .paper-prose p, .paper-prose li { orphans: 3; widows: 3; }
+    .paper-meta, .paper-sources { color: black; }
+    .paper-prose blockquote { font-size: 21pt; break-inside: avoid; }
+    .sacred-passage { margin-block: 20px; break-inside: avoid; }
+    .sacred-passage p { font-size: 20pt; line-height: 1.35; }
+    .paper-prose a { color: black; text-decoration: none; }
+    #artists-statement .paper-prose { font-size: 12pt; line-height: 1.45; }
+    .paper-sources { font-size: 10pt; line-height: 1.4; break-before: page; border: 0; margin: 0; padding: 0; }
+  }
+}
